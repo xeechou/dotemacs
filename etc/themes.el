@@ -1,2 +1,2 @@
-(load-theme 'zenburn)
+(load-theme 'zenburn t)
 
