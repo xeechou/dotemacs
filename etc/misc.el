@@ -1,3 +1,6 @@
+;;-1)set default fill column
+(setq-default fill-column 80)
+
 ;;0) save space
 (require 'saveplace)
 (setq-default save-place t)
@@ -7,7 +10,7 @@
 ;;1) default text
 (setq default-major-mode 'text-mode)
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
-(add-hook 'text-mode-hook 'spell-start)
+
 
 (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)
 
