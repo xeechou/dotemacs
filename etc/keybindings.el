@@ -6,7 +6,7 @@
   "Kill ARG line backwards"
   (interactive "p")
   (kill-line (- 1 arg)))
-(global-set-key (kbd "C-u") 'backward-kill-line) ;;`C-c u'
+(global-set-key (kbd "C-c u") 'backward-kill-line) ;;`C-c u'
 ;;************************************************************
 ;;************************************************************
 ;;************************************************************
@@ -77,7 +77,7 @@
 		    'ignore))))
   (global-auto-mark-mode 1))
 
-(global-set-key (kbd "C-c C-p") 'pop-to-mark-command)
+(global-set-key (kbd "C-c M-p") 'pop-to-mark-command)
 ;;************************************************************
 ;;****************************E*******************************
 ;;************************************************************

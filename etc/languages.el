@@ -45,7 +45,8 @@
 (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode)) auto-mode-alist))
 
 
-
+;; --3) for cmake
+(require 'cmake-mode)
 
 
 
