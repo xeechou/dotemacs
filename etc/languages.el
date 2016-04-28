@@ -2,6 +2,9 @@
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;--- 0) C and C++
+;;setup .h to c++ mode as most people did so
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+
 (setq c-default-style "linux"
       c-basic-offset 8)
 ;; auto-complete using 'irony-mode
