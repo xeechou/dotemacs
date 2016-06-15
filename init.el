@@ -39,6 +39,7 @@
 
 
 ;;;;;;;;;;;; load user configs ;;;;;;;;;;
-
+;; we don't need do anything specificly for flyspell-mode so long as
+;; you installed hunspell, make sure your emacs version is 24+
 (require 'load-dir)
 (load-dir "~/.emacs.d/etc")

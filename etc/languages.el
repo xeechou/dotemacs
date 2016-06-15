@@ -43,17 +43,26 @@
 
 ;;---1) for elisp
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
-;;---2) latex, flyche
+;;---2) latex, flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)	     
-(setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode)) auto-mode-alist))
+
 
 
 ;; --3) for cmake
 (require 'cmake-mode)
+(add-hook 'cmake-mode-hook 'company-mode)
+
+;; --4) for octave-mode
+(autoload 'octave-mode "octave" nil t)
+(setq auto-mode-alist
+      (cons '("\\*.m$" . octave-mode) auto-mode-alist))
 
 
+;; 5) org-mode flyspell
+(add-hook 'org-mode-hook 'flyspell-mode)
 
-
+;; 6) finally, text mode should have flyspell-check
+(add-hook 'text-mode-hook 'flyspell-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
