@@ -1,6 +1,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(autoload 'glsl-mode "glsl-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
+(add-hook 'glsl-mode-hook (lambda () (irony-mode 0)))
+
 ;;--- 0) C and C++
 ;;setup .h to c++ mode as most people did so
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
@@ -32,12 +37,11 @@
   '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
 
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-irony))
+;(eval-after-load 'company
+;  '(add-to-list 'company-backends 'company-irony))
 
 (setq company-minimum-prefix-length 2
-      company-idle-delay 0.3)
-
+      company-idle-delay 0.1)
 
 
 
@@ -47,22 +51,24 @@
 (add-hook 'latex-mode-hook 'flyspell-mode)	     
 
 
-
 ;; --3) for cmake
+
 (require 'cmake-mode)
 (add-hook 'cmake-mode-hook 'company-mode)
 
 ;; --4) for octave-mode
-(autoload 'octave-mode "octave" nil t)
-(setq auto-mode-alist
-      (cons '("\\*.m$" . octave-mode) auto-mode-alist))
-
+;(autoload 'octave-mode "octave" nil t)
+;(setq auto-mode-alist
+;      (cons '("\\*.m$" . octave-mode) auto-mode-alist))
 
 ;; 5) org-mode flyspell
 (add-hook 'org-mode-hook 'flyspell-mode)
 
 ;; 6) finally, text mode should have flyspell-check
 (add-hook 'text-mode-hook 'flyspell-mode)
+
+;; 7) glsl-mode
+;;(add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
