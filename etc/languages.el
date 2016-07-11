@@ -2,9 +2,7 @@
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(autoload 'glsl-mode "glsl-mode" nil t)
-(add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
-(add-hook 'glsl-mode-hook (lambda () (irony-mode 0)))
+
 
 ;;--- 0) C and C++
 ;;setup .h to c++ mode as most people did so
@@ -30,20 +28,18 @@
 ;; the packages in the official repo has problem, we have to install them manually
 (require 'irony-eldoc)
 (add-hook 'irony-mode-hook 'irony-eldoc)
-
 (add-hook 'c++-mode-hook 'flycheck-mode)
 (add-hook 'c-mode-hook 'flycheck-mode)
 (eval-after-load 'flycheck
   '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
 
-;(eval-after-load 'company
-;  '(add-to-list 'company-backends 'company-irony))
+(eval-after-load 'company
+     '(add-to-list 'company-backends 'company-irony))
+
 
 (setq company-minimum-prefix-length 2
       company-idle-delay 0.1)
-
-
 
 ;;---1) for elisp
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
@@ -68,7 +64,13 @@
 (add-hook 'text-mode-hook 'flyspell-mode)
 
 ;; 7) glsl-mode
-;;(add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+(autoload 'glsl-mode "glsl-mode" nil t)
+(add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
+
+;; 8) pkgbuild-mode
+(autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
+(add-to-list 'auto-mode-alist '("/PKGBUILD$" .pkgbuild-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
