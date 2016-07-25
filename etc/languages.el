@@ -3,6 +3,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;;--- -1) for all programming languages
+(require 'fic-mode)
+(add-hook 'prog-mode-hook 'turn-on-fic-mode)
+(add-hook 'c-mode-hook 'turn-non-fic-mode)
+(add-hook 'c++-mode-hook 'turn-non-fic-mode)
 
 ;;--- 0) C and C++
 ;;setup .h to c++ mode as most people did so
@@ -40,6 +45,8 @@
 
 (setq company-minimum-prefix-length 2
       company-idle-delay 0.1)
+
+
 
 ;;---1) for elisp
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
