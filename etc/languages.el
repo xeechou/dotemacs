@@ -37,13 +37,11 @@
   '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
 
-;(eval-after-load 'company
-;  '(add-to-list 'company-backends 'company-irony))
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
 
 (setq company-minimum-prefix-length 2
       company-idle-delay 0.1)
-
-
 
 ;;---1) for elisp
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
@@ -72,3 +70,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 8) hs-minor-mode
+(add-hook 'c-mode-common-hook   'hs-minor-mode)
+(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+(add-hook 'lisp-mode-hook       'hs-minor-mode)
+(add-hook 'perl-mode-hook       'hs-minor-mode)
+(add-hook 'sh-mode-hook         'hs-minor-mode)
