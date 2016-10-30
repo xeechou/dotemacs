@@ -30,6 +30,9 @@
  '(nrepl-message-colors
    (quote
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
+ '(package-selected-packages
+   (quote
+    (async helm-gtags zenburn-theme rust-mode org irony-eldoc ggtags flycheck-rust flycheck-irony company-jedi company-irony atom-one-dark-theme atom-dark-theme)))
  '(vc-annotate-background "#2B2B2B")
  '(vc-annotate-color-map
    (quote
