@@ -28,5 +28,3 @@
       (setq files (cdr files)))
     )
   )
-
-
