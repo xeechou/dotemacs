@@ -73,3 +73,4 @@
 ;; you installed hunspell, make sure your emacs version is 24+
 (require 'load-dir)
 (load-dir "~/.emacs.d/etc")
+
