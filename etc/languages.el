@@ -90,8 +90,20 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; 8) hs-minor-mode
+(require 'hideshow)
+(require 'sgml-mode)
+(require 'nxml-mode)
 (add-hook 'c-mode-common-hook   'hs-minor-mode)
 (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
 (add-hook 'lisp-mode-hook       'hs-minor-mode)
 (add-hook 'perl-mode-hook       'hs-minor-mode)
 (add-hook 'sh-mode-hook         'hs-minor-mode)
+;;Fix XML folding
+(add-to-list 'hs-special-modes-alist
+	     '(nxml-mode
+	       "<!--\\|<[^/>]*[^/]>"
+	       "-->\\|</[^/>]*[^/]>"
+	       "<!--"
+	       sgml-skip-tag-forward
+	       nil))
+(add-hook 'nxml-mode-hook 'hs-minor-mode)
