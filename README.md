@@ -7,6 +7,9 @@ My emacs working environment, majorly for my daily working routine
 - org mode
 - and others.
 
+To start, you need to run `package-refresh-content` once. I comment out the
+command because it is too long for a sytemd job.
+
 I installed many packages, now I use use-package to manage all my packages. Some
 of the projects require external program to work.
 
