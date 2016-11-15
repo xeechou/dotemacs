@@ -6,8 +6,8 @@
 ;;--- -1) for all programming languages
 (require 'fic-mode)
 (add-hook 'prog-mode-hook 'turn-on-fic-mode)
-(add-hook 'c-mode-hook 'turn-non-fic-mode)
-(add-hook 'c++-mode-hook 'turn-non-fic-mode)
+(add-hook 'c-mode-hook 'turn-on-fic-mode)
+(add-hook 'c++-mode-hook 'turn-on-fic-mode)
 
 ;;--- 0) C and C++
 ;;setup .h to c++ mode as most people did so
@@ -38,8 +38,8 @@
 
 (use-package irony
   :ensure t
+  :defer t  
   :init
-  :defer t
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)
   
@@ -64,8 +64,8 @@
 
 (use-package  company
   :ensure t
-  :init
   :defer t
+  :init
   (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook  'company-mode)
   (add-hook 'python-mode-hook 'company-mode)
@@ -81,7 +81,18 @@
 			     company-keywords
 			     company-yasnippet))
 	)
-  ;;;for c/c++
+  
+  (defun complete-or-indent ()
+    (interactive)
+    (if (company-manual-begin)
+	(company-complete-common)
+      (indent-according-to-mode)))
+  (defun indent-or-complete ()
+    (interactive)
+    (if (looking-at "\\_>")
+	(company-complete-common)
+      (indent-according-to-mode)))
+
   (dolist (hook '(c-mode-hook
 		  c++-mode-hook
 		  ))
@@ -99,23 +110,10 @@
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-elisp)))
-  ;;TODO add company-files to company-cmake
   (add-hook 'cmake-mode-hook
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-cmake)))
-
-  
-  (defun complete-or-indent ()
-    (interactive)
-    (if (company-manual-begin)
-	(company-complete-common)
-      (indent-according-to-mode)))
-  (defun indent-or-complete ()
-    (interactive)
-    (if (looking-at "\\_>")
-	(company-complete-common)
-      (indent-according-to-mode)))
   
   )
 
