@@ -58,7 +58,6 @@
 
 
 
-
 ;;************************************************************
 ;;****************************S*******************************
 ;;************************************************************
@@ -81,20 +80,3 @@
 ;;************************************************************
 ;;****************************E*******************************
 ;;************************************************************
-
-
-
-
-
-;;;Hide/Show minor-mode is a much better mode to work with
-(setq cm-map (make-sparse-keymap))
-(global-set-key "\M-o" cm-map)
-(define-key cm-map "t" 'hs-toggle-hiding)         ; Toggle hiding, which is very useful
-; HIDE
-(define-key cm-map "a" 'hs-hide-all)    ; Hide everything but the top-level headings
-(define-key cm-map "c" 'hs-hide-comment-region) ;Hide comment ?
-(define-key cm-map "b" 'hs-hide-block)  ; Hide the block, but you may use toggle-hiding more frequently
-; SHOW
-(define-key cm-map "A" 'hs-show-all)       ; Show (expand) everything
-(define-key cm-map "B" 'hs-show-block)     ; Show this heading's body
-

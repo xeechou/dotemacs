@@ -1,2 +1,0 @@
-(load-theme 'zenburn t)
-
