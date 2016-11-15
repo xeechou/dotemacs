@@ -15,4 +15,5 @@ of the projects require external program to work.
 
 - Irony requires cmake and libclang, you should run `irony-install-server` at any
   c/cpp file.
+- Python need to install `jedi server`, run `jedi:install-server` before using
 - ggtags requires gtags to work, you could install based on your distribution.

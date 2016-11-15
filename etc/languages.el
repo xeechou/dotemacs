@@ -39,6 +39,7 @@
 (use-package irony
   :ensure t
   :init
+  :defer t
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)
   
@@ -64,19 +65,30 @@
 (use-package  company
   :ensure t
   :init
+  :defer t
   (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook  'company-mode)
   (add-hook 'python-mode-hook 'company-mode)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
   (add-hook 'cmake-mode-hook 'company-mode)
+  :config
+  (use-package company-irony :ensure t :defer t)
+  (use-package company-jedi  :ensure t :defer t)
+  (use-package company-irony-c-headers :ensure t :defer t)
+  (setq company-minimum-prefix-length 2
+	company-idle-delay 0.1
+	company-backends  '((company-files
+			     company-keywords
+			     company-yasnippet))
+	)
   ;;;for c/c++
-  (dolist (chook '(c-mode-hook
-		  c++mode-hook))
-    (add-hook chook
+  (dolist (hook '(c-mode-hook
+		  c++-mode-hook
+		  ))
+    (add-hook hook
 	      (lambda ()
 		(add-to-list (make-local-variable 'company-backends)
-			     '(company-irony company-irony-c-headers))))
-    )
+			     '(company-irony company-irony-c-headers)))))
   ;;;for python
   (add-hook 'python-mode-hook
 	    (lambda ()
@@ -92,16 +104,7 @@
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-cmake)))
-  :config
-  (use-package company-irony :ensure t :defer t)
-  (use-package company-jedi  :ensure t :defer t)
-  (use-package company-irony-c-headers :ensure t :defer t)
-  (setq company-minimum-prefix-length 2
-	company-idle-delay 0.1
-	company-backends  '((company-files
-			     company-keywords
-			     company-yasnippet))
-	)
+
   
   (defun complete-or-indent ()
     (interactive)
@@ -195,10 +198,10 @@
 (setq cm-map (make-sparse-keymap))
 (global-set-key "\M-o" cm-map)
 (define-key cm-map "t" 'hs-toggle-hiding)         ; Toggle hiding, which is very useful
-; HIDE
+					; HIDE
 (define-key cm-map "a" 'hs-hide-all)    ; Hide everything but the top-level headings
 (define-key cm-map "c" 'hs-hide-comment-region) ;Hide comment ?
 (define-key cm-map "b" 'hs-hide-block)  ; Hide the block, but you may use toggle-hiding more frequently
-; SHOW
+					; SHOW
 (define-key cm-map "A" 'hs-show-all)       ; Show (expand) everything
 (define-key cm-map "B" 'hs-show-block)     ; Show this heading's body
