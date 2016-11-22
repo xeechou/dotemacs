@@ -80,3 +80,12 @@
 ;;************************************************************
 ;;****************************E*******************************
 ;;************************************************************
+
+
+(defun my-next-word (p)
+  "Move point to the beginning of the next word, past by any space"
+  (interactive "d")
+  (forward-word)
+  (forward-word)
+  (backward-word))
+(global-set-key "\M-f" 'my-next-word)

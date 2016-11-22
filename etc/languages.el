@@ -4,6 +4,14 @@
 
 
 ;;--- -1) for all programming languages
+(add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
+(add-hook 'c++-mode-hook 'show-paren-mode)
+(add-hook 'c-mode-hook 'show-paren-mode)
+(setq show-paren-style 'parenthesis)
+
+
+
+
 (require 'fic-mode)
 (add-hook 'prog-mode-hook 'turn-on-fic-mode)
 (add-hook 'c-mode-hook 'turn-on-fic-mode)

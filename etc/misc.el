@@ -1,6 +1,9 @@
+;;-2) delete selection mode
+(delete-selection-mode 1)
 ;;-1)set default fill column
 (setq-default fill-column 80)
-
+(setq make-backup-files nil)
+(delete-selection-mode 1)
 ;;0) save space
 (require 'saveplace)
 (setq-default save-place t)
