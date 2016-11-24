@@ -153,16 +153,6 @@
   :ensure t
   :mode (("\\.cu\\'" . cuda-mode)))
 
-(use-package org-mode
-  :ensure org
-  :mode (("\\.org$" . org-mode))
-  :config
-  (progn
-    (setq org-log-done t)
-    (setq org-agenda-files (list "~/org/work.org"
-				 "~/org/training.org"
-				 "~/org/social.org")))
-  )
 
 
 
