@@ -14,6 +14,12 @@
   (org-clock-persistence-insinuate)
 
   (setq org-default-notes-file (concat org-directory "/notes.org"))
+  ;;you have to set this before loading org-mode, really weird
+  (setq org-agenda-files (list "~/org/work.org"
+			       "~/org/training.org"
+			       "~/org/miscs.org"
+			       "~/org/today.org"))
+
 ;  (define-key global-map "\C-cc" 'org-capture)
 
   ;I am not sure this global key setting is good or not, capture stuff globally is great
@@ -22,15 +28,8 @@
   (global-set-key "\C-cb" 'org-iswitchb)
   :config
   (progn
-    (setq org-agenda-files (list "~/org/work.org"
-				 "~/org/training.org"
-				 "~/org/miscs.org"
-				 "~/org/today.org"))
     (setq org-log-done t)
-    (setq org-agenda-files (list "~/org/work.org"
-				 "~/org/training.org"
-				 "~/org/social.org"))
-
     )
   
   )
+(message "%s" org-agenda-files)
