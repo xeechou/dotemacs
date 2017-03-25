@@ -43,6 +43,13 @@
   (define-key ggtags-mode-map (kbd "M-.")     'ggtags-find-tag-dwim)
   (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
   )
+;; yasnippet
+(use-package yasnippet
+  :config
+  (yas-reload-all)
+  (add-hook 'c++-mode-hook #'yas-minor-mode)
+  (add-hook 'c-mode-hook #'yas-minor-mode)
+  )
 
 (use-package irony
   :ensure t
@@ -152,7 +159,6 @@
 (use-package cuda-mode
   :ensure t
   :mode (("\\.cu\\'" . cuda-mode)))
-
 
 
 
