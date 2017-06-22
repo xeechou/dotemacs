@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: loop image
+# key: forimg
+# --
+for (${1:int i = 0}; ${2:i < img.rows}; ${3:i++}) {
+        for(${4: int j = 0}; ${5: j < img.cols}; ${6:j++}) {
+		 $0
+	}
+}

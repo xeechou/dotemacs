@@ -88,4 +88,4 @@
   (forward-word)
   (forward-word)
   (backward-word))
-(global-set-key "\M-f" 'my-next-word)
+;;(global-set-key "\M-f" 'my-next-word)

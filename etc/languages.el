@@ -43,6 +43,7 @@
   (define-key ggtags-mode-map (kbd "M-.")     'ggtags-find-tag-dwim)
   (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
   )
+
 ;; yasnippet
 (use-package yasnippet
   :config
@@ -55,20 +56,27 @@
   :ensure t
   :defer t  
   :init
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
+  (defun avoid-issue-irony-hook ()
+    "load irony only if it is supported by irony."
+    (when (member major-mode irony-supported-major-modes)
+      (irony-mode 1))
+    (when (equal major-mode 'c++-mode)
+      (setq irony-additional-clang-options
+	    (append '("-std=c++11") irony-additional-clang-options))))
+  
+  (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
+  (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
   
   :config
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]
       'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol]
-      'irony-completion-at-point-async))
-  
-  (defun my-cpp-hook ()
-    (setq irony-additional-clang-options
-	  (append '("-std=c++11") irony-additional-clang-options)))
-  (add-hook 'c++-mode-hook 'my-cpp-hook)
+      'irony-completion-at-point-async)
+    ;; avoid enabling irony-mode in modes that inherits c-mode, e.g: php-mode
+    ;(when (if (member major-mode irony-supported-major-modes) nil
+					;    (irony-mode 0)))
+    )
   (add-hook 'irony-mode-hook 'my-irony-mode-hook)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
@@ -109,8 +117,7 @@
       (indent-according-to-mode)))
 
   (dolist (hook '(c-mode-hook
-		  c++-mode-hook
-		  ))
+		  c++-mode-hook))
     (add-hook hook
 	      (lambda ()
 		(add-to-list (make-local-variable 'company-backends)
@@ -159,8 +166,11 @@
 (use-package cuda-mode
   :ensure t
   :mode (("\\.cu\\'" . cuda-mode)))
-
-
+;;octave
+(use-package octave
+  :ensure t
+  :mode (("\\.m\\'" . octave-mode)))
+  
 
 ;; flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)	     
