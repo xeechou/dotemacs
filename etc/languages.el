@@ -48,8 +48,8 @@
 (use-package yasnippet
   :config
   (yas-reload-all)
-  (add-hook 'c++-mode-hook #'yas-minor-mode)
-  (add-hook 'c-mode-hook #'yas-minor-mode)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  (add-hook 'cmake-mode-hook #'yas-minor-mode)
   )
 
 (use-package irony
