@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: VTK setup mapper, window,interactor
+# key: setvtk
+# --
+auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+//mapper->SetInputConnection(something);
+
+//actor can manipulate the data from mapper
+auto actor = vtkSmartPointer<vtkActor>::New();
+actor->SetMapper(mapper);
+
+auto renderer = vtkSmartPointer<vtkRenderer>::New();
+renderer->AddActor(actor);
+renderer->SetBackground(0.1, 0.2, 0.4);
+renderer->ResetCamera();
+
+auto renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+renderWindow->SetSize(1000,1000);
+renderWindow->AddRenderer(renderer);
+//add the controller
+auto windowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+windowInteractor->SetRenderWindow(renderWindow);
+
+windowInteractor->Start();

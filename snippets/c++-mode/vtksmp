@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: vtkSmartPoint
+# key: vtksmp
+# --
+auto ${1:data} = vtkSmartPointer<${2:type}>::New();
