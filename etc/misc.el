@@ -5,11 +5,7 @@
 (setq make-backup-files nil)
 (delete-selection-mode 1)
 ;;0) save space
-(require 'saveplace)
-(setq-default save-place t)
-(setq save-place-file "~/.emacs.d/saved-places")
-(setq save-place-forget-unreadable-files nil)
-
+(save-place-mode 1)
 ;;1) default text
 (setq default-major-mode 'text-mode)
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
