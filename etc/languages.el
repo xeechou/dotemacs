@@ -77,6 +77,8 @@
     ;(when (if (member major-mode irony-supported-major-modes) nil
 					;    (irony-mode 0)))
     )
+  (setq company-backend (delete 'company-semantic company-backends))
+  
   (add-hook 'irony-mode-hook 'my-irony-mode-hook)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
@@ -100,6 +102,7 @@
   (use-package company-irony-c-headers :ensure t :defer t)
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
+	company-async-timeout 10
 	company-backends  '((company-files
 			     company-keywords
 			     company-yasnippet))
