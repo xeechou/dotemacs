@@ -57,7 +57,7 @@
   :defer t  
   :init
   (defun avoid-issue-irony-hook ()
-    "load irony only if it is supported by irony."
+    "load irony only if it is supported by irony. So basically do not call irony directly"
     (when (member major-mode irony-supported-major-modes)
       (irony-mode 1))
     (when (equal major-mode 'c++-mode)
@@ -66,6 +66,8 @@
   
   (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
   (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
+  ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
+  ;;shit will go wrong
   
   :config
   (defun my-irony-mode-hook ()
@@ -73,11 +75,7 @@
       'irony-completion-at-point-async)
     (define-key irony-mode-map [remap complete-symbol]
       'irony-completion-at-point-async)
-    ;; avoid enabling irony-mode in modes that inherits c-mode, e.g: php-mode
-    ;(when (if (member major-mode irony-supported-major-modes) nil
-					;    (irony-mode 0)))
     )
-  (setq company-backend (delete 'company-semantic company-backends))
   
   (add-hook 'irony-mode-hook 'my-irony-mode-hook)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
@@ -93,6 +91,7 @@
   :init
   (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook  'company-mode)
+
   (add-hook 'python-mode-hook 'company-mode)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
   (add-hook 'cmake-mode-hook 'company-mode)
