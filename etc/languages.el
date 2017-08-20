@@ -17,13 +17,16 @@
 (add-hook 'c-mode-hook 'turn-on-fic-mode)
 (add-hook 'c++-mode-hook 'turn-on-fic-mode)
 
-;;--- 0) C and C++
-;;setup .h to c++ mode as most people did so
+
+;;before use-package
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
-
+;;default C indent level
 (setq c-default-style "linux"
       c-basic-offset 8)
+
+(setq js-indent-level 2)
+
 
 (use-package ggtags
   :ensure t
@@ -53,6 +56,9 @@
   (add-hook 'cmake-mode-hook #'yas-minor-mode)
   )
 
+
+;; company 
+;;I may replace this with rtags in the future
 (use-package irony
   :ensure t
   :defer t  
@@ -86,6 +92,7 @@
     :config (add-hook 'irony-mode-hook 'irony-eldoc))
   )
 
+
 (use-package  company
   :ensure t
   :defer t
@@ -96,6 +103,7 @@
   (add-hook 'python-mode-hook 'company-mode)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
   (add-hook 'cmake-mode-hook 'company-mode)
+  (add-hook 'js-mode-hook  'company-mode)
   :config
   (use-package company-irony :ensure t :defer t)
   (use-package company-jedi  :ensure t :defer t)
@@ -135,11 +143,11 @@
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-elisp)))
+  
   (add-hook 'cmake-mode-hook
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-cmake)))
-  
   )
 
 (use-package flycheck
@@ -173,7 +181,10 @@
 (use-package octave
   :ensure t
   :mode (("\\.m\\'" . octave-mode)))
-  
+;;special javascript
+(use-package rjsx-mode
+  :ensure t
+  :mode (("\\.js\\'" . rjsx-mode)))
 
 ;; flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)	     
