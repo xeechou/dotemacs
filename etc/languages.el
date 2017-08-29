@@ -104,10 +104,12 @@
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
   (add-hook 'cmake-mode-hook 'company-mode)
   (add-hook 'js-mode-hook  'company-mode)
+  (add-hook 'lua-mode-hook 'company-mode)
   :config
   (use-package company-irony :ensure t :defer t)
   (use-package company-jedi  :ensure t :defer t)
   (use-package company-irony-c-headers :ensure t :defer t)
+  (use-package company-lua   :ensure t :defer t)
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -148,7 +150,12 @@
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-cmake)))
+  (add-hook 'lua-mode-hook
+	    (lambda ()
+	      (add-to-list (make-local-variable 'company-backends)
+			   'company-lua)))
   )
+
 
 (use-package flycheck
   :ensure t
@@ -164,6 +171,7 @@
 
 ;; cmake
 (use-package cmake-mode
+  :ensure t
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
 	 ("\\.cmake\\'" . cmake-mode)))
 ;; pkgbuild
@@ -185,6 +193,10 @@
 (use-package rjsx-mode
   :ensure t
   :mode (("\\.js\\'" . rjsx-mode)))
+
+(use-package lua-mode
+  :ensure t
+  :mode (("\\.lua$" . lua-mode)))
 
 ;; flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)	     
