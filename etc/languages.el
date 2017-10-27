@@ -59,38 +59,7 @@
 
 ;; company 
 ;;I may replace this with rtags in the future
-(use-package irony
-  :ensure t
-  :defer t  
-  :init
-  (defun avoid-issue-irony-hook ()
-    "load irony only if it is supported by irony. So basically do not call irony directly"
-    (when (member major-mode irony-supported-major-modes)
-      (irony-mode 1))
-    (when (equal major-mode 'c++-mode)
-      (setq irony-additional-clang-options
-	    (append '("-std=c++11") irony-additional-clang-options))))
-  
-  (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
-  (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
-  ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
-  ;;shit will go wrong
-  
-  :config
-  (defun my-irony-mode-hook ()
-    (define-key irony-mode-map [remap completion-at-point]
-      'irony-completion-at-point-async)
-    (define-key irony-mode-map [remap complete-symbol]
-      'irony-completion-at-point-async)
-    )
-  
-  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
-  (use-package irony-eldoc
-    :ensure t
-    :config (add-hook 'irony-mode-hook 'irony-eldoc))
-  )
 
 
 (use-package  company
@@ -106,10 +75,67 @@
   (add-hook 'js-mode-hook  'company-mode)
   (add-hook 'lua-mode-hook 'company-mode)
   :config
+  ;;irony-backend
+  (use-package irony
+    :ensure t
+    :defer t  
+    :init
+    (defun avoid-issue-irony-hook ()
+      "load irony only if it is supported by irony. So basically do not call irony directly"
+      (when (member major-mode irony-supported-major-modes)
+	(irony-mode 1))
+      (when (equal major-mode 'c++-mode)
+	(setq irony-additional-clang-options
+	      (append '("-std=c++11") irony-additional-clang-options))))
+    
+    (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
+    (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
+    ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
+    ;;shit will go wrong
+    :config
+    (defun my-irony-mode-hook ()
+      (define-key irony-mode-map [remap completion-at-point]
+	'irony-completion-at-point-async)
+      (define-key irony-mode-map [remap complete-symbol]
+	'irony-completion-at-point-async)
+      )
+    
+    (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+    (use-package irony-eldoc
+      :ensure t
+      :config (add-hook 'irony-mode-hook 'irony-eldoc))
+    )
+  ;;other packages
   (use-package company-irony :ensure t :defer t)
   (use-package company-jedi  :ensure t :defer t)
   (use-package company-irony-c-headers :ensure t :defer t)
   (use-package company-lua   :ensure t :defer t)
+  (use-package flycheck
+    :ensure t
+    :diminish flycheck-mode
+    :init
+    (add-hook 'c-mode-hook 'flycheck-mode)
+    (add-hook 'c++-mode-hook 'flycheck-mode)
+    (add-hook 'python-mode-hook 'flycheck-mode)
+    :config
+    (use-package flycheck-irony :ensure t)
+    (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+    )
+  (use-package rtags
+    :ensure t
+    :defer  t
+    :init
+    (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+    (add-hook 'c-mode-hook  'rtags-start-process-unless-running)
+    :config
+    (use-package company-rtags :ensure t :defer t)
+    (setq rtags-completions-enabled t)
+    (setq rtags-autostart-diagnostics t)
+    ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
+    )
+  
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -134,7 +160,7 @@
     (add-hook hook
 	      (lambda ()
 		(add-to-list (make-local-variable 'company-backends)
-			     '(company-irony company-irony-c-headers)))))
+			     '(company-irony company-irony-c-headers company-rtags)))))
   ;;;for python
   (add-hook 'python-mode-hook
 	    (lambda ()
@@ -157,17 +183,6 @@
   )
 
 
-(use-package flycheck
-  :ensure t
-  :diminish flycheck-mode
-  :init
-  (add-hook 'c-mode-hook 'flycheck-mode)
-  (add-hook 'c++-mode-hook 'flycheck-mode)
-  (add-hook 'python-mode-hook 'flycheck-mode)
-  :config
-  (use-package flycheck-irony :ensure t)
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
-  )
 
 ;; cmake
 (use-package cmake-mode
