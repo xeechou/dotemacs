@@ -27,7 +27,7 @@
 
 (setq js-indent-level 2)
 
-
+;;we will switch to rtags, so, this may be useless in the future
 (use-package ggtags
   :ensure t
   :init (progn
@@ -162,6 +162,8 @@
   (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
   )
 
+
+;;languages
 ;; cmake
 (use-package cmake-mode
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
