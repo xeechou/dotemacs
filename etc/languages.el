@@ -80,6 +80,9 @@
     :ensure t
     :defer t  
     :init
+    ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
+    ;;shit will go wrong
+    :config
     (defun avoid-issue-irony-hook ()
       "load irony only if it is supported by irony. So basically do not call irony directly"
       (when (member major-mode irony-supported-major-modes)
@@ -90,9 +93,7 @@
     
     (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
     (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
-    ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
-    ;;shit will go wrong
-    :config
+    
     (defun my-irony-mode-hook ()
       (define-key irony-mode-map [remap completion-at-point]
 	'irony-completion-at-point-async)
@@ -130,9 +131,9 @@
     (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
     (add-hook 'c-mode-hook  'rtags-start-process-unless-running)
     :config
-    (use-package company-rtags :ensure t :defer t)
-    (setq rtags-completions-enabled t)
-    (setq rtags-autostart-diagnostics t)
+;;    (use-package company-rtags :ensure t :defer t)
+;;    (setq rtags-completions-enabled t)
+;;    (setq rtags-autostart-diagnostics t)
     ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
     )
   
@@ -160,7 +161,7 @@
     (add-hook hook
 	      (lambda ()
 		(add-to-list (make-local-variable 'company-backends)
-			     '(company-irony company-irony-c-headers company-rtags)))))
+			     '(company-irony company-irony-c-headers)))))
   ;;;for python
   (add-hook 'python-mode-hook
 	    (lambda ()

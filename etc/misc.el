@@ -12,7 +12,7 @@
 
 
 (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)
-
+(add-hook 'before-save-hook 'whitespace-cleanup)
 
 ;; 2) autopair.el
 (require 'autopair)

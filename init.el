@@ -1,4 +1,3 @@
-
 ;; 1) this setting avoids subdirectory do not starts with letter or digit
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (let ((default-directory "~/.emacs.d/lisp/"))
@@ -30,10 +29,11 @@
 
 
 ;;now we setup themes directly in init file
-(use-package paganini-theme
+(use-package monokai-theme
   :ensure t
+  :init
+  (load-theme 'monokai t)
   :config
-  (load-theme 'paganini t)
   )
 
 
@@ -43,7 +43,7 @@
 (require 'load-dir)
 (load-dir "~/.emacs.d/etc")
 
- 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -52,7 +52,9 @@
  '(irony-additional-clang-options (quote ("-std=c++11")))
  '(package-selected-packages
    (quote
-    (company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet irony company-irony-c-headers glsl-mode paganini-theme use-package zenburn-theme rust-mode org irony-eldoc helm-gtags ggtags flycheck-rust flycheck-irony diminish company-jedi company-irony bind-key atom-one-dark-theme atom-dark-theme))))
+    (spacemacs-theme company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet irony company-irony-c-headers glsl-mode paganini-theme use-package zenburn-theme rust-mode org irony-eldoc helm-gtags ggtags flycheck-rust flycheck-irony diminish company-jedi company-irony bind-key atom-one-dark-theme atom-dark-theme)))
+ '(spacemacs-theme-comment-bg t)
+ '(spacemacs-theme-comment-italic t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
