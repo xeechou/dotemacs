@@ -223,6 +223,9 @@
 (use-package lua-mode
   :ensure t
   :mode (("\\.lua$" . lua-mode)))
+(use-package markdown-mode
+  :ensure t
+  :mode(("\\.md$" . markdown-mode)))
 
 ;; flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)
