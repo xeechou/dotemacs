@@ -1,8 +1,8 @@
 # -*- mode: snippet -*-
 # name: empty project
-# key: newproj
+# key: new
 # --
-cmake_minimum_required(VERSION 3.1.0 FATAL ERROR)
+cmake_minimum_required(VERSION 3.1.0)
 project(${1:newproj}
   VERSION 0.1
   LANGUAGES C CXX)
@@ -15,4 +15,3 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(include)
 add_subdirectory(${2:src})
-
