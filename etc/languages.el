@@ -36,7 +36,7 @@
 		      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
 			(ggtags-mode 1))))
 	  )
-  :config 
+  :config
   (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
   (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
   (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
@@ -57,7 +57,7 @@
   )
 
 
-;; company 
+;; company
 ;;I may replace this with rtags in the future
 
 
@@ -78,7 +78,7 @@
   ;;irony-backend
   (use-package irony
     :ensure t
-    :defer t  
+    :defer t
     :init
     ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
     ;;shit will go wrong
@@ -89,18 +89,18 @@
 	(irony-mode 1))
       (when (equal major-mode 'c++-mode)
 	(setq irony-additional-clang-options
-	      (append '("-std=c++11") irony-additional-clang-options))))
-    
+	      (append '("-std=c++14") irony-additional-clang-options))))
+
     (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
     (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
-    
+
     (defun my-irony-mode-hook ()
       (define-key irony-mode-map [remap completion-at-point]
 	'irony-completion-at-point-async)
       (define-key irony-mode-map [remap complete-symbol]
 	'irony-completion-at-point-async)
       )
-    
+
     (add-hook 'irony-mode-hook 'my-irony-mode-hook)
     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
@@ -136,7 +136,7 @@
 ;;    (setq rtags-autostart-diagnostics t)
     ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
     )
-  
+
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -144,7 +144,7 @@
 			     company-keywords
 			     company-yasnippet))
 	)
-  
+
   (defun complete-or-indent ()
     (interactive)
     (if (company-manual-begin)
@@ -172,7 +172,7 @@
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
 			   'company-elisp)))
-  
+
   (add-hook 'cmake-mode-hook
 	    (lambda ()
 	      (add-to-list (make-local-variable 'company-backends)
@@ -215,9 +215,12 @@
 (use-package lua-mode
   :ensure t
   :mode (("\\.lua$" . lua-mode)))
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md$" . markdown-mode)))
 
 ;; flyspell
-(add-hook 'latex-mode-hook 'flyspell-mode)	     
+(add-hook 'latex-mode-hook 'flyspell-mode)
 ;; 5) org-mode flyspell
 (add-hook 'org-mode-hook 'flyspell-mode)
 
