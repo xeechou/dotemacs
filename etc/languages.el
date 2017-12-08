@@ -83,14 +83,25 @@
     ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
     ;;shit will go wrong
     :config
+    ;;enable the windows system bindings
+    (if (string-equal system-type "windows-nt")
+	(progn
+	    (setq w32-pipe-read-delay 0)
+	    (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
+      )
     (defun avoid-issue-irony-hook ()
       "load irony only if it is supported by irony. So basically do not call irony directly"
       (when (member major-mode irony-supported-major-modes)
 	(irony-mode 1))
       (when (equal major-mode 'c++-mode)
 	(setq irony-additional-clang-options
+<<<<<<< HEAD
 	      (append '("-std=c++14") irony-additional-clang-options))))
 
+=======
+	      (append '("-std=c++11") irony-additional-clang-options)))
+      )
+>>>>>>> ce64c4f2c101b6eee3dff0be2174de1735cd58f9
     (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
     (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
 
@@ -124,6 +135,7 @@
     (use-package flycheck-irony :ensure t)
     (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
     )
+  (if (not (string-equal system-type "windows-nt"))
   (use-package rtags
     :ensure t
     :defer  t
@@ -136,6 +148,10 @@
 ;;    (setq rtags-autostart-diagnostics t)
     ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
     )
+<<<<<<< HEAD
+=======
+  )
+>>>>>>> ce64c4f2c101b6eee3dff0be2174de1735cd58f9
 
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
