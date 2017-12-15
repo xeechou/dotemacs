@@ -95,13 +95,9 @@
 	(irony-mode 1))
       (when (equal major-mode 'c++-mode)
 	(setq irony-additional-clang-options
-<<<<<<< HEAD
-	      (append '("-std=c++14") irony-additional-clang-options))))
-
-=======
-	      (append '("-std=c++11") irony-additional-clang-options)))
+	      (append '("-std=c++14") irony-additional-clang-options)))
       )
->>>>>>> ce64c4f2c101b6eee3dff0be2174de1735cd58f9
+
     (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
     (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
 
@@ -148,10 +144,7 @@
 ;;    (setq rtags-autostart-diagnostics t)
     ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
     )
-<<<<<<< HEAD
-=======
   )
->>>>>>> ce64c4f2c101b6eee3dff0be2174de1735cd58f9
 
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
