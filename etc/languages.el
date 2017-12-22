@@ -99,8 +99,9 @@
 	(irony-mode 1))
       (when (equal major-mode 'c++-mode)
 	(setq irony-additional-clang-options
-	      (append '("-std=c++11") irony-additional-clang-options)))
+	      (append '("-std=c++14") irony-additional-clang-options)))
       )
+
     (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
     (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
 
@@ -229,7 +230,7 @@
   :mode (("\\.lua$" . lua-mode)))
 (use-package markdown-mode
   :ensure t
-  :mode(("\\.md$" . markdown-mode)))
+  :mode (("\\.md$" . markdown-mode)))
 
 ;; flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)
