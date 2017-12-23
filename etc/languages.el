@@ -7,6 +7,10 @@
 (add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
 (add-hook 'c++-mode-hook 'show-paren-mode)
 (add-hook 'c-mode-hook 'show-paren-mode)
+(add-hook 'c-mode-common-hook
+	  (lambda()
+	    (c-set-offset 'inextern-lang 0)))
+
 (setq show-paren-style 'parenthesis)
 
 
