@@ -19,7 +19,7 @@
 
 
 ;;before use-package
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '(".h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
 ;;default C indent level
 (setq c-default-style "linux"
@@ -132,19 +132,19 @@
     (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
     )
   (if (not (string-equal system-type "windows-nt"))
-  (use-package rtags
-    :ensure t
-    :defer  t
-    :init
-    (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-    (add-hook 'c-mode-hook  'rtags-start-process-unless-running)
-    :config
-;;    (use-package company-rtags :ensure t :defer t)
-;;    (setq rtags-completions-enabled t)
-;;    (setq rtags-autostart-diagnostics t)
-    ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
+      (use-package rtags
+	:ensure t
+	:defer  t
+	:init
+	(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+	(add-hook 'c-mode-hook  'rtags-start-process-unless-running)
+	:config
+	;;    (use-package company-rtags :ensure t :defer t)
+	;;    (setq rtags-completions-enabled t)
+	;;    (setq rtags-autostart-diagnostics t)
+	;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
+	)
     )
-  )
 
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
