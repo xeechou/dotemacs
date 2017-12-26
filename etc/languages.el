@@ -23,7 +23,7 @@
 
 
 ;;before use-package
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '(".h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
 ;;default C indent level
 (setq c-default-style "linux"
