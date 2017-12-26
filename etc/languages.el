@@ -32,25 +32,6 @@
 (setq js-indent-level 2)
 
 ;;we will switch to rtags, so, this may be useless in the future
-(use-package ggtags
-  :ensure t
-  :init (progn
-	  (add-hook 'c-mode-common-hook
-		    (lambda ()
-		      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-			(ggtags-mode 1))))
-	  )
-  :config
-  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
-  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
-  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
-  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
-  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
-  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
-
-  (define-key ggtags-mode-map (kbd "M-.")     'ggtags-find-tag-dwim)
-  (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark)
-  )
 
 ;; yasnippet
 (use-package yasnippet
@@ -128,27 +109,52 @@
     :ensure t
     :diminish flycheck-mode
     :init
+    (setq flycheck-clang-language-standard "c++14")
     (add-hook 'c-mode-hook 'flycheck-mode)
     (add-hook 'c++-mode-hook 'flycheck-mode)
     (add-hook 'python-mode-hook 'flycheck-mode)
     :config
+    ;(use-package flycheck-rtags :ensure t)
+
+    (defun my-flycheck-setup ()
+      (flycheck-select-checker 'rtags)
+      (setq-local flycheck-highlighting-mode nil)
+      (setq-local flycheck-check-syntax-automatically nil)
+      )
+    ;(add-hook 'c-mode-hook 'my-flycheck-setup)
+    ;(add-hook 'c++-mode-hook 'my-flycheck-setup)
     (use-package flycheck-irony :ensure t)
     (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+
     )
   (if (not (string-equal system-type "windows-nt"))
-  (use-package rtags
-    :ensure t
-    :defer  t
-    :init
-    (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-    (add-hook 'c-mode-hook  'rtags-start-process-unless-running)
-    :config
-;;    (use-package company-rtags :ensure t :defer t)
-;;    (setq rtags-completions-enabled t)
-;;    (setq rtags-autostart-diagnostics t)
-    ;;    (rtags-enable-standard-keybindings c-mode-base-map "C-cr")
+      (use-package rtags
+	:ensure t
+	:defer  t
+	:init
+	(defun my-close-rtags-taglist ()
+	  "close rtags-tagslist when in the taglist"
+	  (interactive)
+	  (windmove-right)
+	  (rtags-close-taglist)
+	  )
+	(add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+	(add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+	:config
+	;;define the keybindings
+	(define-key rtags-taglist-mode-map (kbd "q") 'my-close-rtags-taglist)
+	(define-key c-mode-base-map (kbd "C-x t") 'rtags-taglist)
+	(define-key c-mode-base-map (kbd "M-,") 'rtags-find-references-at-point)
+	(define-key c-mode-base-map (kbd "M-.") 'rtags-find-symbol-at-point)
+	(rtags-enable-standard-keybindings)
+	;setup the completion, rtags completion is very ustable, just use irony
+	;(setq rtags-autostart-diagnostics t)
+	;(rtags-diagnostics)
+	;(setq rtags-completions-enabled t)
+	;(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
+	)
     )
-  )
+  ;; (use-package company-rtags :ensure t :defer t)
 
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
@@ -236,7 +242,6 @@
 (add-hook 'latex-mode-hook 'flyspell-mode)
 ;; 5) org-mode flyspell
 (add-hook 'org-mode-hook 'flyspell-mode)
-
 ;; 6) finally, text mode should have flyspell-check
 (add-hook 'text-mode-hook 'flyspell-mode)
 
