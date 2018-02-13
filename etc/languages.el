@@ -135,7 +135,9 @@
 	:ensure t
 	:defer  t
 	:init
-	(setq rtags-path "/home/xichen-local/.bin/")
+	(unless (file-exists-p "/usr/bin/rdm")
+	  (setq rtags-path (concat (getenv "HOME") "/.bin/"))
+	  )
 	(defun my-close-rtags-taglist ()
 	  "close rtags-tagslist when in the taglist"
 	  (interactive)
