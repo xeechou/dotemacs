@@ -35,6 +35,7 @@
 
 ;; yasnippet
 (use-package yasnippet
+  :ensure t
   :config
   (yas-reload-all)
   (add-hook 'prog-mode-hook #'yas-minor-mode)
@@ -80,7 +81,8 @@
 	(irony-mode 1))
       (when (equal major-mode 'c++-mode)
 	(setq irony-additional-clang-options
-	      (append '("-std=c++14") irony-additional-clang-options)))
+	      (delete-dups
+	       (append '("-std=c++14") irony-additional-clang-options))))
       )
 
     (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
@@ -102,9 +104,10 @@
     )
   ;;other packages
   (use-package company-irony :ensure t :defer t)
-  (use-package company-jedi  :ensure t :defer t)
   (use-package company-irony-c-headers :ensure t :defer t)
   (use-package company-lua   :ensure t :defer t)
+  (use-package company-jedi  :ensure t :defer t)
+
   (use-package flycheck
     :ensure t
     :diminish flycheck-mode
@@ -132,6 +135,7 @@
 	:ensure t
 	:defer  t
 	:init
+	(setq rtags-path "/home/xichen-local/.bin/")
 	(defun my-close-rtags-taglist ()
 	  "close rtags-tagslist when in the taglist"
 	  (interactive)
