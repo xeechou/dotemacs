@@ -112,11 +112,16 @@
     :ensure t
     :diminish flycheck-mode
     :init
-    (setq flycheck-clang-language-standard "c++14")
+
     (add-hook 'c-mode-hook 'flycheck-mode)
     (add-hook 'c++-mode-hook 'flycheck-mode)
     (add-hook 'python-mode-hook 'flycheck-mode)
     :config
+    (when (equal major-mode 'c++-mode)
+      (setq flycheck-clang-language-standard "c++14"))
+    (when (equal major-mode 'c-mode)
+      (setq flycheck-clang-language-standard "c11"))
+;;    (setq flycheck-clang-language-standard "c++14")    )
     ;(use-package flycheck-rtags :ensure t)
 
     (defun my-flycheck-setup ()
@@ -220,7 +225,7 @@
 ;; pkgbuild
 (use-package pkgbuild-mode
   :ensure t
-  :mode (("/PKGBUILD$" . pkgbuild-mode)))
+  :mode (("/PKGBUILD\\'" . pkgbuild-mode)))
 ;; glsl
 (use-package glsl-mode
   :ensure t
@@ -239,10 +244,15 @@
 
 (use-package lua-mode
   :ensure t
-  :mode (("\\.lua$" . lua-mode)))
+  :mode (("\\.lua\\'" . lua-mode)))
 (use-package markdown-mode
   :ensure t
-  :mode (("\\.md$" . markdown-mode)))
+  :mode (("\\.md\\'" . markdown-mode)))
+(use-package jam-mode
+  :ensure t
+  :mode (("\\.v2\\'" . jam-mode)
+	 ("/Jamfile\\." . jam-mode)
+	 ("\\.jam\\'" . jam-mode)))
 
 ;; flyspell
 (add-hook 'latex-mode-hook 'flyspell-mode)
