@@ -7,31 +7,26 @@
 (add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
 (add-hook 'c++-mode-hook 'show-paren-mode)
 (add-hook 'c-mode-hook 'show-paren-mode)
-(add-hook 'c-mode-common-hook
-	  (lambda()
-	    (c-set-offset 'inextern-lang 0)))
-
 (setq show-paren-style 'parenthesis)
 
-
-
-
-(require 'fic-mode)
-(add-hook 'prog-mode-hook 'turn-on-fic-mode)
-(add-hook 'c-mode-hook 'turn-on-fic-mode)
-(add-hook 'c++-mode-hook 'turn-on-fic-mode)
-
-
-;;before use-package
-(add-to-list 'auto-mode-alist '(".h$" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
+(add-hook 'c-mode-common-hook (lambda()
+				(c-set-offset 'inextern-lang 0)
+				(c-set-offset 'innamespace 0)))
 ;;default C indent level
 (setq c-default-style "linux"
       c-basic-offset 8)
+;;before use-package
+(add-to-list 'auto-mode-alist '(".h$" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
 
-(setq js-indent-level 2)
 
-;;we will switch to rtags, so, this may be useless in the future
+(use-package fic-mode
+  :load-path "lisp/"
+  :config
+  (add-hook 'prog-mode-hook 'turn-on-fic-mode)
+  (add-hook 'c-mode-hook 'turn-on-fic-mode)
+  (add-hook 'c++-mode-hook 'turn-on-fic-mode)
+  )
 
 ;; yasnippet
 (use-package yasnippet
@@ -41,7 +36,6 @@
   (add-hook 'prog-mode-hook #'yas-minor-mode)
   (add-hook 'cmake-mode-hook #'yas-minor-mode)
   )
-
 
 ;; company
 (use-package  company
@@ -144,19 +138,22 @@
 	  :init
 	  (unless (file-exists-p "/usr/bin/rdm")
 	    (setq rtags-path (concat (getenv "HOME") "/.bin/"))
+	    (setq rtags-close-taglist-on-selection t)
 	    )
 	  (defun my-close-rtags-taglist ()
 	    "close rtags-tagslist when in the taglist"
 	    (interactive)
 	    (windmove-right)
 	    (rtags-close-taglist)
+	    (kill-buffer "*RTags*")
 	    )
 	  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
 	  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
 	  :config
 	  ;;define the keybindings
-	  (define-key rtags-taglist-mode-map (kbd "q") 'my-close-rtags-taglist)
-	  (define-key c-mode-base-map (kbd "C-x t") 'rtags-taglist)
+	  ;; Je n'aime pas le rtags-taglist, il a trop des etiquette que J'ai besoin.
+	  ;; (define-key rtags-taglist-mode-map (kbd "q") 'my-close-rtags-taglist)
+	  ;; (define-key c-mode-base-map (kbd "C-x t") 'rtags-taglist)
 	  (define-key c-mode-base-map (kbd "M-,") 'rtags-find-references-at-point)
 	  (define-key c-mode-base-map (kbd "M-.") 'rtags-find-symbol-at-point)
 	  (rtags-enable-standard-keybindings)
@@ -240,6 +237,7 @@
   :ensure t
   :mode (("\\.m\\'" . octave-mode)))
 ;;special javascript
+(setq js-indent-level 2)
 (use-package rjsx-mode
   :ensure t
   :mode (("\\.js\\'" . rjsx-mode)))

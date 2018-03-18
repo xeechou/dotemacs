@@ -1,5 +1,9 @@
 irony/*
 elpa/*
-
+.python-environments/*
 saved-places
+places
+recentf
 auto-save-list/*
+network-security.data
+org-clock-save.el
