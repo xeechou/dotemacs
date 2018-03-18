@@ -36,8 +36,9 @@
   (add-hook 'prog-mode-hook #'yas-minor-mode)
   (add-hook 'cmake-mode-hook #'yas-minor-mode)
   )
-
-;; company
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;company;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package  company
   :ensure t
   :defer t
@@ -80,13 +81,15 @@
     (add-hook 'c++-mode-hook 'flycheck-mode)
     (add-hook 'python-mode-hook 'flycheck-mode)
     :config
-    (when (equal major-mode 'c++-mode)
-      (setq flycheck-clang-language-standard "c++14"))
-    (when (equal major-mode 'c-mode)
-      (setq flycheck-clang-language-standard "c11"))
-
-    (use-package flycheck-irony :ensure t)
-    (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+    (use-package flycheck-irony
+      :ensure t
+      :config
+      (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+      (when (equal major-mode 'c++-mode)
+	(setq flycheck-clang-language-standard "c++14"))
+      (when (equal major-mode 'c-mode)
+	(setq flycheck-clang-language-standard "c11"))
+      )
     )
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; C++ setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package irony
@@ -103,7 +106,7 @@
 	    (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
       )
     (defun avoid-issue-irony-hook ()
-      "load irony only if it is supported by irony. So basically do not call irony directly"
+      "load irony only if it is supported by irony."
       (when (member major-mode irony-supported-major-modes)
 	(irony-mode 1))
       (when (equal major-mode 'c++-mode)
@@ -135,33 +138,25 @@
 	(use-package rtags
 	  :ensure t
 	  :defer  t
-	  :init
-	  (unless (file-exists-p "/usr/bin/rdm")
-	    (setq rtags-path (concat (getenv "HOME") "/.bin/"))
-	    (setq rtags-close-taglist-on-selection t)
-	    )
-	  (defun my-close-rtags-taglist ()
-	    "close rtags-tagslist when in the taglist"
-	    (interactive)
-	    (windmove-right)
-	    (rtags-close-taglist)
-	    (kill-buffer "*RTags*")
-	    )
+	  :config
 	  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
 	  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-	  :config
+	  (unless (file-exists-p "/usr/bin/rdm")
+	    (setq rtags-path (concat (getenv "HOME") "/.bin/"))
+	    )
+	  ;; (defun my-close-rtags-taglist ()
+	  ;;   "close rtags-tagslist when in the taglist"
+	  ;;   (interactive)
+	  ;;   (windmove-right)
+	  ;;   (rtags-close-taglist)
+	  ;;   (kill-buffer "*RTags*")
+	  ;;   )
 	  ;;define the keybindings
 	  ;; Je n'aime pas le rtags-taglist, il a trop des etiquette que J'ai besoin.
 	  ;; (define-key rtags-taglist-mode-map (kbd "q") 'my-close-rtags-taglist)
 	  ;; (define-key c-mode-base-map (kbd "C-x t") 'rtags-taglist)
 	  (define-key c-mode-base-map (kbd "M-,") 'rtags-find-references-at-point)
 	  (define-key c-mode-base-map (kbd "M-.") 'rtags-find-symbol-at-point)
-	  (rtags-enable-standard-keybindings)
-					;setup the completion, rtags completion is very ustable, just use irony
-					;(setq rtags-autostart-diagnostics t)
-					;(rtags-diagnostics)
-					;(setq rtags-completions-enabled t)
-					;(define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
 	  )
       )
     )
@@ -213,7 +208,7 @@
 
 
 ;;languages
-;; cmake
+;;cmake
 (use-package cmake-mode
   :ensure t
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)

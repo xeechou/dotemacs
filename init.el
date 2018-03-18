@@ -54,9 +54,8 @@
  '(irony-additional-clang-options (quote ("-std=c++11")))
  '(package-selected-packages
    (quote
-    (jedi-direx jam-mode yasnippet-snippets flycheck-rtags ironyt markdown-mode spacemacs-theme company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet irony company-irony-c-headers glsl-mode paganini-theme use-package zenburn-theme rust-mode org irony-eldoc helm-gtags ggtags flycheck-rust flycheck-irony diminish company-jedi company-irony bind-key atom-one-dark-theme atom-dark-theme)))
- '(spacemacs-theme-comment-bg t)
- '(spacemacs-theme-comment-italic t))
+    (jedi-direx jam-mode yasnippet-snippets flycheck-rtags ironyt markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet irony company-irony-c-headers glsl-mode paganini-theme use-package zenburn-theme rust-mode org irony-eldoc helm-gtags ggtags flycheck-rust flycheck-irony diminish company-jedi company-irony bind-key )))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

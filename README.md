@@ -1,4 +1,4 @@
-#My personal emacs configurations
+# My personal emacs configurations
 
 My emacs working environment, majorly for my daily working routine
 - C/C++
@@ -17,3 +17,12 @@ of the projects require external program to work.
   c/cpp file.
 - Python need to install `jedi server`, run `jedi:install-server` before using
 - ggtags requires gtags to work, you could install based on your distribution.
+
+
+
+### Issues happend
+- when I put some command hook in `:init` section with `use-package`, somehow I
+  broke the `match-string` function.
+- loading `irony-mode` only at `c` and `c++`, because **php** in emacs is also a
+  cc-mode.
+- `rdm-mode` is really buggy.
