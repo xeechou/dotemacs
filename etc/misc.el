@@ -22,3 +22,17 @@
 ;; 3) add line numbers in, so I can jump to the line
 (add-hook 'find-file-hook (lambda () (linum-mode t)))
 (setq linum-format "%4d\u2502")
+
+;; flyspell
+(cond
+ ((executable-find "aspell")
+  (setq ispell-program-name "aspell"))
+ ((executable-find "hunspell")
+  (setq ispell-program-name "hunspell"))
+ )
+(setq flyspell-issue-message-flag nil)
+(add-hook 'latex-mode-hook 'flyspell-mode)
+;; 5) org-mode flyspell
+(add-hook 'org-mode-hook 'flyspell-mode)
+;; 6) finally, text mode should have flyspell-check
+(add-hook 'text-mode-hook 'flyspell-mode)
