@@ -250,6 +250,7 @@
 	 ("\\.jam\\'" . jam-mode)))
 
 ;; flyspell
+(setq flyspell-issue-message-flag nil)
 (add-hook 'latex-mode-hook 'flyspell-mode)
 ;; 5) org-mode flyspell
 (add-hook 'org-mode-hook 'flyspell-mode)
