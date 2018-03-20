@@ -24,15 +24,30 @@
 (setq linum-format "%4d\u2502")
 
 ;; flyspell
-(cond
- ((executable-find "aspell")
-  (setq ispell-program-name "aspell"))
- ((executable-find "hunspell")
-  (setq ispell-program-name "hunspell"))
- )
 (setq flyspell-issue-message-flag nil)
+(defun spell-switch-dictionary()
+  (interactive)
+  (let* ((dic ispell-current-dictionary)
+	 (change (if (string= dic "francais") "english" "francais")))
+    (ispell-change-dictionary change)
+    (message "Dictionary switched from %s to %s" dic change)
+    ))
+(global-set-key (kbd "<f8>")   'spell-switch-dictionary)
 (add-hook 'latex-mode-hook 'flyspell-mode)
-;; 5) org-mode flyspell
 (add-hook 'org-mode-hook 'flyspell-mode)
-;; 6) finally, text mode should have flyspell-check
 (add-hook 'text-mode-hook 'flyspell-mode)
+;;  ((executable-find "hunspell")
+;;   (setq ispell-program-name "hunspell")
+;;   (setq ispell-local-dictionary "en_US")
+;;   ;; ispell-set-spellchecker-params has to be called
+;;   ;; before ispell-hunspell-add-multi-dic will work
+;;   ;;(ispell-set-spellchecker-params)
+;; ;;  (ispell-hunspell-add-multi-dic "en_US,fr_CA")
+;;   )
+;;  ((executable-find "aspell")
+;;   (setq ispell-program-name "aspell"))
+;;  )
+
+;; 5) org-mode flyspell
+
+;; 6) finally, text mode should have flyspell-check
