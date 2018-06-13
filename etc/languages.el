@@ -249,6 +249,10 @@
 	 ("/Jamfile\\." . jam-mode)
 	 ("\\.jam\\'" . jam-mode)))
 
+(use-package rust-mode
+  :ensure t
+  :mode (("\\.rs\\'" . rust-mode)))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -265,6 +269,7 @@
 (add-hook 'lisp-mode-hook       'hs-minor-mode)
 (add-hook 'perl-mode-hook       'hs-minor-mode)
 (add-hook 'sh-mode-hook         'hs-minor-mode)
+(add-hook 'rust-mode-hook       'hs-minor-mode)
 
 ;;Fix XML folding
 (add-to-list 'hs-special-modes-alist
