@@ -53,6 +53,7 @@
   (add-hook 'lua-mode-hook 'company-mode)
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -92,74 +93,33 @@
       )
     )
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; C++ setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package irony
+  (use-package ccls
     :ensure t
     :defer t
+    :commands (lsp-ccls-enable)
     :init
-    ;;if I add this line: (delete 'c++-mode-hook 'company-senmatic-backend)
-    ;;shit will go wrong
+    (defun my-ccls-enable ()
+      (condition-case nil
+	  (lsp-ccls-enable)
+      (user-error nil))
+      )
+    (add-hook 'c-mode-hook 'my-ccls-enable)
+    (add-hook 'c++-mode-hook 'my-ccls-enable)
     :config
-    ;;enable the windows system bindings
-    (if (string-equal system-type "windows-nt")
-	(progn
-	    (setq w32-pipe-read-delay 0)
-	    (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
-      )
-    (defun avoid-issue-irony-hook ()
-      "load irony only if it is supported by irony."
-      (when (member major-mode irony-supported-major-modes)
-	(irony-mode 1))
-      (when (equal major-mode 'c++-mode)
-	(setq irony-additional-clang-options
-	      (delete-dups
-	       (append '("-std=c++14") irony-additional-clang-options))))
-      )
+    (setq ccls-executable "~/.bin/ccls")
+    (setq ccls-extra-init-params
+	  '(:clang (:extraArgs ("-D__cpp_deduction_guides=0" "-Wno-macro-redefined"))
+		   ))
+    ;;there should be other settings. I need to get it work first
+    (with-eval-after-load 'projectile
+      (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
 
-    (add-hook 'c++-mode-hook 'avoid-issue-irony-hook)
-    (add-hook 'c-mode-hook 'avoid-issue-irony-hook)
-
-    (defun my-irony-mode-hook ()
-      (define-key irony-mode-map [remap completion-at-point]
-	'irony-completion-at-point-async)
-      (define-key irony-mode-map [remap complete-symbol]
-	'irony-completion-at-point-async)
-      )
-
-    (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-    (use-package irony-eldoc
-      :ensure t
-      :config (add-hook 'irony-mode-hook 'irony-eldoc))
-    (use-package company-irony :ensure t :defer t)
-    (use-package company-irony-c-headers :ensure t :defer t)
-    ;;;;;setup the Rtags as well in the irony
-    (if (not (string-equal system-type "windows-nt"))
-	(use-package rtags
-	  :ensure t
-	  :defer  t
-	  :config
-	  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-	  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-	  (unless (file-exists-p "/usr/bin/rdm")
-	    (setq rtags-path (concat (getenv "HOME") "/.bin/"))
-	    )
-	  ;; (defun my-close-rtags-taglist ()
-	  ;;   "close rtags-tagslist when in the taglist"
-	  ;;   (interactive)
-	  ;;   (windmove-right)
-	  ;;   (rtags-close-taglist)
-	  ;;   (kill-buffer "*RTags*")
-	  ;;   )
-	  ;;define the keybindings
-	  ;; Je n'aime pas le rtags-taglist, il a trop des etiquette que J'ai besoin.
-	  ;; (define-key rtags-taglist-mode-map (kbd "q") 'my-close-rtags-taglist)
-	  ;; (define-key c-mode-base-map (kbd "C-x t") 'rtags-taglist)
-	  (define-key c-mode-base-map (kbd "M-,") 'rtags-find-references-at-point)
-	  (define-key c-mode-base-map (kbd "M-.") 'rtags-find-symbol-at-point)
-	  )
-      )
+    (use-package company-c-headers :ensure t :defer t)
+    (use-package company-lsp :ensure t :defer t)
+    (require 'lsp-imenu)
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
     )
+
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; python setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package company-jedi
     :ensure t
@@ -170,7 +130,7 @@
     :bind (:map python-mode-map
 		("M-," . jedi:goto-definition)
 		("M-." . jedi:goto-definition-next)
-	   )
+		)
     )
   ;;other packages
   (use-package company-lua   :ensure t :defer t)
@@ -182,7 +142,7 @@
     (add-hook hook
 	      (lambda ()
 		(add-to-list (make-local-variable 'company-backends)
-			     '(company-irony company-irony-c-headers)))))
+			     '(company-lsp company-c-headers)))))
   ;;;for python
   (add-hook 'python-mode-hook
 	    (lambda ()
@@ -252,6 +212,10 @@
 (use-package rust-mode
   :ensure t
   :mode (("\\.rs\\'" . rust-mode)))
+
+(use-package graphviz-dot-mode
+  :ensure t
+  :mode (("\\.dot\\'" . graphviz-dot-mode)))
 
 
 

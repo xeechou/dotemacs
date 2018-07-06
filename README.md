@@ -26,3 +26,8 @@ of the projects require external program to work.
 - loading `irony-mode` only at `c` and `c++`, because **php** in emacs is also a
   cc-mode.
 - `rdm-mode` is really buggy.
+
+
+### switch to lsp-mode + ccls-emacs
+required `ccls` package, for archlinux, go for ccls-git, for `ubuntu` and other
+distros, compile and and move to `$PATH`.
