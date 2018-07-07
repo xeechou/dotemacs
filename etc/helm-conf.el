@@ -1,8 +1,10 @@
 (use-package helm
+  :commands (helm-imenu)
   :ensure helm
-  :init	(progn
+  :init		(progn
 		  (require 'helm-config)
 		  (require 'helm-grep)
+		  (require 'helm-imenu)
 					;define this minibuffer function
 		  (defun helm-hide-minibuffer-maybe ()
 		    (when (with-helm-buffer helm-echo-input-in-header-line)
@@ -18,12 +20,13 @@
 		  (helm-mode 1)
 		  )
 
-  :bind	( ("M-x" . helm-M-x)
+  :bind		( ("M-x" . helm-M-x)
 		  ("M-y" . helm-show-kill-ring)
 		  ("C-x b" . helm-buffers-list)
 		  ("C-x C-f" . helm-find-files)
 		  ("C-c r" . helm-recentf)
 		  ("C-c h o" . helm-occur)
+		  ("C-x t" . helm-imenu)
 		  ;;a key-map
 		  :map helm-map
 		  ("<tab>" . helm-execute-persistent-action)
@@ -36,6 +39,7 @@
 		  :map minibuffer-local-map
 		  ("M-p" . helm-minibuffer-history)
 		  ("M-n" . helm-minibuffer-history)
+
 		 ; :map help
 		 ; ("C-f" . helm-apropos)
 		 ; ("r"   . helm-info-emacs)
