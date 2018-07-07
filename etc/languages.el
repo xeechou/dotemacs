@@ -29,7 +29,7 @@
   )
 
 ;; yasnippet
-(use-package yasnippet
+(use-package yasnippet-snippets
   :ensure t
   :config
   (yas-reload-all)
