@@ -1,3 +1,4 @@
+(display-time)
 ;; 1) this setting avoids subdirectory do not starts with letter or digit
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (let ((default-directory "~/.emacs.d/lisp/"))
