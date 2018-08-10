@@ -52,7 +52,7 @@
  '(irony-additional-clang-options (quote ("-std=c++11")))
  '(package-selected-packages
    (quote
-    (auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags ironyt markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet irony company-irony-c-headers glsl-mode paganini-theme use-package zenburn-theme rust-mode org irony-eldoc helm-gtags ggtags flycheck-rust flycheck-irony diminish company-jedi company-irony bind-key)))
+    (counsel ivy lsp-ui flycheck-irony auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags ironyt markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode paganini-theme use-package zenburn-theme rust-mode org helm-gtags ggtags flycheck-rust diminish company-jedi bind-key)))
  '(safe-local-variable-values
    (quote
     ((eval c-set-offset

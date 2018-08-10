@@ -73,25 +73,6 @@
 	(company-complete-common)
       (indent-according-to-mode)))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;setting up flycheck;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package flycheck
-    :ensure t
-    :diminish flycheck-mode
-    :init
-    (add-hook 'c-mode-hook 'flycheck-mode)
-    (add-hook 'c++-mode-hook 'flycheck-mode)
-    (add-hook 'python-mode-hook 'flycheck-mode)
-    :config
-    (use-package flycheck-irony
-      :ensure t
-      :config
-      (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
-      (when (equal major-mode 'c++-mode)
-	(setq flycheck-clang-language-standard "c++14"))
-      (when (equal major-mode 'c-mode)
-	(setq flycheck-clang-language-standard "c11"))
-      )
-    )
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; C++ setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package ccls
     :ensure t
@@ -113,11 +94,28 @@
     ;;there should be other settings. I need to get it work first
     (with-eval-after-load 'projectile
       (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
-
     (use-package company-c-headers :ensure t :defer t)
     (use-package company-lsp :ensure t :defer t)
     (require 'lsp-imenu)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;setting up flycheck;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (use-package flycheck
+      :ensure t
+      :diminish flycheck-mode
+      :init
+      (add-hook 'c-mode-hook 'flycheck-mode)
+      (add-hook 'c++-mode-hook 'flycheck-mode)
+      (add-hook 'python-mode-hook 'flycheck-mode)
+      (add-hook 'ccls-mode-hook 'flycheck-mode)
+      :config
+      )
+    )
+
+  (use-package lsp-ui
+    :ensure t
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
     )
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; python setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
