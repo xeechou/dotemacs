@@ -4,7 +4,7 @@
 (let ((default-directory "~/.emacs.d/lisp/"))
     (normal-top-level-add-subdirs-to-load-path))
 
-
+;;(setq warning-minimum-level :error)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;; MELPA ;;;;;;;;;;;;;;;;;;;;;;;;;

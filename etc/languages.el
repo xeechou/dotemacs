@@ -88,6 +88,7 @@
     (add-hook 'c++-mode-hook 'my-ccls-enable)
     :config
     (setq ccls-executable (string-trim-right (shell-command-to-string "which ccls")))
+    (setq ccls-extra-args '("--log-file=/tmp/cq.log"))
     (setq ccls-extra-init-params
 	  '(:clang (:extraArgs ("-D__cpp_deduction_guides=0" "-Wno-macro-redefined"))
 		   ))
@@ -113,10 +114,13 @@
 
   (use-package lsp-ui
     :ensure t
+    :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
     :config
-    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-
-    )
+    ;;don't create lsp-stderr buffer
+    (setq lsp-print-io t)
+    :bind (:map lsp-ui-mode-map
+		("M-." . lsp-ui-peek-find-definitions)
+		("M-?" . lsp-ui-peek-find-references)))
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; python setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package company-jedi
