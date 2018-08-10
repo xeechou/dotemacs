@@ -57,20 +57,25 @@
 ;;************************************************************
 ;;3) return to previous position, this feature is very important, we need the
 ;; help of auto-mark, so it behaive like vim
-(when (require 'auto-mark nil t)
+(use-package auto-mark
+  :load-path "lisp"
+  :config
   (setq auto-mark-command-class-alist
-	'((anything . anything)
-	  (goto-line . jump)
-	  (indent-for-tab-command . ignore)
+	'((goto-line . jump)
 	  (undo . ignore)))
-  (setq auto-mark-command-classifiers
-	(list (lambda (command)
-		(if (and (eq command 'self-insert-command)
-			 (eq last-command-char ? ))
-		    'ignore))))
-  (global-auto-mark-mode 1))
+  (global-auto-mark-mode 1)
+  :bind ("C-c C-<SPC>"  . 'pop-to-mark-command)
+  )
+;; (when (require 'auto-mark nil t)
 
-(global-set-key (kbd "C-c M-p") 'pop-to-mark-command)
+;;   (setq auto-mark-command-classifiers
+;;	(list (lambda (command)
+;;		(if (and (eq command 'self-insert-command)
+;;			 (eq last-command-char ? ))
+;;		    'ignore))))
+;;   (global-auto-mark-mode 1))
+
+
 ;;************************************************************
 ;;****************************E*******************************
 ;;************************************************************

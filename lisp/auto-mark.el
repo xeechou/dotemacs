@@ -1,8 +1,10 @@
 ;;; auto-mark.el --- Mark automatically
 
+;; Copyright (C) 2018  Sichem Zhou
 ;; Copyright (C) 2008  MATSUYAMA Tomohiro
 
-;; Author: MATSUYAMA Tomohiro <t.matsuyama.pub@gmail.com>
+;; Author: MATSUYAMA Tomohiro <t.matsuyama.pub@gmail.com>,
+;;         Sichem Zhou <sichem.zh@gmail.com>
 ;; Keywords: convenience
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -38,6 +40,9 @@
 ;; regard `goto-line' command as a jump command not move command to push a mark automatically
 ;; when you goto-line even after move command sequence, add '(goto-line . jump) into the list
 ;; so that auto-mark can detect command sequence changes.
+
+;; In addition, I changed the logic so it can remember the point of pop-mark. It
+;; maybe annoying though
 
 ;; To use this package, please add following code into your .emacs:
 ;; (require 'auto-mark)
@@ -92,41 +97,60 @@ and returns CLASS."
 (defvar auto-mark-command-class nil
   "Current command sequence class.")
 
+(defvar auto-mark-was-pop-to-mark nil
+  "If last command was pop to mark and this command is not")
+
+(defun auto-mark-determine-was-pop-to-mark (command lcommand)
+  (and (eq lcommand 'pop-to-mark-command)
+       (not (eq command 'pop-to-mark-command))))
+
+
 (defun auto-mark-classify-command (command)
   (or (cdr-safe (assq command auto-mark-command-class-alist))
       (let (class
-            (classifiers auto-mark-command-classifiers))
-        (while (and (consp classifiers) (null class))
-          (setq class (funcall (car classifiers) command))
-          (setq classifiers (cdr classifiers)))
-        class)))
+	    (classifiers auto-mark-command-classifiers))
+	(while (and (consp classifiers) (null class))
+	  (setq class (funcall (car classifiers) command))
+	  (setq classifiers (cdr classifiers)))
+	class)))
+
 
 (defun auto-mark-pre-command-handle ()
   (setq auto-mark-previous-buffer-size (buffer-size)
-        auto-mark-previous-point (point))
-  (auto-mark-handle-command-class
-   (auto-mark-classify-command this-command)))
+	auto-mark-previous-point (point)
+	auto-mark-was-pop-to-mark
+	(auto-mark-determine-was-pop-to-mark this-command last-command)
+	)
+  ;;it occurs to me that it is here to deal with other type of commands
+  ;; (auto-mark-handle-command-class
+  ;;  (auto-mark-classify-command this-command))
+  )
 
 (defun auto-mark-post-command-handle ()
   (auto-mark-handle-command-class
    (if (eq 'ignore (auto-mark-classify-command this-command))
        'ignore
      (if (/= auto-mark-previous-buffer-size (buffer-size))
-         'edit
-       
+	 'edit
+
        (if (or (and auto-mark-ignore-move-on-sameline
-                    (/= (line-number-at-pos auto-mark-previous-point)
-                        (line-number-at-pos (point))))
-               (/= auto-mark-previous-point (point)))
-           'move)))))
+		    (/= (line-number-at-pos auto-mark-previous-point)
+			(line-number-at-pos (point))))
+	       (/= auto-mark-previous-point (point)))
+	   'move)))))
 
 (defun auto-mark-handle-command-class (class)
   (if (and class
-           (not (or (eq class 'ignore)
-                    (eq class auto-mark-command-class))))
+	   (not (or (eq class 'ignore)
+		    (eq class auto-mark-command-class))))
       (progn
-        (push-mark auto-mark-previous-point t nil)
-        (setq auto-mark-command-class class))))
+	(push-mark auto-mark-previous-point t nil)
+;;	(message "push mark")
+	(setq auto-mark-command-class class))
+    (if auto-mark-was-pop-to-mark
+	(progn ;;so it is working but why marking doesn't work as I expected
+	(push-mark auto-mark-previous-point t nil)
+	  ))))
 
 (defun auto-mark-mode-maybe ()
   (if (not (minibufferp (current-buffer)))
@@ -139,14 +163,15 @@ and returns CLASS."
   :group 'auto-mark
   (if auto-mark-mode
       (progn
-        (make-local-variable 'auto-mark-previous-buffer-size)
-        (make-local-variable 'auto-mark-previous-point)
-        (make-local-variable 'auto-mark-command-class)
-        (setq auto-mark-previous-buffer-size 0
-              auto-mark-previous-point (point-min)
-              auto-mark-command-class nil)
-        (add-hook 'pre-command-hook 'auto-mark-pre-command-handle nil t)
-        (add-hook 'post-command-hook 'auto-mark-post-command-handle nil t))
+	(make-local-variable 'auto-mark-previous-buffer-size)
+	(make-local-variable 'auto-mark-previous-point)
+	(make-local-variable 'auto-mark-command-class)
+	(make-local-variable 'auto-mark-was-pop-to-mark)
+	(setq auto-mark-previous-buffer-size 0
+	      auto-mark-previous-point (point-min)
+	      auto-mark-command-class nil)
+	(add-hook 'pre-command-hook 'auto-mark-pre-command-handle nil t)
+	(add-hook 'post-command-hook 'auto-mark-post-command-handle nil t))
     (remove-hook 'pre-command-hook 'auto-mark-pre-command-handle t)
     (remove-hook 'post-command-hook 'auto-mark-post-command-handle t)))
 
