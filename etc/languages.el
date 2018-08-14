@@ -1,7 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(setq clang-known-modes '(c++-mode c-mode))
+(setq compnay-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
 
 ;;--- -1) for all programming languages
 (add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
@@ -16,7 +17,6 @@
 (setq c-default-style "linux"
       c-basic-offset 8)
 ;;before use-package
-(add-to-list 'auto-mode-alist '(".h$" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
 
 
@@ -24,8 +24,6 @@
   :load-path "lisp/"
   :config
   (add-hook 'prog-mode-hook 'turn-on-fic-mode)
-  (add-hook 'c-mode-hook 'turn-on-fic-mode)
-  (add-hook 'c++-mode-hook 'turn-on-fic-mode)
   )
 
 ;; yasnippet
@@ -80,9 +78,9 @@
     :commands (lsp-ccls-enable)
     :init
     (defun my-ccls-enable ()
-      (condition-case nil
-	  (lsp-ccls-enable)
-      (user-error nil))
+      (when (memq major-mode clang-known-modes)
+	(condition-case nil (lsp-ccls-enable)
+	  (user-error nil)))
       )
     (add-hook 'c-mode-hook 'my-ccls-enable)
     (add-hook 'c++-mode-hook 'my-ccls-enable)
@@ -117,6 +115,8 @@
     :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
     :config
     ;;don't create lsp-stderr buffer
+    ;;I need to read lsp-ui code
+    (setq lsp-ui-flycheck-live-reporting nil)
     (setq lsp-print-io t)
     :bind (:map lsp-ui-mode-map
 		("M-." . lsp-ui-peek-find-definitions)
