@@ -30,6 +30,7 @@
 
 ;;now we setup themes directly in init file
 (use-package spacemacs-theme
+  :defer t
   :ensure t
   :init
   (load-theme 'spacemacs-dark t)
