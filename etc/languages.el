@@ -97,6 +97,7 @@
     (use-package company-lsp :ensure t :defer t)
     (require 'lsp-imenu)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    (setq imenu-max-item-length 120)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;setting up flycheck;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     (use-package flycheck
       :ensure t
