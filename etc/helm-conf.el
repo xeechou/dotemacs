@@ -99,8 +99,6 @@
   ("M-x" . counsel-M-x)
   ("C-x C-f" . counsel-find-file)
   ;;this collide
-  ("C-c C-f" . counsel-describe-function)
-  ("C-c C-v" . counsel-describe-variable)
   ("C-c C-u" . counsel-unicode-char)
   ("C-c C-i" . counsel-info-lookup-symbol)
   ("C-x t" . counsel-imenu)

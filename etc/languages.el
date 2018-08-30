@@ -26,6 +26,10 @@
   (add-hook 'prog-mode-hook 'turn-on-fic-mode)
   )
 
+(use-package color-rg
+  :load-path "lisp/"
+  )
+
 ;; yasnippet
 (use-package yasnippet-snippets
   :ensure t
