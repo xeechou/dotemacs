@@ -83,10 +83,6 @@ and returns CLASS."
   :group 'auto-mark
   :type '(repeat function))
 
-(defcustom auto-mark-ignore-move-on-sameline t
-  "Ignore move on same line."
-  :group 'auto-mark
-  :type 'boolean)
 
 (defvar auto-mark-previous-buffer-size nil
   "Previous buffer size for detecting changes the buffer.")
@@ -126,18 +122,18 @@ and returns CLASS."
   ;;  (auto-mark-classify-command this-command))
   )
 
+(defun auto-mark-on-sameline ()
+  (= (line-number-at-pos auto-mark-previous-point)
+     (line-number-at-pos (point))))
+
 (defun auto-mark-post-command-handle ()
   (auto-mark-handle-command-class
-   (if (eq 'ignore (auto-mark-classify-command this-command))
+   (if (or (eq 'ignore (auto-mark-classify-command this-command))
+	   (auto-mark-on-sameline))
        'ignore
      (if (/= auto-mark-previous-buffer-size (buffer-size))
 	 'edit
-
-       (if (or (and auto-mark-ignore-move-on-sameline
-		    (/= (line-number-at-pos auto-mark-previous-point)
-			(line-number-at-pos (point))))
-	       (/= auto-mark-previous-point (point)))
-	   'move)))))
+       'move))))
 
 (defun auto-mark-handle-command-class (class)
   (if (and class
@@ -145,7 +141,7 @@ and returns CLASS."
 		    (eq class auto-mark-command-class))))
       (progn
 	(push-mark auto-mark-previous-point t nil)
-;;	(message "push mark")
+	(message "push mark")
 	(setq auto-mark-command-class class))
     (if auto-mark-was-pop-to-mark
 	(progn ;;so it is working but why marking doesn't work as I expected
