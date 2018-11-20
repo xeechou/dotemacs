@@ -94,6 +94,8 @@
   )
 
 (use-package counsel :ensure t
+  :config
+  (use-package smex :ensure t)
   :bind
   ("C-s" . swiper)
   ("M-x" . counsel-M-x)
