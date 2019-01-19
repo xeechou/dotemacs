@@ -79,15 +79,9 @@
   (use-package ccls
     :ensure t
     :defer t
-    :commands (lsp-ccls-enable)
     :init
-    (defun my-ccls-enable ()
-      (when (memq major-mode clang-known-modes)
-	(condition-case nil (lsp-ccls-enable)
-	  (user-error nil)))
-      )
-    (add-hook 'c-mode-hook 'my-ccls-enable)
-    (add-hook 'c++-mode-hook 'my-ccls-enable)
+    :hook ((c-mode c++-mode objc-mode) .
+	   (lambda () (require 'ccls) (lsp)))
     :config
     (setq ccls-executable (string-trim-right (shell-command-to-string "which ccls")))
     (setq ccls-extra-args '("--log-file=/tmp/cq.log"))
@@ -98,9 +92,8 @@
     (with-eval-after-load 'projectile
       (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
     (use-package company-c-headers :ensure t :defer t)
-    (use-package company-lsp :ensure t :defer t)
-    (require 'lsp-imenu)
-    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    (use-package lsp-mode :commands lsp)
+    (use-package company-lsp :ensure t :defer t :commands company-lsp)
     (setq imenu-max-item-length 120)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;setting up flycheck;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     (use-package flycheck
@@ -108,10 +101,7 @@
       :ensure t
       :diminish flycheck-mode
       :init
-      (add-hook 'c-mode-hook 'flycheck-mode)
-      (add-hook 'c++-mode-hook 'flycheck-mode)
-      (add-hook 'python-mode-hook 'flycheck-mode)
-      (add-hook 'ccls-mode-hook 'flycheck-mode)
+      :hook ((c-mode c++-mode python-mode ccls-mode) . flycheck-mode)
       :config
       )
     )
@@ -119,6 +109,7 @@
   (use-package lsp-ui
     :defer t
     :ensure t
+    :commands lsp-ui-mode
     :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
     :config
     ;;don't create lsp-stderr buffer
