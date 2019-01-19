@@ -198,11 +198,6 @@
 (use-package markdown-mode
   :ensure t
   :mode (("\\.md\\'" . markdown-mode)))
-(use-package jam-mode
-  :ensure t
-  :mode (("\\.v2\\'" . jam-mode)
-	 ("/Jamfile\\." . jam-mode)
-	 ("\\.jam\\'" . jam-mode)))
 
 (use-package rust-mode
   :ensure t
