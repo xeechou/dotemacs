@@ -21,7 +21,9 @@
 ;;install use-package if we don't have, but package refresh-content gonna take really long time
 (unless (package-installed-p 'use-package)
   ;(package-refresh-contents)
-  (package-install 'use-package))
+  (package-install 'use-package)
+  (package-install 'diminish)
+  )
 
 (eval-when-compile
   (require 'use-package)
