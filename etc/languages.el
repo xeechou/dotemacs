@@ -43,7 +43,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package  company
   :ensure t
-  :defer t
   :init
   (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook  'company-mode)
@@ -78,7 +77,6 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; C++ setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package ccls
     :ensure t
-    :defer t
     :init
     :hook ((c-mode c++-mode objc-mode) .
 	   (lambda () (require 'ccls) (lsp)))
@@ -91,13 +89,12 @@
     ;;there should be other settings. I need to get it work first
     (with-eval-after-load 'projectile
       (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
-    (use-package company-c-headers :ensure t :defer t)
+    (use-package company-c-headers :ensure t)
     (use-package lsp-mode :commands lsp)
-    (use-package company-lsp :ensure t :defer t :commands company-lsp)
+    (use-package company-lsp :ensure t :commands company-lsp)
     (setq imenu-max-item-length 120)
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;setting up flycheck;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     (use-package flycheck
-      :defer t
       :ensure t
       :diminish flycheck-mode
       :init
@@ -107,7 +104,6 @@
     )
 
   (use-package lsp-ui
-    :defer t
     :ensure t
     :commands lsp-ui-mode
     :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
@@ -123,9 +119,8 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; python setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package company-jedi
     :ensure t
-    :defer t
     :config
-    (use-package jedi-direx :ensure t :defer t
+    (use-package jedi-direx :ensure t
       :config (add-hook 'jedi-mode-hook 'jedi-direx:setup))
     :bind (:map python-mode-map
 		("M-," . jedi:goto-definition)
@@ -133,7 +128,7 @@
 		)
     )
   ;;other packages
-  (use-package company-lua   :ensure t :defer t)
+  (use-package company-lua   :ensure t)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Backend-setup;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
