@@ -14,6 +14,14 @@
   (org-clock-persistence-insinuate)
 
   (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+  ;; recursively update the parents TODO
+  (defun org-summary-todo (n-done n-not-done)
+    "Switch entry to DONE when all subentries are don, to TODO otherwise"
+    (let (org-log-done org-log-states) ; turn off logging
+      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+  (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+
   ;;you have to set this before loading org-mode, really weird
   (setq org-agenda-files (list "~/org/work.org"
 			       "~/org/training.org"
@@ -30,12 +38,4 @@
   (progn
     (setq org-log-done 'time)
     )
-  ;; recursively update the parents TODO
-  (defun org-summary-todo (n-done n-not-done)
-    "Switch entry to DONE when all subentries are don, to TODO otherwise"
-    (let (org-log-done org-log-states) ; turn off logging
-      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-  (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
-
   )
-(message "%s" org-agenda-files)

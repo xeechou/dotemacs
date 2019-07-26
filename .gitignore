@@ -7,3 +7,6 @@ recentf
 auto-save-list/*
 network-security.data
 org-clock-save.el
+
+.lsp-session-v*
+smex-items
