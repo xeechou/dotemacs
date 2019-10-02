@@ -1,8 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package company-c-headers :ensure t)
 (setq clang-known-modes '(c++-mode c-mode))
-(setq compnay-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
+(setq company-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
 
 ;;--- -1) for all programming languages
 (add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
@@ -41,20 +42,44 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;company;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package  company
+(use-package lsp-mode
   :ensure t
-  :init
-  (add-hook 'c++-mode-hook 'company-mode)
-  (add-hook 'c-mode-hook  'company-mode)
+  :hook ((c++-mode . lsp)
+	 (c-mode . lsp)
+	 (python-mode . lsp))
+  :commands (lsp lsp-deferred)
+  :config
+  (require 'lsp-clients)
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :init
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+    :bind (:map lsp-ui-mode-map
+		("M-." . lsp-ui-peek-find-definitions)
+		("M-?" . lsp-ui-peek-find-references)))
+    :config
+    ;;don't create lsp-stderr buffer
+    ;;I need to read lsp-ui code
+    (setq lsp-ui-sideline-enable nil
+	  lsp-ui-doc-enable nil
+	  lsp-ui-flycheck-enable t
+	  lsp-ui-imenu-enable t
+	  lsp-ui-sideline-ignore-duplicate t)
+  )
 
-  (add-hook 'python-mode-hook 'company-mode)
-  (add-hook 'emacs-lisp-mode-hook 'company-mode)
-  (add-hook 'cmake-mode-hook 'company-mode)
-  (add-hook 'js-mode-hook  'company-mode)
-  (add-hook 'lua-mode-hook 'company-mode)
+(use-package company
+  :ensure t
+  :defer t
+  :hook ((c-mode . company-mode)
+	 (c++-mode . company-mode)
+	 (emacs-lisp-mode . company-mode))
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+  (use-package company-lsp :ensure t :defer t
+    :config
+    (push 'company-lsp company-backends)
+    )
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -74,61 +99,8 @@
 	(company-complete-common)
       (indent-according-to-mode)))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; C++ setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package ccls
-    :ensure t
-    :init
-    :hook ((c-mode c++-mode objc-mode) .
-	   (lambda () (require 'ccls) (lsp)))
-    :config
-    (setq ccls-executable (string-trim-right (shell-command-to-string "which ccls")))
-    (setq ccls-extra-args '("--log-file=/tmp/cq.log"))
-    (setq ccls-extra-init-params
-	  '(:clang (:extraArgs ("-D__cpp_deduction_guides=0" "-Wno-macro-redefined"))
-		   ))
-    ;;there should be other settings. I need to get it work first
-    (with-eval-after-load 'projectile
-      (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
-    (use-package company-c-headers :ensure t)
-    (use-package lsp-mode :commands lsp)
-    (use-package company-lsp :ensure t :commands company-lsp)
-    (setq imenu-max-item-length 120)
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;setting up flycheck;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (use-package flycheck
-      :ensure t
-      :diminish flycheck-mode
-      :init
-      :hook ((c-mode c++-mode python-mode ccls-mode) . flycheck-mode)
-      :config
-      )
-    )
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; lanuages ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (use-package lsp-ui
-    :ensure t
-    :commands lsp-ui-mode
-    :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-    :config
-    ;;don't create lsp-stderr buffer
-    ;;I need to read lsp-ui code
-    (setq lsp-ui-flycheck-live-reporting nil)
-    (setq lsp-print-io t)
-    :bind (:map lsp-ui-mode-map
-		("M-." . lsp-ui-peek-find-definitions)
-		("M-?" . lsp-ui-peek-find-references)))
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; python setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package company-jedi
-    :ensure t
-    :config
-    (use-package jedi-direx :ensure t
-      :config (add-hook 'jedi-mode-hook 'jedi-direx:setup))
-    :bind (:map python-mode-map
-		("M-," . jedi:goto-definition)
-		("M-." . jedi:goto-definition-next)
-		)
-    )
-  ;;other packages
-  (use-package company-lua   :ensure t)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Backend-setup;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -159,19 +131,12 @@
 			   'company-lua)))
   )
 
-
-
-
 ;;languages
 ;;cmake
 (use-package cmake-mode
   :ensure t
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
 	 ("\\.cmake\\'" . cmake-mode)))
-;; pkgbuild
-(use-package pkgbuild-mode
-  :ensure t
-  :mode (("/PKGBUILD\\'" . pkgbuild-mode)))
 ;; glsl
 (use-package glsl-mode
   :ensure t
@@ -179,10 +144,6 @@
 	 ("\\.vs\\'" . glsl-mode)
 	 ("\\.fs\\'" . glsl-mode)
 	 ("\\.gs\\'" . glsl-mode)))
-(use-package cuda-mode
-  :ensure t
-  :mode (("\\.cu\\'" . cuda-mode)))
-;;octave
 (use-package octave
   :ensure t
   :mode (("\\.m\\'" . octave-mode)))
