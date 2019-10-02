@@ -5,6 +5,11 @@
 (setq clang-known-modes '(c++-mode c-mode))
 (setq company-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
 
+(use-package flycheck
+  :ensure t
+  :commands flycheck-mode
+  :hook ((c++-mode c-mode) . flycheck-mode))
+
 ;;--- -1) for all programming languages
 (add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
 (add-hook 'c++-mode-hook 'show-paren-mode)
@@ -49,6 +54,11 @@
 	 (python-mode . lsp))
   :commands (lsp lsp-deferred)
   :init (setq lsp-auto-guess-root t)
+  :custom
+  (lsp-print-io nil)
+  (lsp-trace nil)
+  (lsp-print-performance nil)
+  (lsp-prefer-flymake nil)
   :config
   (require 'lsp-clients)
   (use-package lsp-ui
@@ -60,14 +70,16 @@
 		("M-." . lsp-ui-peek-find-definitions)
 		("M-?" . lsp-ui-peek-find-references)
 		("C-x t" . lsp-ui-imenu)))
-    :config
-    ;;don't create lsp-stderr buffer
-    ;;I need to read lsp-ui code
-    (setq lsp-ui-sideline-enable nil
-	  lsp-ui-doc-enable nil
-	  lsp-ui-flycheck-enable t
-	  lsp-ui-imenu-enable t
-	  lsp-ui-sideline-ignore-duplicate t)
+  :custom
+  (lsp-ui-sideline-enable t)
+  (lsp-ui-sideline-ignore-duplicate t)
+  (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-flycheck-enable t)
+    ;; ;;don't create lsp-stderr buffer
+    ;; ;;I need to read lsp-ui code
+    ;; (setq lsp-ui-flycheck-enable t
+    ;;	  lsp-ui-imenu-enable t
+    ;;	  lsp-ui-sideline-ignore-duplicate t)
   )
 
 (use-package company
