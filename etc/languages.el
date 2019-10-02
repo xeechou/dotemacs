@@ -48,6 +48,7 @@
 	 (c-mode . lsp)
 	 (python-mode . lsp))
   :commands (lsp lsp-deferred)
+  :init (setq lsp-auto-guess-root t)
   :config
   (require 'lsp-clients)
   (use-package lsp-ui
@@ -57,7 +58,8 @@
     (add-hook 'lsp-mode-hook 'lsp-ui-mode)
     :bind (:map lsp-ui-mode-map
 		("M-." . lsp-ui-peek-find-definitions)
-		("M-?" . lsp-ui-peek-find-references)))
+		("M-?" . lsp-ui-peek-find-references)
+		("C-x t" . lsp-ui-imenu)))
     :config
     ;;don't create lsp-stderr buffer
     ;;I need to read lsp-ui code
