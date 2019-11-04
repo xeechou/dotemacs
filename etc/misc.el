@@ -9,6 +9,8 @@
 ;;1) default text
 (setq default-major-mode 'text-mode)
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
+(add-hook 'text-mode-hook 'column-number-mode)
+(add-hook 'prog-mode-hook 'column-number-mode)
 
 (use-package whitespace-cleanup-mode
   :ensure t

@@ -59,7 +59,11 @@
     (whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key)))
  '(safe-local-variable-values
    (quote
-    ((indent-tab-mode)
+    ((eval progn
+	   (c-set-offset
+	    (quote innamespace)
+	    (quote +)))
+     (indent-tab-mode)
      (cmake-tab-width . 4)
      (eval c-set-offset
 	   (quote innamespace)

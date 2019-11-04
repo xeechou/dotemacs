@@ -87,7 +87,8 @@
   :defer t
   :hook ((c-mode . company-mode)
 	 (c++-mode . company-mode)
-	 (emacs-lisp-mode . company-mode))
+	 (emacs-lisp-mode . company-mode)
+	 (cmake-mode . company-mode))
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package company-lsp :ensure t :defer t
