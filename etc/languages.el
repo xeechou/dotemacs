@@ -5,6 +5,12 @@
 (setq clang-known-modes '(c++-mode c-mode))
 (setq company-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
 
+(use-package smart-tabs-mode
+  :ensure t
+  :init
+  (smart-tabs-insinuate 'c 'c++)
+)
+
 (use-package flycheck
   :ensure t
   :commands flycheck-mode

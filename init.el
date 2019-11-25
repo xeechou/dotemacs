@@ -62,6 +62,22 @@
     ((eval progn
 	   (c-set-offset
 	    (quote innamespace)
+	    (quote +))
+	   (setq c-basic-offset 4))
+     (eval progn
+	   (c-set-offset
+	    (quote innamespace)
+	    (quote +))
+	   (setq c-basic-offset 4)
+	   (add-hook
+	    (quote c++-mode-hook)
+	    (lambda nil
+	      (smart-tabs-mode-enable)
+	      (smart-tabs-advice c-indent-line c-basic-offset)
+	      (smart-tabs-advice c-indent-region c-basic-offset))))
+     (eval progn
+	   (c-set-offset
+	    (quote innamespace)
 	    (quote +)))
      (indent-tab-mode)
      (cmake-tab-width . 4)
@@ -70,7 +86,10 @@
 	   0)
      (eval c-set-offset
 	   (quote inextern-lang)
-	   0)))))
+	   0))))
+ '(whitespace-style
+   (quote
+    (face trailing tabs spaces lines newline empty space-before-tab space-mark tab-mark newline-mark))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
