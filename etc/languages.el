@@ -50,6 +50,7 @@
   (add-hook 'prog-mode-hook #'yas-minor-mode)
   (add-hook 'cmake-mode-hook #'yas-minor-mode)
   )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;company;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -172,22 +173,36 @@
 (setq js-indent-level 2)
 (use-package rjsx-mode
   :ensure t
+  :defer t
   :mode (("\\.js\\'" . rjsx-mode)))
 
 (use-package lua-mode
   :ensure t
+  :defer t
   :mode (("\\.lua\\'" . lua-mode)))
 (use-package markdown-mode
   :ensure t
+  :defer t
   :mode (("\\.md\\'" . markdown-mode)))
 
 (use-package rust-mode
   :ensure t
+  :defer t
   :mode (("\\.rs\\'" . rust-mode)))
 
 (use-package graphviz-dot-mode
   :ensure t
+  :defer t
   :mode (("\\.dot\\'" . graphviz-dot-mode)))
+
+(use-package dockerfile-mode
+  :ensure t
+  :defer t
+  :mode (("/Dockerfile" . dockerfile-mode)))
+(use-package yaml-mode
+  :ensure t
+  :defer t
+  :mode (("\\.yml\\'" . yaml-mode)))
 
 
 
