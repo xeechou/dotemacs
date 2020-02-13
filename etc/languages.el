@@ -24,7 +24,8 @@
 
 (add-hook 'c-mode-common-hook (lambda()
 				(c-set-offset 'inextern-lang 0)
-				(c-set-offset 'innamespace 0)))
+				(c-set-offset 'innamespace 0)
+				(c-set-offset 'inline-open 0)))
 ;;default C indent level
 (setq c-default-style "linux"
       c-basic-offset 8)
