@@ -1,0 +1,16 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline shader stage
+# key: vkgps
+# --
+std::array<VkPipelineShaderStageCreateInfo, 2> ${1:shaderStages};
+$1[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+$1[0].stage = VK_SHADER_STAGE_VERTEX_BIT;	//vertex shader
+$1[0].module = ${2:VK_NULL_HANDLE};
+$1[0].pName = "main";
+assert($1[0].module != VK_NULL_HANDLE);
+
+$1[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+$1[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;	//fragment shader
+$1[1].module = ${3:VK_NULL_HANDLE};
+$1[1].pName = "main";
+assert($1[1].module != VK_NULL_HANDLE);

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline multisample state
+# key: vkgpm
+# --
+VkPipelineMultisampleStateCreateInfo ${1:multiSampleState} = {};
+$1.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+$1.rasterizationSamples = VK_SAMPLE_COUNT_${2:1_BIT};
+$1.pSampleMask = ${3:nullptr};

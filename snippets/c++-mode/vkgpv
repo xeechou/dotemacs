@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline viewport state
+# key: vkgpv
+# --
+VkPipelineViewportStateCreateInfo ${1:viewportState} = \{\};
+$1.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+$1.viewportCount = ${2:1};
+$1.scissorCount = ${3:1};

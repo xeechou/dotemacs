@@ -1,0 +1,39 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline create
+# key: vkpc
+# --
+vkgpa
+
+vkgpr
+
+vkgpb
+
+vkgpm
+
+vkgpv
+
+vkgpds
+
+vkgpd
+
+vkgpvi
+
+vkgps
+
+VkGraphicsPipelineCreateInfo GraphicsPipelineInfo = \{\};
+GraphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+GraphicsPipelineInfo.pNext = nullptr;
+GraphicsPipelineInfo.flags = 0;
+GraphicsPipelineInfo.layout = ${1:pipelineLayout};
+GraphicsPipelineInfo.renderPass = ${2:renderPass};
+// all the modules
+GraphicsPipelineInfo.pInputAssemblyState = &${3:inputAssemblyState};
+GraphicsPipelineInfo.pVertexInputState = &${4:vertexInputState};
+GraphicsPipelineInfo.pRasterizationState = &${5:rasterizationState};
+GraphicsPipelineInfo.pColorBlendState = &${6:colorBlendState};
+GraphicsPipelineInfo.pMultisampleState = &${7:multiSampleState};
+GraphicsPipelineInfo.pViewportState = &${8:viewportState};
+GraphicsPipelineInfo.pDepthStencilState = &${9:depthStencilState};
+GraphicsPipelineInfo.pDynamicState = &${10:dynamicState};
+GraphicsPipelineInfo.stageCount = static_cast<uint32_t>(${11:shaderStages}.size());
+GraphicsPipelineInfo.pStages = $11.data();

@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline depth stencil state
+# key: vkgpds
+# --
+VkPipelineDepthStencilStateCreateInfo ${1:depthStencilState} = \{\};
+$1.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+$1.depthTestEnable = VK_TRUE;
+$1.depthWriteEnable = VK_TRUE;
+$1.depthCompareOp = ${2:VK_COMPARE_OP_LESS};
+$1.depthBoundsTestEnable = VK_FALSE;
+$1.back.failOp = ${3:VK_STENCIL_OP_KEEP};
+$1.back.passOp = ${4:VK_STENCIL_OP_KEEP};
+$1.stencilTestEnable = ${5:VK_FALSE};
+$1.front = $1.back;

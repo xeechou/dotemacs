@@ -2,7 +2,7 @@
 # name: vulkan create info
 # key: vkcf
 # --
-Vk${1:type}CreateInfo $1CreateInfo = \{\};
-$1CreateInfo.sType = VK_STRUCTURE_TYPE_${1:$(upcase yas-text)}_CREATE_INFO;
-$1CreateInfo.pNext = ${2:nullptr};
-$1CreateInfo.flags = ${3:0};
+Vk${1:type}CreateInfo ${2:$1}Info = \{\};
+$2Info.sType = VK_STRUCTURE_TYPE_${1:$(upcase yas-text)}_CREATE_INFO;
+$2Info.pNext = ${3:nullptr};
+$2Info.flags = ${4:0};

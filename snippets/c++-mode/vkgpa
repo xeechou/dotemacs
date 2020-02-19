@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline input assembly
+# key: vkgpa
+# --
+VkPipelineInputAssemblyStateCreateInfo ${1:inputAssemblyState} = \{\};
+$1.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+$1.topology = VK_PRIMITIVE_TOPOLOGY_${2:TRIANGLE_LIST};

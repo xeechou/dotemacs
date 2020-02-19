@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline color blending state
+# key: vkgpb
+# --
+VkPipelineColorBlendAttachmentState ${1:blendAttachmentState} = \{\};
+$1.colorWriteMask = 0xf;
+$1.blendEnable = ${2:VK_FALSE};
+VkPipelineColorBlendStateCreateInfo ${3:colorBlendState} = \{\};
+$3.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+$3.attachmentCount = 1;
+$3.pAttachments = &$1;

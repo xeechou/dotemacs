@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline vertex input
+# key: vkgpvi
+# --
+VkVertexInputBindingDescription ${1:vertexInputBinding} = \{\};
+$1.binding = 0;
+$1.stride = ${2:sizeof(Vertex)};
+$1.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+std::array<VkVertexInputAttributeDescription, 1> ${3:vertexInputAttributs};
+$3[0].binding = 0; //first binding
+$3[0].location = 0;
+$3[0].format = ${4:VK_FORMAT_R32G32B32_SFLOAT};
+$3[0].offset = ${5:offsetof(Vertex, position)};
+
+VkPipelineVertexInputStateCreateInfo ${6:vertexInputState} = {};
+$6.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+$6.vertexBindingDescriptionCount = 1;
+$6.pVertexBindingDescriptions = &$1;
+$6.vertexAttributeDescriptionCount = $3.size();
+$6.pVertexAttributeDescriptions = $3.data();

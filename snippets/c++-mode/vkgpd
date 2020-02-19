@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline dynamic states
+# key: vkgpd
+# --
+std::vector<VkDynamicState> ${1:dynamicStateEnables};
+$1.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+$1.push_back(VK_DYNAMIC_STATE_SCISSOR);
+VkPipelineDynamicStateCreateInfo ${2:dynamicState} = {};
+$2.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+$2.pDynamicStates = $1.data();
+$2.dynamicStateCount = static_cast<uint32_t>($1.size());

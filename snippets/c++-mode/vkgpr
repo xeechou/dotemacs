@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: vulkan Pipeline rasterization state
+# key: vkgpr
+# --
+VkPipelineRasterizationStateCreateInfo ${1:rasterizationState} = \{\};
+$1.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+$1.polygonMode = ${2:VK_POLYGON_MODE_FILL};
+$1.cullMode = ${3:VK_CULL_MODE_NONE};
+$1.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+$1.depthClampEnable = ${4:VK_FALSE};
+$1.rasterizerDiscardEnable = ${5:VK_FALSE};
+$1.depthBiasEnable = ${6:VK_FALSE};
+$1.lineWidth = ${7:1.0f};
