@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: vulkan renderpass depedencies
+# key: vkrpd
+# --
+VkSubpassDependency ${1:depedency} = \{\};
+$1.srcSubpass = ${2:VK_SUBPASS_EXTERNAL};
+$1.dstSubpass = ${3:0}; //dst to our first depedencies
+$1.srcStageMask = VK_PIPELINE_STAGE_${4:BOTTOM_OF_PIPE_BIT};
+$1.dstStageMask = VK_PIPELINE_STAGE_${5:COLOR_ATTACHMENT_OUTPUT_BIT};
+$1.srcAccessMask = VK_ACCESS_${6:MEMORY_READ_BIT};
+$1.dstAccessMask = VK_ACCESS_${7:COLOR_ATTACHMENT_READ_BIT};
+$1.dependencyFlags = VK_DEPENDENCY_${8:BY_REGION_BIT};

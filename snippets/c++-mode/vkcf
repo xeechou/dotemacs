@@ -3,6 +3,6 @@
 # key: vkcf
 # --
 Vk${1:type}CreateInfo ${2:$1}Info = \{\};
-$2Info.sType = VK_STRUCTURE_TYPE_${1:$(upcase yas-text)}_CREATE_INFO;
-$2Info.pNext = ${3:nullptr};
-$2Info.flags = ${4:0};
+$2Info.sType = VK_STRUCTURE_TYPE_${3:${1:$(upcase yas-text)}}_CREATE_INFO;
+$2Info.pNext = ${4:nullptr};
+$2Info.flags = ${5:0};

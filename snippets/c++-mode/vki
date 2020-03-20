@@ -2,6 +2,6 @@
 # name: vulkan allocate info
 # key: vki
 # --
-Vk${1:type}${2:Create}Info $1$2Info = \{\};
-$1$2Info.sType = VK_STRUCTURE_TYPE_${3:${1:$(upcase yas-text)}}_${2:$(upcase yas-text)}_INFO;
-$1$2Info.pNext = ${4:nullptr};
+Vk${1:type}${2:Create}Info ${3:$1$2}Info = \{\};
+$3Info.sType = VK_STRUCTURE_TYPE_${4:${1:$(upcase yas-text)}}_${2:$(upcase yas-text)}_INFO;
+$3Info.pNext = ${5:nullptr};

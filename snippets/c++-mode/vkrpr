@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: vulkan attachment reference
+# key: vkrpr
+# --
+VkAttachmentReference ${1:attachmentRef} = \{\};
+$1.attachment = ${2:0};
+$1.layout = VK_IMAGE_LAYOUT_${3:COLOR_ATTACHMENT_OPTIMAL};

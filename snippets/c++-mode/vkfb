@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: vulkan framebuffer
+# key: vkfb
+# --
+std::array<VkImageView, 1> ${1:attachments};
+$1[0] = ${2:view};
+
+VkFramebufferCreateInfo ${3:framebufferInfo} = {};
+$3.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+$3.pNext = nullptr;
+$3.flags = 0;
+$3.renderPass = ${4:renderPass};
+$3.attachmentCount = (unsigned)($1.size());
+$3.pAttachments = $1.data();
+$3.width = width;
+$3.height = height;
+$3.layers = 1;

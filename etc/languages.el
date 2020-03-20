@@ -166,7 +166,8 @@
   :mode (("\\.glsl\\'" . glsl-mode)
 	 ("\\.vs\\'" . glsl-mode)
 	 ("\\.fs\\'" . glsl-mode)
-	 ("\\.gs\\'" . glsl-mode)))
+	 ("\\.gs\\'" . glsl-mode)
+	 ("\\.comp\\'" . glsl-mode)))
 (use-package octave
   :ensure t
   :mode (("\\.m\\'" . octave-mode)))

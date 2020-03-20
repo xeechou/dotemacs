@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: vulkan renderpass
+# key: vkrp
+# --
+vkrpa;
+vkrpr;
+vkrps;
+vkrpd;
+
+VkRenderPassCreateInfo ${1:RenderPass}Info = \{\};
+$1Info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+$1Info.pNext = nullptr;
+$1Info.flags = 0;
+$1Info.attachmentCount = (unsigned)${2:attachments}.size();
+$1Info.pAttachments = $2.data();
+$1Info.subpassCount = 1;
+$1Info.pSubpasses = &${3:subpassDescription};
+$1Info.dependencyCount = (unsigned)${4:dependencies}.size();
+$1Info.pDependencies = $4.data();
