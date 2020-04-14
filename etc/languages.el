@@ -201,12 +201,16 @@
   :ensure t
   :defer t
   :mode (("/Dockerfile" . dockerfile-mode)))
+
 (use-package yaml-mode
   :ensure t
   :defer t
   :mode (("\\.yml\\'" . yaml-mode)))
 
-
+(use-package gdscript-mode
+  :ensure t
+  :defer t
+  :mode (("\\.gd\\'" . gdscript-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
@@ -216,13 +220,7 @@
 (require 'hideshow)
 (require 'sgml-mode)
 (require 'nxml-mode)
-(add-hook 'c-mode-common-hook   'hs-minor-mode)
-(add-hook 'python-mode-hook     'hs-minor-mode)
-(add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
-(add-hook 'lisp-mode-hook       'hs-minor-mode)
-(add-hook 'perl-mode-hook       'hs-minor-mode)
-(add-hook 'sh-mode-hook         'hs-minor-mode)
-(add-hook 'rust-mode-hook       'hs-minor-mode)
+(add-hook 'prog-mode-hook 'hs-minor-mode)
 
 ;;Fix XML folding
 (add-to-list 'hs-special-modes-alist
