@@ -212,6 +212,12 @@
   :defer t
   :mode (("\\.gd\\'" . gdscript-mode)))
 
+(use-package meson-mode
+  :ensure t
+  :defer t
+  :config (add-hook 'meson-mode-hook 'company-mode)
+  :mode (("/meson\\.build\\'" . meson-mode)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
