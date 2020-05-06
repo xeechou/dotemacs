@@ -83,6 +83,7 @@
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-diagnostics t)
   (lsp-ui-flycheck-enable t)
+  (lsp-ui-doc-position 'top)
     ;; ;;don't create lsp-stderr buffer
     ;; ;;I need to read lsp-ui code
     ;; (setq lsp-ui-flycheck-enable t
