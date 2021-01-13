@@ -68,7 +68,6 @@
   (lsp-print-performance nil)
   (lsp-prefer-flymake nil)
   :config
-  (require 'lsp-clients)
   (use-package lsp-ui
     :ensure t
     :commands lsp-ui-mode
@@ -83,7 +82,7 @@
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-diagnostics t)
   (lsp-ui-flycheck-enable t)
-  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-position 'bottom)
     ;; ;;don't create lsp-stderr buffer
     ;; ;;I need to read lsp-ui code
     ;; (setq lsp-ui-flycheck-enable t
@@ -100,10 +99,6 @@
 	 (cmake-mode . company-mode))
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package company-lsp :ensure t :defer t
-    :config
-    (push 'company-lsp company-backends)
-    )
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -133,7 +128,7 @@
     (add-hook hook
 	      (lambda ()
 		(add-to-list (make-local-variable 'company-backends)
-			     '(company-lsp company-c-headers)))))
+			     'company-capf))))
   ;;;for python
   (add-hook 'python-mode-hook
 	    (lambda ()
