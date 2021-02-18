@@ -24,21 +24,24 @@
   ;;setup the default directory
   (setq org-directory "~/org/")
   (setq org-mobile-inbox-for-pull "~/org/index.org")
-  (setq org-mobile-directory "~/Documents/test/")
+  (setq org-mobile-directory "~/Documents/org-remote/")
 
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-  ;;you have to set this before loading org-mode, really weird
-  (setq org-agenda-files (list "~/org/work.org"
-			       "~/org/training.org"
-			       "~/org/miscs.org"
-			       "~/org/today.org"))
-
-;  (define-key global-map "\C-cc" 'org-capture)
+  (setq org-default-notes-file (concat org-directory "miscs.org"))
+  ;; you have to set this before loading org-mode
+  (setq org-agenda-files (list (concat org-directory "work.org")
+			       (concat org-directory "training.org")
+			       (concat org-directory "miscs.org")))
+  ;; other notes I would like ot store
+  (setq org-mobile-files (list (concat org-directory "notes.org")
+			       (concat org-directory "today.org")
+			       (concat org-directory "goals-habits.org")
+			       (concat org-directory "social.org")))
 
   ;I am not sure this global key setting is good or not, capture stuff globally is great
   (global-set-key "\C-ca" 'org-agenda)
   (global-set-key "\C-cc" 'org-capture)
   (global-set-key "\C-cb" 'org-iswitchb)
+
   :config
   (progn
     (setq org-log-done 'time)

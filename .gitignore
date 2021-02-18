@@ -12,3 +12,4 @@ org-clock-save.el
 smex-items
 .log/*
 .org-id-locations
+bookmarks
