@@ -10,3 +10,5 @@ org-clock-save.el
 .cache/
 .lsp-session-v*
 smex-items
+.log/*
+.org-id-locations

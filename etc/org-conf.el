@@ -1,3 +1,4 @@
+(use-package org-mobile-sync :ensure t)
 (use-package org-mode
   :ensure org
   :mode (("\\.org$" . org-mode))
@@ -13,7 +14,6 @@
   (setq org-clock-persist 'history)
   (org-clock-persistence-insinuate)
 
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
 
   ;; recursively update the parents TODO
   (defun org-summary-todo (n-done n-not-done)
@@ -21,7 +21,12 @@
     (let (org-log-done org-log-states) ; turn off logging
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
   (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+  ;;setup the default directory
+  (setq org-directory "~/org/")
+  (setq org-mobile-inbox-for-pull "~/org/index.org")
+  (setq org-mobile-directory "~/Documents/test/")
 
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
   ;;you have to set this before loading org-mode, really weird
   (setq org-agenda-files (list "~/org/work.org"
 			       "~/org/training.org"
