@@ -65,26 +65,31 @@
 ;;************************************************************
 ;;****************************S*******************************
 ;;************************************************************
-;;3) return to previous position, this feature is very important, we need the
-;; help of auto-mark, so it behaive like vim
-(use-package auto-mark
-  :load-path "lisp"
+
+;;3) this backward-forward package helps us jump back-forward in the mark ring.
+(use-package backward-forward
+  :ensure t
+  :demand
   :config
-  (setq auto-mark-command-class-alist
-	'((goto-line . jump)
-	  (undo . ignore)))
-  (global-auto-mark-mode 1)
-  :bind ("C-c C-<SPC>"  . 'pop-to-mark-command)
+  (backward-forward-mode t)
+  :bind (:map backward-forward-mode-map
+              ("<C-left>" . nil)
+              ("<C-right>" . nil)
+              ("<M-left>" . backward-forward-previous-location)
+              ("<M-right>" . backward-forward-next-location)
+              ("<mouse-8>" . backward-forward-previous-location)
+              ("<mouse-9>" . backward-forward-next-location)
+              )
   )
-;; (when (require 'auto-mark nil t)
-
-;;   (setq auto-mark-command-classifiers
-;;	(list (lambda (command)
-;;		(if (and (eq command 'self-insert-command)
-;;			 (eq last-command-char ? ))
-;;		    'ignore))))
-;;   (global-auto-mark-mode 1))
-
+;; (use-package auto-mark
+;;   :load-path "lisp"
+;;   :config
+;;   (setq auto-mark-command-class-alist
+;;	'((goto-line . jump)
+;;	  (undo . ignore)))
+;;   (global-auto-mark-mode 1)
+;;   :bind ("C-c C-<SPC>"  . 'pop-to-mark-command)
+;;   )
 
 ;;************************************************************
 ;;****************************E*******************************
