@@ -74,6 +74,7 @@
     :init
     (add-hook 'lsp-mode-hook 'lsp-ui-mode)
     :bind (:map lsp-ui-mode-map
+		;; remember M-, (which is xref function) to jump back
 		("M-." . lsp-ui-peek-find-definitions)
 		("M-?" . lsp-ui-peek-find-references)
 		("C-x t" . lsp-ui-imenu)))
