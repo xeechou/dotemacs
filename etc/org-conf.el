@@ -32,11 +32,11 @@
 			       (concat org-directory "training.org")
 			       (concat org-directory "miscs.org")))
   ;; it seems if we use org-mobile-files, it is the only list we move
-  (setq org-mobile-files (-concat org-agenda-files
-				  (list (concat org-directory "notes.org")
-					(concat org-directory "today.org")
-					(concat org-directory "goals-habits.org")
-					(concat org-directory "social.org"))))
+  (setq org-mobile-files (append org-agenda-files
+				 (list (concat org-directory "notes.org")
+				       (concat org-directory "today.org")
+				       (concat org-directory "goals-habits.org")
+				       (concat org-directory "social.org"))))
 
   ;I am not sure this global key setting is good or not, capture stuff globally is great
   (global-set-key "\C-ca" 'org-agenda)
