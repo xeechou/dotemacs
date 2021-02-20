@@ -13,3 +13,4 @@ smex-items
 .log/*
 .org-id-locations
 bookmarks
+eshell/history
