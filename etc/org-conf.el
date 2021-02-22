@@ -3,7 +3,7 @@
   :mode (("\\.org$" . org-mode))
   :init
   (setq org-todo-keywords
-	'((sequence "TODO" "DOIN" "PEND" "|" "DONE" "CANC")))
+	'((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
   (setq org-todo-keyword-faces
 	'(("TODO" . error)
 	  ("DOIN" . org-document-title)
