@@ -34,6 +34,7 @@
 				       (concat org-directory "today.org")
 				       (concat org-directory "goals-habits.org")
 				       (concat org-directory "social.org"))))
+  (setq org-log-done 'time)
 
   ;; org-push
   (defun org-push-copy ()
@@ -90,9 +91,4 @@
 	      ("\C-ca" . org-agenda)
 	      ("\C-cc" . org-capture)
 	      ("\C-cb" . org-iswitchb))
-  :config
-
-  (progn
-    (setq org-log-done 'time)
-    )
   )
