@@ -32,16 +32,14 @@
 ;;before use-package
 (add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
 
-
 (use-package fic-mode
   :load-path "lisp/"
+  :diminish fic-mode
   :config
   (add-hook 'prog-mode-hook 'turn-on-fic-mode)
   )
 
-(use-package color-rg
-  :load-path "lisp/"
-  )
+(use-package color-rg :load-path "lisp/" )
 
 ;; yasnippet
 (use-package yasnippet-snippets
@@ -162,59 +160,20 @@
   :ensure t
   :mode (("\\.glsl\\'" . glsl-mode)
 	 ("\\.vs\\'" . glsl-mode)
+	 ("\\.vert\\'" . glsl-mode)
 	 ("\\.fs\\'" . glsl-mode)
+	 ("\\.frag\\'" . glsl-mode)
 	 ("\\.gs\\'" . glsl-mode)
-	 ("\\.comp\\'" . glsl-mode)))
-(use-package octave
-  :ensure t
-  :mode (("\\.m\\'" . octave-mode)))
-;;special javascript
-(setq js-indent-level 2)
+	 ("\\.comp\\'" . glsl-mode))
+  )
+;;javascript
 (use-package rjsx-mode
   :ensure t
   :defer t
-  :mode (("\\.js\\'" . rjsx-mode)))
-
-(use-package lua-mode
-  :ensure t
-  :defer t
-  :mode (("\\.lua\\'" . lua-mode)))
-(use-package markdown-mode
-  :ensure t
-  :defer t
-  :mode (("\\.md\\'" . markdown-mode)))
-
-(use-package rust-mode
-  :ensure t
-  :defer t
-  :mode (("\\.rs\\'" . rust-mode)))
-
-(use-package graphviz-dot-mode
-  :ensure t
-  :defer t
-  :mode (("\\.dot\\'" . graphviz-dot-mode)))
-
-(use-package dockerfile-mode
-  :ensure t
-  :defer t
-  :mode (("/Dockerfile" . dockerfile-mode)))
-
-(use-package yaml-mode
-  :ensure t
-  :defer t
-  :mode (("\\.yml\\'" . yaml-mode)))
-
-(use-package gdscript-mode
-  :ensure t
-  :defer t
-  :mode (("\\.gd\\'" . gdscript-mode)))
-
-(use-package meson-mode
-  :ensure t
-  :defer t
-  :config (add-hook 'meson-mode-hook 'company-mode)
-  :mode (("/meson\\.build\\'" . meson-mode)))
-
+  :mode (("\\.js\\'" . rjsx-mode))
+  :config (setq js-indent-level 2)
+  )
+;;typescript
 (use-package typescript-mode
   :ensure t
   :mode "\\.ts\\'"
@@ -223,6 +182,27 @@
   (setq typescript-indent-level 2)
   (setq-default indent-tabs-mode nil)
   )
+;;mesonbuild
+(use-package meson-mode
+  :ensure t
+  :defer t
+  :hook (meson-mode . company-mode)
+  :mode (("/meson\\.build\\'" . meson-mode))
+  )
+;;graphviz dot
+(use-package graphviz-dot-mode :ensure t
+  :mode (("\\.dot\\'" . graphviz-dot-mode)))
+
+(use-package lua-mode :ensure t :mode (("\\.lua\\'" . lua-mode)))
+
+(use-package rust-mode :ensure t :mode (("\\.rs\\'" . rust-mode)))
+
+(use-package gdscript-mode :ensure t :mode (("\\.gd\\'" . gdscript-mode)))
+
+(use-package markdown-mode :ensure t :mode (("\\.md\\'" . markdown-mode)))
+
+(use-package octave :ensure t :mode (("\\.m\\'" . octave-mode)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;; Setup for programming languages ;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
