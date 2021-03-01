@@ -208,65 +208,79 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; 8) hs-minor-mode
-(require 'hideshow)
-(require 'sgml-mode)
-(require 'nxml-mode)
-(add-hook 'prog-mode-hook 'hs-minor-mode)
+(use-package hideif
+  :ensure t
+  :diminish hide-ifdef-mode
+  :hook (c-mode-common . hide-ifdef-mode)
+  :config
+  (setq hide-ifdef-read-only t)
+  )
 
-;;Fix XML folding
-(add-to-list 'hs-special-modes-alist
-	     '(nxml-mode
-	       "<!--\\|<[^/>]*[^/]>"
-	       "-->\\|</[^/>]*[^/]>"
-	       "<!--"
-	       sgml-skip-tag-forward
-	       nil))
-(add-hook 'nxml-mode-hook 'hs-minor-mode)
-
-(defun hs-hide-leafs-recursive (minp maxp)
-  "Hide blocks below point that do not contain further blocks in
+(use-package hideshow
+  :hook ((prog-mode . hs-minor-mode)
+	 (nxml-mode . hs-minor-mode))
+  :diminish hs-minor-mode
+  :bind (;; the two map didn't work, polluting global map
+	 ("C-c C-h t" . hs-toggle-hiding)
+	 ("C-c C-h l" . hs-hide-level)
+	 ("C-c C-h a" . hs-hide-leafs)
+	 ("C-c C-h s" . hs-show-all)
+	 )
+  :config
+  (setq hs-isearch-open t)
+  (add-to-list 'hs-special-modes-alist
+	       '(nxml-mode
+		 "<!--\\|<[^/>]*[^/]>"
+		 "-->\\|</[^/>]*[^/]>"
+		 "<!--"
+		 sgml-skip-tag-forward
+		 nil))
+  ;;---- define the leaf function
+  (defun hs-hide-leafs-recursive (minp maxp)
+    "Hide blocks below point that do not contain further blocks in
     region (MINP MAXP)."
-  (when (hs-find-block-beginning)
-    (setq minp (1+ (point)))
-    (funcall hs-forward-sexp-func 1)
-    (setq maxp (1- (point))))
-  (unless hs-allow-nesting
-    (hs-discard-overlays minp maxp))
-  (goto-char minp)
-  (let ((leaf t))
-    (while (progn
-	     (forward-comment (buffer-size))
-	     (and (< (point) maxp)
-		  (re-search-forward hs-block-start-regexp maxp t)))
-      (setq pos (match-beginning hs-block-start-mdata-select))
-      (if (hs-hide-leafs-recursive minp maxp)
-	  (save-excursion
-	    (goto-char pos)
-	    (hs-hide-block-at-point t)))
-      (setq leaf nil))
-    (goto-char maxp)
-    leaf))
-
-(defun hs-hide-leafs ()
-  "Hide all blocks in the buffer that do not contain subordinate
+    (when (hs-find-block-beginning)
+      (setq minp (1+ (point)))
+      (funcall hs-forward-sexp-func 1)
+      (setq maxp (1- (point))))
+    (unless hs-allow-nesting
+      (hs-discard-overlays minp maxp))
+    (goto-char minp)
+    (let ((leaf t))
+      (while (progn
+	       (forward-comment (buffer-size))
+	       (and (< (point) maxp)
+		    (re-search-forward hs-block-start-regexp maxp t)))
+	(setq pos (match-beginning hs-block-start-mdata-select))
+	(if (hs-hide-leafs-recursive minp maxp)
+	    (save-excursion
+	      (goto-char pos)
+	      (hs-hide-block-at-point t)))
+	(setq leaf nil))
+      (goto-char maxp)
+      leaf))
+  (defun hs-hide-leafs ()
+    "Hide all blocks in the buffer that do not contain subordinate
     blocks.  The hook `hs-hide-hook' is run; see `run-hooks'."
-  (interactive)
-  (hs-life-goes-on
-   (save-excursion
-     (message "Hiding blocks ...")
+    (interactive)
+    (hs-life-goes-on
      (save-excursion
-       (goto-char (point-min))
-       (hs-hide-leafs-recursive (point-min) (point-max)))
-     (message "Hiding blocks ... done"))
-   (run-hooks 'hs-hide-hook)))
+       (message "Hiding blocks ...")
+       (save-excursion
+	 (goto-char (point-min))
+	 (hs-hide-leafs-recursive (point-min) (point-max)))
+       (message "Hiding blocks ... done"))
+     (run-hooks 'hs-hide-hook)))
+  )
 
-;;;Hide/Show minor-mode is a much better mode to work with
-(setq cm-map (make-sparse-keymap))
-(global-set-key "\M-o" cm-map)
-(define-key cm-map "t" 'hs-toggle-hiding)         ; Toggle hiding, which is very useful
-					; HIDE
-(define-key cm-map "a" 'hs-hide-leafs)    ; Hide everything but the top-level headings
-(define-key cm-map "c" 'hs-hide-comment-region) ;Hide comment ?
-(define-key cm-map "l" 'hs-hide-level)
-(define-key cm-map "A" 'hs-show-all)       ; Show (expand) everything
-(define-key cm-map "B" 'hs-show-block)     ; Show this heading's body
+
+;; ;;;Hide/Show minor-mode is a much better mode to work with
+;; (setq cm-map (make-sparse-keymap))
+;; (global-set-key "\M-o" cm-map)
+;; (define-key cm-map "t" 'hs-toggle-hiding)         ; Toggle hiding, which is very useful
+;;					; HIDE
+;; (define-key cm-map "a" 'hs-hide-leafs)    ; Hide everything but the top-level headings
+;; (define-key cm-map "c" 'hs-hide-comment-region) ;Hide comment ?
+;; (define-key cm-map "l" 'hs-hide-level)
+;; (define-key cm-map "A" 'hs-show-all)       ; Show (expand) everything
+;; (define-key cm-map "B" 'hs-show-block)     ; Show this heading's body
