@@ -236,7 +236,7 @@
 	 ("C-c C-h t" . hs-toggle-hiding)
 	 ("C-c C-h l" . hs-hide-level)
 	 ("C-c C-h a" . hs-hide-leafs)
-	 ("C-c C-h s" . hs-show-all)
+	 ("C-c C-h s" . hs-show-block)
 	 )
   :config
   (setq hs-isearch-open t)
@@ -247,7 +247,7 @@
 		 "<!--"
 		 sgml-skip-tag-forward
 		 nil))
-  ;;---- define the leaf function
+  :preface
   (defun hs-hide-leafs-recursive (minp maxp)
     "Hide blocks below point that do not contain further blocks in
     region (MINP MAXP)."
