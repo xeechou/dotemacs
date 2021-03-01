@@ -1,10 +1,12 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;; Setup for programming languages ;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; functional packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package company-c-headers :ensure t)
 (setq clang-known-modes '(c++-mode c-mode))
 (setq company-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
 
+;;--- -1) for all programming languages
 (use-package smart-tabs-mode
   :ensure t
   :init
@@ -16,21 +18,11 @@
   :commands flycheck-mode
   :hook ((c++-mode c-mode) . flycheck-mode))
 
-;;--- -1) for all programming languages
-(add-hook 'emacs-lisp-mode-hook 'show-paren-mode)
-(add-hook 'c++-mode-hook 'show-paren-mode)
-(add-hook 'c-mode-hook 'show-paren-mode)
-(setq show-paren-style 'parenthesis)
-
-(add-hook 'c-mode-common-hook (lambda()
-				(c-set-offset 'inextern-lang 0)
-				(c-set-offset 'innamespace 0)
-				(c-set-offset 'inline-open 0)))
-;;default C indent level
-(setq c-default-style "linux"
-      c-basic-offset 8)
-;;before use-package
-(add-to-list 'auto-mode-alist '("\\.inl\\'" . c++-mode))
+(use-package paren
+  :ensure t
+  :diminish show-paren-mode
+  :hook (prog-mode . show-paren-mode)
+  :config (setq show-paren-style 'parenthesis))
 
 (use-package fic-mode
   :load-path "lisp/"
@@ -50,9 +42,9 @@
   (add-hook 'cmake-mode-hook #'yas-minor-mode)
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;company;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lsp setup
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package lsp-mode
   :ensure t
   :hook ((c++-mode . lsp)
@@ -149,7 +141,28 @@
 			   'company-lua)))
   )
 
-;;languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; C family
+(use-package cc-mode
+  :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
+	 ("\\.m\\'" . c-mode)
+	 ("\\.mm\\'" . c++-mode)
+	 ("\\.inl\\'" . c++-mode))
+  :preface
+  (defun my-cmode-hook ()
+    (setq c-default-style "linux"
+	  c-basic-offset 8)
+    (c-set-offset 'inextern-lang 0)
+    (c-set-offset 'innamespace 0)
+    (c-set-offset 'inline-open 0)
+    )
+  :hook
+  (c-mode-common . my-cmode-hook)
+  )
+
 ;;cmake
 (use-package cmake-mode
   :ensure t
@@ -203,11 +216,10 @@
 
 (use-package octave :ensure t :mode (("\\.m\\'" . octave-mode)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;; Setup for programming languages ;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; hideshow
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; 8) hs-minor-mode
 (use-package hideif
   :ensure t
   :diminish hide-ifdef-mode
@@ -272,15 +284,3 @@
        (message "Hiding blocks ... done"))
      (run-hooks 'hs-hide-hook)))
   )
-
-
-;; ;;;Hide/Show minor-mode is a much better mode to work with
-;; (setq cm-map (make-sparse-keymap))
-;; (global-set-key "\M-o" cm-map)
-;; (define-key cm-map "t" 'hs-toggle-hiding)         ; Toggle hiding, which is very useful
-;;					; HIDE
-;; (define-key cm-map "a" 'hs-hide-leafs)    ; Hide everything but the top-level headings
-;; (define-key cm-map "c" 'hs-hide-comment-region) ;Hide comment ?
-;; (define-key cm-map "l" 'hs-hide-level)
-;; (define-key cm-map "A" 'hs-show-all)       ; Show (expand) everything
-;; (define-key cm-map "B" 'hs-show-block)     ; Show this heading's body
