@@ -31,6 +31,7 @@
   ;; it seems if we use org-mobile-files, it is the only list we move
   (setq org-mobile-files (append org-agenda-files
 				 (list (concat org-directory "notes.org")
+				       (concat org-directory "journal.org")
 				       (concat org-directory "today.org")
 				       (concat org-directory "goals-habits.org")
 				       (concat org-directory "social.org"))))
