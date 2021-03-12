@@ -1,6 +1,8 @@
 (use-package org-mode
   :ensure org
   :mode (("\\.org$" . org-mode))
+  :custom
+  (org-directory "~/org/")
   :init
   (setq org-todo-keywords
 	'((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
@@ -20,35 +22,38 @@
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
   (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
   ;;setup the default directory
-  (setq org-directory "~/org/")
-  (setq org-mobile-directory "~/Documents/org-remote/")
+  (setq org-mobile-dir "~/Documents/org-remote/")
 
   (setq org-default-notes-file (concat org-directory "miscs.org"))
   ;; you have to set this before loading org-mode
   (setq org-agenda-files (list (concat org-directory "work.org")
 			       (concat org-directory "training.org")
-			       (concat org-directory "miscs.org")))
+			       (concat org-directory "miscs.org")
+			       (concat org-directory "goals-habits.org")))
   ;; it seems if we use org-mobile-files, it is the only list we move
   (setq org-mobile-files (append org-agenda-files
 				 (list (concat org-directory "notes.org")
 				       (concat org-directory "journal.org")
 				       (concat org-directory "today.org")
-				       (concat org-directory "goals-habits.org")
 				       (concat org-directory "social.org"))))
   (setq org-log-done 'time)
 
   ;; org-push
   (defun org-push-copy ()
     "copy agenda files"
-    (if (file-exists-p org-mobile-directory)
-	(dolist (src org-mobile-files)
-	  (let (name dest)
-	    (progn
-	      (setq name (file-name-nondirectory src))
-	      (setq dest (concat org-mobile-directory name))
-	      (copy-file src dest 'ok-if-already-exists))
-	    ))
-      (message "%s does not exist" org-mobile-directory))
+    (message "Coping agendas ...")
+    (if (file-exists-p org-mobile-dir)
+	(let ((files (directory-files-recursively org-directory "\.org$")))
+	  (progn (dolist (src files)
+		   (let (name dest)
+		     (progn
+		       (setq name (string-remove-prefix org-directory src))
+		       (setq dest (concat org-mobile-dir name))
+		       (copy-file src dest 'ok-if-already-exists))))
+		 (message "Coping agendas done")
+		 )
+	  )
+      (message "%s does not exist" org-mobile-dir))
     )
   (defun org-push ()
     "org push but delete the agendas and mobileorg, use this for now"
@@ -58,22 +63,25 @@
 	(save-window-excursion
 	  (message "Creating agendas... done")
 	  (org-save-all-org-buffers)
-	  (message "Coping agendas... done") ;;we will last see this if no error happens
 	  (org-push-copy)
 	  )))
     )
   ;; org-pull
   (defun org-pull-copy ()
     "copy agenda files"
-    (if (file-exists-p org-mobile-directory)
-	(dolist (dest org-mobile-files)
-	  (let (name src)
-	    (progn
-	      (setq name (file-name-nondirectory dest))
-	      (setq src (concat org-mobile-directory name))
-	      (copy-file src dest 'ok-if-already-exists))
-	    ))
-      (message "remote %s does not exist" org-mobile-directory))
+    (message "pulling orgs...")
+    (if (file-exists-p org-mobile-dir)
+	(let ((files (directory-files-recursively org-mobile-dir "\.org$")))
+	  ;;coping from remote to local
+	  (progn (dolist (src files)
+		   (let (name dest)
+		     (setq name (string-remove-prefix org-mobile-dir src))
+		     (setq dest (concat org-directory name))
+		     (copy-file src dest 'ok-if-already-exists)
+		     ))
+		 (message "pulling orgs... done"))
+	  )
+      (message "remote %s does not exist" org-mobile-dir))
     )
   (defun org-pull ()
     "pulling all the agendas from remote, this overrides current files"
@@ -83,11 +91,11 @@
 	(save-window-excursion
 	  (message "saving agendas... done")
 	  (org-save-all-org-buffers)
-	  (message "pulling agendas...done")
 	  (org-pull-copy)
 	  )))
     )
-  ;I am not sure this global key setting is good or not, capture stuff globally is great
+  ;I am not sure this global key setting is good or not, capture stuff globally
+  ;is great
   :bind (:map global-map
 	      ("\C-ca" . org-agenda)
 	      ("\C-cc" . org-capture)
@@ -100,7 +108,7 @@
   :hook
   (after-init . org-roam-mode)
   :custom
-  (org-roam-directory "~/org/roam")
+  (org-roam-directory (concat org-directory "roam/"))
   :bind (:map org-roam-mode-map
               (("C-c n r" . org-roam-buffer-toggle-display) ;;toggle-back-links
                ("C-c n f" . org-roam-find-file)
@@ -116,14 +124,16 @@
         '(
           ("d" "default" plain #'org-roam-capture--get-point
            :file-name "%<%Y-%m-%d-%H-%M-%S>-${slug}"
-           :head "#+title: ${title}\n#+ROAM_TAGS: %^{org-roam-tags}\n#+created: %u\n#+last_modified: %U\n%?"
+           :head "#+title: ${title}\n#+ROAM_TAGS: %^{org-roam-tags}\n\
+#+created: %u\n#+last_modified: %U\n%?"
            :unnarrowed t
            :jump-to-captured t)
 
           ("l" "clipboard" plain (function org-roam--capture-get-point)
            "%c"
            :file-name "%<%Y-%m-%d-%H-%M-%S>-${slug}"
-           :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n#+ROAM_TAGS: %?\n"
+           :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n\
+#+ROAM_TAGS: %?\n"
            :unnarrowed t
            :prepend t
            :jump-to-captured t)
