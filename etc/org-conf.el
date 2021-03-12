@@ -92,3 +92,23 @@
 	      ("\C-cc" . org-capture)
 	      ("\C-cb" . org-iswitchb))
   )
+
+;; org-roam minor mode
+(use-package org-roam
+  :ensure t
+  :hook
+  (after-init . org-roam-mode)
+  :custom
+  (org-roam-directory "~/org/roam")
+  :bind (:map org-roam-mode-map
+              (("C-c n r" . org-roam-buffer-toggle-display) ;;toggle-back-links
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n d" . org-roam-find-directory)
+               ("C-c n g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))
+              (("C-c n I" . org-roam-insert-immediate)))
+  :config
+  (when (eq system-type 'windows-nt)
+    (setq org-roam-db-update-method 'immediate))
+  )
