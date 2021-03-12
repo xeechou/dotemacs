@@ -111,4 +111,21 @@
   :config
   (when (eq system-type 'windows-nt)
     (setq org-roam-db-update-method 'immediate))
+  (setq org-roam-capture-templates
+        '(
+          ("d" "default" plain #'org-roam-capture--get-point
+           :file-name "%<%Y-%m-%d-%H-%M-%S>-${slug}"
+           :head "#+title: ${title}\n#+ROAM_TAGS: %^{org-roam-tags}\n#+created: %u\n#+last_modified: %U\n%?"
+           :unnarrowed t
+           :jump-to-captured t)
+
+          ("l" "clipboard" plain (function org-roam--capture-get-point)
+           "%c"
+           :file-name "%<%Y-%m-%d-%H-%M-%S>-${slug}"
+           :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n#+ROAM_TAGS: %?\n"
+           :unnarrowed t
+           :prepend t
+           :jump-to-captured t)
+          ))
+  (setq org-roam-completion-system 'ivy)
   )
