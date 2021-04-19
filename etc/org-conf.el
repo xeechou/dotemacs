@@ -14,6 +14,9 @@
 	  ("PEND" . org-level-3)))
   (setq org-clock-persist 'history)
   (org-clock-persistence-insinuate)
+  ;; org-latex-preview settings, requires we have program latex and dvipng
+  (setq org-latex-create-formula-image-program 'dvipng)
+  (setq org-preview-latex-image-directory "/tmp/ltximg/")
 
   ;; recursively update the parents TODO
   (defun org-summary-todo (n-done n-not-done)
