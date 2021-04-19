@@ -4,6 +4,10 @@
 (let ((default-directory "~/.emacs.d/lisp/"))
     (normal-top-level-add-subdirs-to-load-path))
 
+;; set for using native-compiled emacs
+(when (fboundp 'native-compiled-async)
+  (setq comp-deferred-compilation t
+	comp-deferred-compilation-black-list '("/mu4e.*\\.el$")))
 ;;(setq warning-minimum-level :error)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -122,6 +126,7 @@
     (cons 340 "#505050")
     (cons 360 "#505050")))
  '(vc-annotate-very-old-color nil)
+ '(warning-suppress-types '((comp)))
  '(whitespace-style
    '(face trailing tabs spaces lines newline empty space-before-tab space-mark tab-mark newline-mark)))
 (custom-set-faces

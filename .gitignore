@@ -16,3 +16,4 @@ bookmarks
 eshell/history
 # org-roam database, we just keep it locally
 org-roam.db
+eln-cache/
