@@ -24,8 +24,6 @@
     (let (org-log-done org-log-states) ; turn off logging
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
   (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
-  ;;setup the default directory
-  (setq org-mobile-dir "~/Documents/org-remote/")
 
   (setq org-default-notes-file (concat org-directory "miscs.org"))
   ;; you have to set this before loading org-mode
@@ -41,62 +39,6 @@
 				       (concat org-directory "social.org"))))
   (setq org-log-done 'time)
 
-  ;; org-push
-  (defun org-push-copy ()
-    "copy agenda files"
-    (message "Coping agendas ...")
-    (if (file-exists-p org-mobile-dir)
-	(let ((files (directory-files-recursively org-directory "\.org$")))
-	  (progn (dolist (src files)
-		   (let (name dest)
-		     (progn
-		       (setq name (string-remove-prefix org-directory src))
-		       (setq dest (concat org-mobile-dir name))
-		       (copy-file src dest 'ok-if-already-exists))))
-		 (message "Coping agendas done")
-		 )
-	  )
-      (message "%s does not exist" org-mobile-dir))
-    )
-  (defun org-push ()
-    "org push but delete the agendas and mobileorg, use this for now"
-    (interactive)
-    (save-excursion
-      (save-restriction
-	(save-window-excursion
-	  (message "Creating agendas... done")
-	  (org-save-all-org-buffers)
-	  (org-push-copy)
-	  )))
-    )
-  ;; org-pull
-  (defun org-pull-copy ()
-    "copy agenda files"
-    (message "pulling orgs...")
-    (if (file-exists-p org-mobile-dir)
-	(let ((files (directory-files-recursively org-mobile-dir "\.org$")))
-	  ;;coping from remote to local
-	  (progn (dolist (src files)
-		   (let (name dest)
-		     (setq name (string-remove-prefix org-mobile-dir src))
-		     (setq dest (concat org-directory name))
-		     (copy-file src dest 'ok-if-already-exists)
-		     ))
-		 (message "pulling orgs... done"))
-	  )
-      (message "remote %s does not exist" org-mobile-dir))
-    )
-  (defun org-pull ()
-    "pulling all the agendas from remote, this overrides current files"
-    (interactive)
-    (save-excursion
-      (save-restriction
-	(save-window-excursion
-	  (message "saving agendas... done")
-	  (org-save-all-org-buffers)
-	  (org-pull-copy)
-	  )))
-    )
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
   :bind (:map global-map
@@ -142,4 +84,11 @@
            :jump-to-captured t)
           ))
   (setq org-roam-completion-system 'ivy)
+  )
+
+;; My synchronizer
+(use-package org-msync :load-path "lisp/"
+  :custom
+  (org-msync-local-dir org-directory)
+  (org-msync-remote-dir "~/Documents/org-remote/")
   )
