@@ -16,7 +16,8 @@
   (org-clock-persistence-insinuate)
   ;; org-latex-preview settings, requires we have program latex and dvipng
   (setq org-latex-create-formula-image-program 'dvipng)
-  (setq org-preview-latex-image-directory "/tmp/ltximg/")
+  (setq org-preview-latex-image-directory
+	(concat temporary-file-directory "ltximg/"))
 
   ;; recursively update the parents TODO
   (defun org-summary-todo (n-done n-not-done)
@@ -88,6 +89,9 @@
 
 ;; My synchronizer
 (use-package org-msync :load-path "lisp/"
+  :init
+  (add-hook 'org-mode-hook 'org-msync-after-save-hook)
+  (add-hook 'auto-save-hook 'org-msync-auto-save-hook)
   :custom
   (org-msync-local-dir org-directory)
   (org-msync-remote-dir "~/Documents/org-remote/")
