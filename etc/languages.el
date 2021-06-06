@@ -72,8 +72,10 @@
   (lsp-ui-sideline-enable t)
   (lsp-ui-sideline-ignore-duplicate t)
   (lsp-ui-sideline-show-diagnostics t)
+  (lsp-ui-sideline-delay 2)
   (lsp-ui-flycheck-enable t)
-  (lsp-ui-doc-position 'bottom)
+  (lsp-ui-doc-enable nil)
+  ;; (lsp-ui-doc-position 'bottom)
     ;; ;;don't create lsp-stderr buffer
     ;; ;;I need to read lsp-ui code
     ;; (setq lsp-ui-flycheck-enable t

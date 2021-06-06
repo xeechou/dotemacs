@@ -70,9 +70,8 @@
  '(jdee-db-active-breakpoint-face-colors (cons "#1b1d1e" "#fc20bb"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
- '(lsp-log-io nil)
+ '(lsp-log-io nil nil nil "Customized with use-package lsp-mode")
  '(lsp-prefer-flymake nil t)
- '(lsp-print-io nil)
  '(lsp-print-performance nil)
  '(lsp-trace nil t)
  '(lsp-ui-flycheck-enable t t)
@@ -86,7 +85,10 @@
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
  '(safe-local-variable-values
-   '((eval progn
+   '((c-file-offsets
+      (innamespace . 0)
+      (block-open . 0))
+     (eval progn
 	   (c-set-offset 'innamespace '+)
 	   (setq c-basic-offset 4))
      (eval progn
