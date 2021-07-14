@@ -181,6 +181,17 @@
 	 ("\\.gs\\'" . glsl-mode)
 	 ("\\.comp\\'" . glsl-mode))
   )
+;; golang
+(use-package go-mode
+  :ensure t
+  :mode (("\\.go\\'" . go-mode)
+	 ("\\.mode\\'" . go-mode))
+  :init
+  (add-hook 'go-mode-hook ;;hooks only work on go-mode
+            (lambda ()
+              (add-hook 'before-save-hook 'gofmt-before-save nil t)))
+  )
+
 ;;javascript
 (use-package rjsx-mode
   :ensure t
