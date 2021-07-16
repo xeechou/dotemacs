@@ -45,11 +45,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lsp setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package lsp-mode
   :ensure t
-  :hook ((c++-mode . lsp)
-	 (c-mode . lsp)
-	 (python-mode . lsp))
   :commands (lsp lsp-deferred)
   :init (setq lsp-auto-guess-root t)
   :custom
@@ -86,12 +84,14 @@
 (use-package company
   :ensure t
   :defer t
-  :hook ((c-mode . company-mode)
-	 (c++-mode . company-mode)
-	 (emacs-lisp-mode . company-mode)
-	 (cmake-mode . company-mode))
+  :hook ((emacs-lisp-mode . company-mode))
+  :init
+  (add-hook 'emacs-lisp-mode-hook
+	    (lambda ()
+	      (add-to-list (make-local-variable 'company-backends)
+			   'company-elisp)))
   :config
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -110,37 +110,6 @@
     (if (looking-at "\\_>")
 	(company-complete-common)
       (indent-according-to-mode)))
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; lanuages ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Backend-setup;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (dolist (hook '(c-mode-hook
-		  c++-mode-hook))
-    (add-hook hook
-	      (lambda ()
-		(add-to-list (make-local-variable 'company-backends)
-			     'company-capf))))
-  ;;;for python
-  (add-hook 'python-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-jedi)))
-  ;;;for elisp
-  (add-hook 'emacs-lisp-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-elisp)))
-
-  (add-hook 'cmake-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-cmake)))
-  (add-hook 'lua-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-lua)))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -155,21 +124,46 @@
 	 ("\\.inl\\'" . c++-mode))
   :preface
   (defun my-cmode-hook ()
+    ;;default settings
     (setq c-default-style "linux"
 	  c-basic-offset 8)
     (c-set-offset 'inextern-lang 0)
     (c-set-offset 'innamespace 0)
     (c-set-offset 'inline-open 0)
     )
+  (defun cc-company-backend-hook ()
+    (add-to-list (make-local-variable 'company-backends) 'company-capf))
   :hook
-  (c-mode-common . my-cmode-hook)
+  ((c-mode-common . my-cmode-hook)
+   (c++-mode . cc-company-backend-hook)
+   (c-mode . cc-company-backend-hook)
+   (c++-mode . lsp)
+   (c-mode . lsp))
   )
+
+;;python
+(use-package python-mode
+  :ensure t
+  :preface
+  :init
+  (add-hook 'python-mode-hook
+	    (lambda ()
+	      (add-to-list (make-local-variable 'company-backends)
+			   'company-jedi)))
+  :hook ((python-mode . lsp)
+	 (python-mode . company)))
 
 ;;cmake
 (use-package cmake-mode
   :ensure t
+  :init
+  (add-hook 'cmake-mode-hook
+	    (lambda ()
+	      (add-to-list (make-local-variable 'company-backends)
+			   'company-cmake)))
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
 	 ("\\.cmake\\'" . cmake-mode)))
+
 ;; glsl
 (use-package glsl-mode
   :ensure t
@@ -181,12 +175,14 @@
 	 ("\\.gs\\'" . glsl-mode)
 	 ("\\.comp\\'" . glsl-mode))
   )
+
 ;; golang
 (use-package go-mode
   :ensure t
   :mode (("\\.go\\'" . go-mode)
 	 ("\\.mode\\'" . go-mode))
   :init
+  (add-hook 'go-mode-hook #'lsp-deferred)
   (add-hook 'go-mode-hook ;;hooks only work on go-mode
             (lambda ()
               (add-hook 'before-save-hook 'gofmt-before-save nil t)))
@@ -199,6 +195,7 @@
   :mode (("\\.js\\'" . rjsx-mode))
   :config (setq js-indent-level 2)
   )
+
 ;;typescript
 (use-package typescript-mode
   :ensure t
@@ -208,6 +205,7 @@
   (setq typescript-indent-level 2)
   (setq-default indent-tabs-mode nil)
   )
+
 ;;mesonbuild
 (use-package meson-mode
   :ensure t
@@ -215,11 +213,20 @@
   :hook (meson-mode . company-mode)
   :mode (("/meson\\.build\\'" . meson-mode))
   )
+
+(use-package lua-mode
+  :ensure t
+  :mode (("\\.lua\\'" . lua-mode))
+  :init
+  (add-hook 'lua-mode-hook
+	    (lambda ()
+	      (add-to-list (make-local-variable 'company-backends)
+			   'company-lua)))
+  )
+
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t
   :mode (("\\.dot\\'" . graphviz-dot-mode)))
-
-(use-package lua-mode :ensure t :mode (("\\.lua\\'" . lua-mode)))
 
 (use-package rust-mode :ensure t :mode (("\\.rs\\'" . rust-mode)))
 
