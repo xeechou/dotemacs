@@ -13,10 +13,7 @@
   (smart-tabs-insinuate 'c 'c++)
 )
 
-(use-package flycheck
-  :ensure t
-  :commands flycheck-mode
-  :hook ((c++-mode c-mode) . flycheck-mode))
+(use-package flycheck :ensure t :commands flycheck-mode)
 
 (use-package paren
   :ensure t
@@ -136,8 +133,10 @@
   :hook
   ((c-mode-common . my-cmode-hook)
    (c++-mode . cc-company-backend-hook)
-   (c-mode . cc-company-backend-hook)
+   (c++-mode . flycheck-mode)
    (c++-mode . lsp)
+   (c-mode . cc-company-backend-hook)
+   (c-mode . flycheck-mode)
    (c-mode . lsp))
   )
 
@@ -235,6 +234,8 @@
 (use-package markdown-mode :ensure t :mode (("\\.md\\'" . markdown-mode)))
 
 (use-package octave :ensure t :mode (("\\.m\\'" . octave-mode)))
+
+(use-package yaml-mode :ensure t :mode (("\\.yml\\'" . yaml-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hideshow
