@@ -10,6 +10,8 @@
 	comp-deferred-compilation-black-list '("/mu4e.*\\.el$")))
 ;;(setq warning-minimum-level :error)
 
+;; disable org-roam warning
+(setq org-roam-v2-ack t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;; MELPA ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
