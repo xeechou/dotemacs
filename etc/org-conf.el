@@ -51,18 +51,12 @@
 ;; org-roam minor mode
 (use-package org-roam
   :ensure t
-  :hook
-  (after-init . org-roam-mode)
   :custom
   (org-roam-directory (concat org-directory "roam/"))
-  :bind (:map org-roam-mode-map
-              (("C-c n r" . org-roam-buffer-toggle-display) ;;toggle-back-links
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n d" . org-roam-find-directory)
-               ("C-c n g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))
-              (("C-c n I" . org-roam-insert-immediate)))
+  :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
+	  ("C-c n f" . org-roam-node-find)
+	  ("C-c n c" . org-roam-capture)
+	  ("C-c n g" . org-roam-graph)) ;; doesn't work
   :config
   (when (eq system-type 'windows-nt)
     (setq org-roam-db-update-method 'immediate))
