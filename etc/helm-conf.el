@@ -26,3 +26,9 @@
   ("C-c j" . counsel-git-grep)
   ("C-c k" . counsel-ag)
   )
+
+;; using tramp mode
+(use-package counsel-tramp :ensure t
+  :bind ("C-c s" . counsel-tramp)
+  :if (eq window-system 'w32)
+  :config (setq tramp-default-method "plink"))

@@ -87,7 +87,7 @@
  '(lsp-ui-sideline-show-diagnostics t)
  '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-   '(exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
+   '(counsel-tramp exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
