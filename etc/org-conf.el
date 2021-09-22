@@ -31,13 +31,13 @@
   (setq org-agenda-files (list (concat org-directory "work.org")
 			       (concat org-directory "training.org")
 			       (concat org-directory "miscs.org")
-			       (concat org-directory "goals-habits.org")))
+			       (concat org-directory "social.org")))
   ;; it seems if we use org-mobile-files, it is the only list we move
   (setq org-mobile-files (append org-agenda-files
 				 (list (concat org-directory "notes.org")
 				       (concat org-directory "journal.org")
 				       (concat org-directory "today.org")
-				       (concat org-directory "social.org"))))
+				       (concat org-directory "goal-habits.org"))))
   (setq org-log-done 'time)
 
   ;I am not sure this global key setting is good or not, capture stuff globally
@@ -56,16 +56,16 @@
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
 	  ("C-c n f" . org-roam-node-find)
 	  ("C-c n c" . org-roam-capture)
+	  ("C-c n i" . org-roam-node-insert)
 	  ("C-c n g" . org-roam-graph)) ;; doesn't work
   :config
   (when (eq system-type 'windows-nt)
     (setq org-roam-db-update-method 'immediate))
   (setq org-roam-capture-templates
         '(
-          ("d" "default" plain #'org-roam-capture--get-point
-           :file-name "%<%Y-%m-%d-%H-%M-%S>-${slug}"
-           :head "#+title: ${title}\n#+ROAM_TAGS: %^{org-roam-tags}\n\
-#+created: %u\n#+last_modified: %U\n%?"
+          ("d" "default" plain "%?"
+	   :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                     "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
            :unnarrowed t
            :jump-to-captured t)
 
