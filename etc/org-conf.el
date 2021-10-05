@@ -30,14 +30,14 @@
   ;; you have to set this before loading org-mode
   (setq org-agenda-files (list (concat org-directory "work.org")
 			       (concat org-directory "training.org")
+			       (concat org-directory "goals-habits.org")
 			       (concat org-directory "miscs.org")
 			       (concat org-directory "social.org")))
   ;; it seems if we use org-mobile-files, it is the only list we move
   (setq org-mobile-files (append org-agenda-files
 				 (list (concat org-directory "notes.org")
 				       (concat org-directory "journal.org")
-				       (concat org-directory "today.org")
-				       (concat org-directory "goal-habits.org"))))
+				       (concat org-directory "today.org"))))
   (setq org-log-done 'time)
 
   ;I am not sure this global key setting is good or not, capture stuff globally
