@@ -56,23 +56,20 @@
   "get json path using prefix"
   (concat dir org-msync-json))
 
-(defun org-msync-local-entry (path)
-  "strip path of local org directory prefix"
-  (let ((dir (file-truename org-msync-local-dir))
-	(tpath (file-truename path)))
-    (string-remove-prefix dir tpath)))
-
-;; (defun org-msync-remote-entry (path)
-;;   "strip path of remote org diretory prefix"
-;;   (let ((dir (file-truename org-msync-remote-dir))
-;;	(tpath (file-truename path)))
-;;     (string-remove-prefix dir tpath)))
-
 (defun org-msync-entry (path dir)
   "strip path from dir prefix"
   (let ((dir (file-truename dir))
 	(tpath (file-truename path)))
     (string-remove-prefix dir tpath)))
+
+(defun org-msync-local-entry (path)
+  "strip path of local org directory prefix"
+  (org-msync-entry path org-msync-local-dir))
+
+(defun org-msync-remote-entry (path)
+  "strip path of remote org diretory prefix"
+  (org-msync-entry path org-msync-remote-dir))
+
 
 (defun org-msync-hash-file (path)
   "generate the hash for the given path"
@@ -126,8 +123,8 @@
       (org-msync-write-chksums json-local sums)
       (message "flushed org checksums"))))
 
-(defun org-msync-flush-all-chksums ()
-  "mannually flush all checksums of org files"
+(defun org-msync-flush-all-local-chksums ()
+  "mannually flush all checksums of local org files"
   (if (file-exists-p org-msync-local-dir)
       (let ((files (directory-files-recursively org-msync-local-dir "\.org$"))
 	    (chksums (make-hash-table :test 'equal)))
@@ -144,6 +141,23 @@
 	) ;;let
     ))
 
+(defun org-msync-flush-all-remote-chksums ()
+  "mannually updating remote checksums of org files"
+  (if (file-exists-p org-msync-remote-dir)
+      (let ((files (directory-files-recursively org-msync-remote-dir "\.org$"))
+	    (chksums (make-hash-table :test 'equal)))
+	;;1: find all files and do the hash
+	(dolist (src files)
+	  (setq src (file-truename src))
+	  (puthash (org-msync-remote-entry src)
+		   (org-msync-hash-file src)
+		   chksums)
+	  )
+	;;2: write that hash to the disk
+	(org-msync-write-chksums (org-msync-remote-json) chksums)
+	(message "flushed all org checksums")
+	) ;;let
+    ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; sync ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -201,7 +215,9 @@
 	(message "saving agendas... done")
 	(org-save-all-org-buffers)
 	(message "writing org checksums...")
-	(org-msync-flush-all-chksums)
+	(org-msync-flush-all-local-chksums)
+	(org-msync-flush-all-remote-chksums)
+	(message "coping org files...")
 	(if (and (org-msync-dir-set org-msync-local-dir)
 		 (org-msync-dir-set org-msync-remote-dir))
 	    (org-msync-copy org-msync-remote-dir org-msync-local-dir)
@@ -219,7 +235,8 @@
 	(message "Creating agendas... done")
 	(org-save-all-org-buffers)
 	(message "writing org checksums...")
-	(org-msync-flush-all-chksums)
+	(org-msync-flush-all-local-chksums)
+	(message "coping org files...")
 	(if (and (org-msync-dir-set org-msync-local-dir)
 		 (org-msync-dir-set org-msync-remote-dir))
 	    (org-msync-copy org-msync-local-dir org-msync-remote-dir)
