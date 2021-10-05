@@ -7,30 +7,30 @@ project(${1:newproj}
   VERSION 0.1
   LANGUAGES C CXX)
 
-add_definitions(-D_GNU_SOURCE)
-set(CMAKE_BINARY_DIR "\${CMAKE_SOURCE_DIR}/build")
+##### Options
+option(PROJ_WERROR "enable treating warning as errors" ON)
+option(PROJ_SANITIZER "enable sanitizer for supported compilers" ON)
+option(CMAKE_EXPORT_COMPILER_COMMANDS "generating compile commands when possible" ON)
+
+##### settings
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "\${CMAKE_MODULE_PATH}" "\${PROJECT_SOURCE_DIR}/cmake")
+set(OpenGL_GL_PREFERENCE GLVND) # for opengl on linux
+
+# remove this if you don't want
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "\${CMAKE_BINARY_DIR}/bin")
-
-set(CMAKE_C_FLAGS "\${CMAKE_C_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -Wall")
-
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(CMAKE_C_FLAGS "\${CMAKE_C_FLAGS} -ggdb3")
-  set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -ggdb3")
-else()
-  set(CMAKE_C_FLAGS "\${CMAKE_C_FLAGS} -O2 -fPIC")
-  set(CMAKE_CXX_FLAGS "\${CMAKE_CXX_FLAGS} -O2 -fPIC")
+
+if(__GNUC__ OR __clang__ OR __MINGW32__ OR __MINGW64__)   #gcc like interface
+  include(${2:GCCFlags})
+elseif(_MSC_VER)
+  include(${3:MSVCFlags})
 endif()
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
-include_directories(include)
-add_subdirectory(${2:src})
+add_subdirectory(${4:src})

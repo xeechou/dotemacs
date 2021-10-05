@@ -1,0 +1,22 @@
+# -*- mode: snippet -*-
+# name: gcc config
+# key: gcc
+# --
+
+add_definitions(-D_GNU_SOURCE)
+set(PROJ_COMMON_FLAGS "-Wall -Wextra")
+
+if(PROJ_ERROR)
+  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -Werror")
+endif()
+
+if (PROJ_SANITIZER)
+  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -fsanitize=address  -fsanitize=leak")
+endif()
+
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -ggdb3")
+else()
+  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -O2 -fPIC")
+endif()
