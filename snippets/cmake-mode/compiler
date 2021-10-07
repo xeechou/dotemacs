@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: detect compiler
+# key: dcmp
+# --
+
+# we do not detect mingw/cgwin or mysys here. detecting compiler should be
+# enough
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  include(${1:GCCFlags})
+elseif(CMAKE_CXX_COMPILE_ID MATCHES "Clang")
+  if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC") #clang-cl
+    include(${2:MSVCFlags})
+  elseif(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU") #regular clang
+    include(${1:GCCFlags})
+  endif()
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  include(${2:MSVCFlags})
+endif()

@@ -4,19 +4,24 @@
 # --
 
 add_definitions(-D_GNU_SOURCE)
-set(PROJ_COMMON_FLAGS "-Wall -Wextra")
+set(PROJ_COMPILE_FLAGS
+  -Wall
+  -Wextra
+  -Wno-unused-parameter
+  )
 
 if(PROJ_ERROR)
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -Werror")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS} -Werror)
 endif()
 
 if (PROJ_SANITIZER)
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -fsanitize=address  -fsanitize=leak")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS} -fsanitize=address  -fsanitize=leak)
+  set(PROJ_LINK_FLAGS  -fsanitize=address -fsanitize=leak)
 endif()
 
-
+# use target_compile_options and target_link_options to use these flags
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -ggdb3")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS} -ggdb3)
 else()
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} -O2 -fPIC")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS} -O2 -fPIC)
 endif()

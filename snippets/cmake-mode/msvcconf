@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: msvc flags
-# key: msv
+# key: msvc
 # --
 
 # /nologo:  don't show version info
@@ -12,19 +12,31 @@
 # /MP:      build with multiple processes
 # /bigobj:  allow large .obj files
 # /Wx:      treat warnning as error
-# /wd4653:  Ignore PCH for any individual file that has different optimization settings
-# /wd4068:  "Unknown pragma"
 
-set(PROJ_COMMON_FLAGS "/W4 /nologo /GF /utf-8 /MP /wd4653 /wd4068")
+set(PROJ_COMPILE_FLAGS
+  /W4       # highest warning level
+  /nologo   # don't show version info
+  /GF       #
+  /utf-8    # set source charset to utf-8
+  /MP       # build with multiple processes
+  /wd4653   # Ignore PCH for any individual file that has different optimization settings
+  /wd4068   # Ignore unknow pragma
+  )
+
+
 set(CMAKE_RC_FLAGS /nologo)
+add_definitions(-D_USE_MATH_DEFINES)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 if(PROJ_ERROR)
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} /WX")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS} /WX)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} /Zi /Zo /Oy- /MDd")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS} /Zi /Zo /Oy- /MDd)
 else()
-  set(PROJ_COMMON_FLAGS "\${PROJ_COMMON_FLAGS} /Ox /MD")
+  set(PROJ_COMPILE_FLAGS \${PROJ_COMPILE_FLAGS}
+    /Ox	#full optimization
+    /MD #dynamic linked 
+    )
 endif()
-

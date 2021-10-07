@@ -2,15 +2,15 @@
 # name: empty project
 # key: npj
 # --
-cmake_minimum_required(VERSION 3.1.0)
-project(${1:newproj}
+cmake_minimum_required(VERSION ${1:3.10.0} FATAL_ERROR)
+project(${2:newproj}
   VERSION 0.1
   LANGUAGES C CXX)
 
 ##### Options
 option(PROJ_WERROR "enable treating warning as errors" ON)
 option(PROJ_SANITIZER "enable sanitizer for supported compilers" ON)
-option(CMAKE_EXPORT_COMPILER_COMMANDS "generating compile commands when possible" ON)
+option(CMAKE_EXPORT_COMPILE_COMMANDS "generating compile commands when possible" ON)
 
 ##### settings
 set(CMAKE_CXX_STANDARD 17)
@@ -26,11 +26,4 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-
-if(__GNUC__ OR __clang__ OR __MINGW32__ OR __MINGW64__)   #gcc like interface
-  include(${2:GCCFlags})
-elseif(_MSC_VER)
-  include(${3:MSVCFlags})
-endif()
-
-add_subdirectory(${4:src})
+add_subdirectory(${3:src})
