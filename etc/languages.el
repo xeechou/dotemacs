@@ -24,9 +24,7 @@
 (use-package fic-mode
   :load-path "lisp/"
   :diminish fic-mode
-  :config
-  (add-hook 'prog-mode-hook 'turn-on-fic-mode)
-  )
+  :hook (prog-mode . turn-on-fic-mode))
 
 (use-package color-rg :load-path "lisp/" )
 
@@ -35,9 +33,7 @@
   :ensure t
   :config
   (yas-reload-all)
-  (add-hook 'prog-mode-hook #'yas-minor-mode)
-  (add-hook 'cmake-mode-hook #'yas-minor-mode)
-  )
+  :hook ((prog-mode outline-mode cmake-mode) . yas-minor-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lsp setup
@@ -56,8 +52,8 @@
   (use-package lsp-ui
     :ensure t
     :commands lsp-ui-mode
-    :init
-    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+    :hook
+    (lsp-mode . lsp-ui-mode)
     :bind (:map lsp-ui-mode-map
 		;; remember M-, (which is xref function) to jump back
 		("M-." . lsp-ui-peek-find-definitions)
