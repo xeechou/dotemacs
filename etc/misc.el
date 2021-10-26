@@ -1,6 +1,3 @@
-;;-3) winner-mode
-(use-package winner :defer t :diminish :init (winner-mode 1))
-
 ;;-2) delete selection mode
 (delete-selection-mode 1)
 ;;-1)set default fill column
@@ -15,18 +12,22 @@
 (add-hook 'text-mode-hook 'column-number-mode)
 (add-hook 'prog-mode-hook 'column-number-mode)
 
+;;-3) winner-mode
+(use-package winner :defer :diminish
+  :hook ((prog-mode text-mode) . winner-mode))
+
 (use-package whitespace-cleanup-mode
   :ensure t
   :hook ((prog-mode . whitespace-cleanup-mode)))
 
 ;; 2) autopair.el
 (use-package autopair :load-path "lisp/"
-  :config (autopair-global-mode))
+  :hook ((prog-mode text-mode) . autopair-mode))
 
 ;;3) linenum
-;; 3) add line numbers in, so I can jump to the line
-(add-hook 'find-file-hook (lambda () (linum-mode t)))
-(setq linum-format "%4d\u2502")
+(use-package linum :diminish
+  :custom (linum-format "%4d\u2502")
+  :hook ((prog-mode text-mode) . linum-mode))
 
 ;; flyspell
 (setq flyspell-issue-message-flag nil)
@@ -53,6 +54,14 @@
 ;;   (setq ispell-program-name "aspell"))
 ;;  )
 
-;; 5) org-mode flyspell
-
-;; 6) finally, text mode should have flyspell-check
+;; pdf-tools
+(use-package pdf-tools
+  :defer
+  :pin manual
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  :custom
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
