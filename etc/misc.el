@@ -22,9 +22,10 @@
   :ensure t
   :hook ((prog-mode . whitespace-cleanup-mode)))
 
-;; 2) autopair.el
-(use-package autopair :load-path "lisp/"
-  :hook ((prog-mode text-mode) . autopair-mode))
+;; 2) using electric pair instead of autopair
+(use-package electric-pair
+  :diminish electric-pair-mode
+  :hook ((prog-mode text-mod) . electric-pair-mode))
 
 ;;3) linenum
 (use-package linum
