@@ -1,3 +1,6 @@
+;;-3) winner-mode
+(use-package winner :defer t :diminish :init (winner-mode 1))
+
 ;;-2) delete selection mode
 (delete-selection-mode 1)
 ;;-1)set default fill column
@@ -16,11 +19,9 @@
   :ensure t
   :hook ((prog-mode . whitespace-cleanup-mode)))
 
-;;(add-hook 'before-save-hook 'whitespace-cleanup)
-
 ;; 2) autopair.el
-(require 'autopair)
-(autopair-global-mode)
+(use-package autopair :load-path "lisp/"
+  :config (autopair-global-mode))
 
 ;;3) linenum
 ;; 3) add line numbers in, so I can jump to the line
