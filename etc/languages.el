@@ -42,8 +42,9 @@
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
-  :init (setq lsp-auto-guess-root t)
+  :hook (lsp-mode . lsp-enable-which-key-integration)
   :custom
+  (lsp-auto-guess-root t)
   (lsp-print-io nil)
   (lsp-trace nil)
   (lsp-print-performance nil)
@@ -51,7 +52,7 @@
   :config
   (use-package lsp-ui
     :ensure t
-    :commands lsp-ui-mode
+    ;;:commands lsp-ui-mode
     :hook
     (lsp-mode . lsp-ui-mode)
     :bind (:map lsp-ui-mode-map
@@ -77,12 +78,9 @@
 (use-package company
   :ensure t
   :defer t
-  :hook ((emacs-lisp-mode . company-mode))
-  :init
-  (add-hook 'emacs-lisp-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-elisp)))
+  :hook ((emacs-lisp-mode . company-mode)
+	 (emacs-lisp-mode . (lambda () (make-local-variable 'company-backends)
+			      'company-elisp)))
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (setq company-minimum-prefix-length 2
@@ -90,8 +88,8 @@
 	company-async-timeout 10
 	company-backends  '((company-files
 			     company-keywords
-			     company-yasnippet))
-	)
+			     company-yasnippet
+			     company-capf)))
 
   (defun complete-or-indent ()
     (interactive)
@@ -124,40 +122,33 @@
     (c-set-offset 'innamespace 0)
     (c-set-offset 'inline-open 0)
     )
-  (defun cc-company-backend-hook ()
-    (add-to-list (make-local-variable 'company-backends) 'company-capf))
   :hook
   ((c-mode-common . my-cmode-hook)
-   (c++-mode . cc-company-backend-hook)
    (c++-mode . flycheck-mode)
    (c++-mode . lsp)
-   (c-mode . cc-company-backend-hook)
    (c-mode . flycheck-mode)
    (c-mode . lsp))
   )
 
-;;python
+;;python TODO: switch to lsp
 (use-package python-mode
   :ensure t
-  :preface
-  :init
-  (add-hook 'python-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-jedi)))
-  :hook ((python-mode . lsp)
-	 (python-mode . company)))
+  :config
+  (use-package lsp-jedi
+    :ensure t
+    :config (with-eval-after-load "lsp-mode"
+	      (add-to-list 'lsp-disabled-clients 'pyls)
+	      (add-to-list 'lsp-enabled-clients  'jedi)))
+  :hook (python-mode . lsp))
 
 ;;cmake
 (use-package cmake-mode
   :ensure t
-  :init
-  (add-hook 'cmake-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-cmake)))
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
-	 ("\\.cmake\\'" . cmake-mode)))
+	 ("\\.cmake\\'" . cmake-mode))
+  :hook ((cmake-mode . company-mode)
+	 (cmake-mode .  (lambda () (make-local-variable 'company-backends)
+			  'company-cmake))))
 
 ;; glsl
 (use-package glsl-mode
@@ -176,11 +167,8 @@
   :ensure t
   :mode (("\\.go\\'" . go-mode)
 	 ("\\.mode\\'" . go-mode))
-  :init
-  (add-hook 'go-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook ;;hooks only work on go-mode
-            (lambda ()
-              (add-hook 'before-save-hook 'gofmt-before-save nil t)))
+  :hook ((go-mode . lsp-deferred)
+	 (go-mode . (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t))))
   )
 
 ;;javascript
@@ -209,15 +197,14 @@
   :mode (("/meson\\.build\\'" . meson-mode))
   )
 
+;;lua TODO use lsp
 (use-package lua-mode
   :ensure t
   :mode (("\\.lua\\'" . lua-mode))
-  :init
-  (add-hook 'lua-mode-hook
-	    (lambda ()
-	      (add-to-list (make-local-variable 'company-backends)
-			   'company-lua)))
-  )
+  :hook ((lua-mode . company-mode)
+	 (lua-mode . (lambda ()
+		       (add-to-list (make-local-variable 'company-backends)
+				    'company-lua)))))
 
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t
