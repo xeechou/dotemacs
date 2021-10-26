@@ -197,9 +197,10 @@
   :mode (("/meson\\.build\\'" . meson-mode))
   )
 
-;;lua TODO use lsp
+;;lua
 (use-package lua-mode
   :ensure t
+  :config (use-package company-lua :ensure t :defer t)
   :mode (("\\.lua\\'" . lua-mode))
   :hook ((lua-mode . company-mode)
 	 (lua-mode . (lambda ()
