@@ -13,7 +13,9 @@
 (add-hook 'prog-mode-hook 'column-number-mode)
 
 ;;-3) winner-mode
-(use-package winner :defer :diminish
+(use-package winner
+  :defer t
+  :diminish winner-mode
   :hook ((prog-mode text-mode) . winner-mode))
 
 (use-package whitespace-cleanup-mode
@@ -25,7 +27,8 @@
   :hook ((prog-mode text-mode) . autopair-mode))
 
 ;;3) linenum
-(use-package linum :diminish
+(use-package linum
+  :diminish linum-mode
   :custom (linum-format "%4d\u2502")
   :hook ((prog-mode text-mode) . linum-mode))
 
@@ -54,9 +57,10 @@
 ;;   (setq ispell-program-name "aspell"))
 ;;  )
 
-;; pdf-tools
+;; pdf-tools, only run this on windows
 (use-package pdf-tools
-  :defer
+  :if (eq system-type 'windows-nt)
+  :defer t
   :pin manual
   :magic ("%PDF" . pdf-view-mode)
   :config
