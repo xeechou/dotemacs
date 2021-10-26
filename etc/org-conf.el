@@ -44,13 +44,13 @@
   ;is great
   :bind (:map global-map
 	      ("\C-ca" . org-agenda)
-	      ("\C-cc" . org-capture)
-	      ("\C-cb" . org-iswitchb))
+	      ("\C-cc" . org-capture))
   )
 
 ;; org-roam minor mode
 (use-package org-roam
   :ensure t
+  :init (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory (concat org-directory "roam/"))
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
@@ -59,8 +59,13 @@
 	  ("C-c n i" . org-roam-node-insert)
 	  ("C-c n g" . org-roam-graph)) ;; doesn't work
   :config
+  ;;start db sync automatically, also you are able to refresh backlink buffer
+  (org-roam-db-autosync-enable)
+  (setq org-roam-completion-system 'ivy)
+  ;;setup for windows
   (when (eq system-type 'windows-nt)
     (setq org-roam-db-update-method 'immediate))
+  ;; template for v2
   (setq org-roam-capture-templates
         '(
           ("d" "default" plain "%?"
@@ -78,7 +83,13 @@
            :prepend t
            :jump-to-captured t)
           ))
-  (setq org-roam-completion-system 'ivy)
+  ;; configure org-roam-buffer
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+		 (display-buffer-in-direction)
+		 (direction . right)
+		 (window-width . 0.33)
+		 (window-height . fit-window-to-buffer)))
   )
 
 ;; My synchronizer
