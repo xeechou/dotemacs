@@ -19,13 +19,6 @@
   (setq org-preview-latex-image-directory
 	(concat temporary-file-directory "ltximg/"))
 
-  ;; recursively update the parents TODO
-  (defun org-summary-todo (n-done n-not-done)
-    "Switch entry to DONE when all subentries are don, to TODO otherwise"
-    (let (org-log-done org-log-states) ; turn off logging
-      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-  (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
-
   (setq org-default-notes-file (concat org-directory "miscs.org"))
   ;; you have to set this before loading org-mode
   (setq org-agenda-files (list (concat org-directory "work.org")
@@ -39,7 +32,12 @@
 				       (concat org-directory "journal.org")
 				       (concat org-directory "today.org"))))
   (setq org-log-done 'time)
-
+  ;; recursively update the parents TODO
+  (defun org-summary-todo (n-done n-not-done)
+    "Switch entry to DONE when all subentries are don, to TODO otherwise"
+    (let (org-log-done org-log-states) ; turn off logging
+      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+  :hook (org-after-todo-statistics . org-summary-todo)
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
   :bind (:map global-map
@@ -94,9 +92,8 @@
 
 ;; My synchronizer
 (use-package org-msync :load-path "lisp/"
-  :init
-  (add-hook 'org-mode-hook 'org-msync-after-save-hook)
-  (add-hook 'auto-save-hook 'org-msync-auto-save-hook)
+  :hook ((org-mode . org-msync-after-save-hook)
+	 (auto-save . org-msync-auto-save-hook))
   :custom
   (org-msync-local-dir org-directory)
   (org-msync-remote-dir "~/Documents/org-remote/")
