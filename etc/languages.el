@@ -79,8 +79,8 @@
   :ensure t
   :defer t
   :hook ((emacs-lisp-mode . company-mode)
-	 (emacs-lisp-mode . (lambda () (make-local-variable 'company-backends)
-			      'company-elisp)))
+	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
+						    'company-elisp))))
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (setq company-minimum-prefix-length 2
@@ -144,11 +144,12 @@
 ;;cmake
 (use-package cmake-mode
   :ensure t
+  :config (use-package company-cmake :load-path "lisp/")
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
 	 ("\\.cmake\\'" . cmake-mode))
   :hook ((cmake-mode . company-mode)
-	 (cmake-mode .  (lambda () (make-local-variable 'company-backends)
-			  'company-cmake))))
+	 (cmake-mode .  (lambda () (add-to-list (make-local-variable 'company-backends)
+				    'company-cmake)))))
 
 ;; glsl
 (use-package glsl-mode
