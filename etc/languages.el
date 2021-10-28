@@ -35,17 +35,15 @@
   (yas-reload-all)
   :hook ((prog-mode outline-mode cmake-mode) . yas-minor-mode))
 
-(use-package which-key :ensure t :diminish which-key-mode)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lsp setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package lsp-mode
   :ensure t
+  :after which-key
   :commands (lsp lsp-deferred)
-  :hook ((lsp-mode . which-key-mode)
-	 (lsp-mode . lsp-enable-which-key-integration))
+  :hook ((lsp-mode . lsp-enable-which-key-integration))
   :custom
   (lsp-auto-guess-root t)
   (lsp-print-io nil)

@@ -33,6 +33,11 @@
   :custom (linum-format "%4d\u2502")
   :hook ((prog-mode text-mode) . linum-mode))
 
+;;4) which-key
+(use-package which-key :ensure t
+  :diminish which-key-mode
+  :hook ((prog-mode text-mode) . which-key-mode))
+
 ;; flyspell
 (setq flyspell-issue-message-flag nil)
 (defun spell-switch-dictionary()
