@@ -31,4 +31,40 @@
 (use-package counsel-tramp :ensure t
   :bind ("C-c s" . counsel-tramp)
   :if (eq window-system 'w32)
-  :config (setq tramp-default-method "plink"))
+  :config
+  (setq auth-source-save-behavior nil)  ;; don't store the password
+  ;; here is the config to make trump work on windows, for plink, need to remove the -ssh option.
+  (when (eq system-type 'windows-nt)
+    (add-to-list 'tramp-methods
+		 `("sshw"
+                   (tramp-login-program "ssh")
+                   ;; ("%h") must be a single element, see `tramp-compute-multi-hops'.
+                   (tramp-login-args (("-l" "%u" "-o \"StrictHostKeyChecking=no\"") ("-P" "%p") ("-tt")
+				      ("%h") ("\"")
+				      (,(format
+                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
+                                         tramp-terminal-type ;;dumb
+                                         "##"))
+				      ("/bin/sh") ("\"")))
+                   (tramp-remote-shell       "/bin/sh")
+                   (tramp-remote-shell-login ("-l"))
+                   (tramp-remote-shell-args  ("-c"))
+                   (tramp-default-port       22)))
+
+    (add-to-list 'tramp-methods
+		 `("plinkw"
+                   (tramp-login-program "plink")
+                   ;; ("%h") must be a single element, see `tramp-compute-multi-hops'.
+                   (tramp-login-args (("-l" "%u") ("-P" "%p") ("-t")
+				      ("%h") ("\"")
+				      (,(format
+                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
+                                         tramp-terminal-type
+                                         "$"))
+				      ("/bin/sh") ("\"")))
+                   (tramp-remote-shell       "/bin/sh")
+                   (tramp-remote-shell-login ("-l"))
+                   (tramp-remote-shell-args  ("-c"))
+                   (tramp-default-port       22)))
+    )
+  )
