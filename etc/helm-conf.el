@@ -33,34 +33,23 @@
   :if (eq window-system 'w32)
   :config
   (setq auth-source-save-behavior nil)  ;; don't store the password
-  ;; here is the config to make trump work on windows, for plink, need to remove the -ssh option.
+
+  ;; Here is the config to make trump work on windows; forget ssh, emacs will
+  ;; find /c/windows/system32/openssh first, the git ssh won't work either. For
+  ;; plink to work, you have to run pink in terminal first to add it to the
+  ;; REGISTRY, otherwise it will spit whole bunch of thing tramp will not
+  ;; understand.
   (when (eq system-type 'windows-nt)
-    (add-to-list 'tramp-methods
-		 `("sshw"
-                   (tramp-login-program "ssh")
-                   ;; ("%h") must be a single element, see `tramp-compute-multi-hops'.
-                   (tramp-login-args (("-l" "%u" "-o \"StrictHostKeyChecking=no\"") ("-P" "%p") ("-tt")
-				      ("%h") ("\"")
-				      (,(format
-                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
-                                         tramp-terminal-type ;;dumb
-                                         "##"))
-				      ("/bin/sh") ("\"")))
-                   (tramp-remote-shell       "/bin/sh")
-                   (tramp-remote-shell-login ("-l"))
-                   (tramp-remote-shell-args  ("-c"))
-                   (tramp-default-port       22)))
 
     (add-to-list 'tramp-methods
 		 `("plinkw"
                    (tramp-login-program "plink")
-                   ;; ("%h") must be a single element, see `tramp-compute-multi-hops'.
                    (tramp-login-args (("-l" "%u") ("-P" "%p") ("-t")
 				      ("%h") ("\"")
 				      (,(format
                                          "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
                                          tramp-terminal-type
-                                         "$"))
+                                         "$")) ;; This prompt will be
 				      ("/bin/sh") ("\"")))
                    (tramp-remote-shell       "/bin/sh")
                    (tramp-remote-shell-login ("-l"))
