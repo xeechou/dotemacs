@@ -5,6 +5,7 @@
 (use-package company-c-headers :ensure t)
 (setq clang-known-modes '(c++-mode c-mode))
 (setq company-known-modes '(c++-mode c-mode python-mode emacs-lisp-mode cmake-mode js-mode lua-mode))
+(setq enable-remote-dir-locals t)
 
 ;;--- -1) for all programming languages
 (use-package smart-tabs-mode

@@ -38,30 +38,6 @@
   :diminish which-key-mode
   :hook ((prog-mode text-mode) . which-key-mode))
 
-;; flyspell
-(setq flyspell-issue-message-flag nil)
-(defun spell-switch-dictionary()
-  (interactive)
-  (let* ((dic ispell-current-dictionary)
-	 (change (if (string= dic "francais") "english" "francais")))
-    (ispell-change-dictionary change)
-    (message "Dictionary switched from %s to %s" dic change)
-    ))
-(global-set-key (kbd "<f8>")   'spell-switch-dictionary)
-(add-hook 'latex-mode-hook 'flyspell-mode)
-(add-hook 'org-mode-hook 'flyspell-mode)
-(add-hook 'text-mode-hook 'flyspell-mode)
-;;  ((executable-find "hunspell")
-;;   (setq ispell-program-name "hunspell")
-;;   (setq ispell-local-dictionary "en_US")
-;;   ;; ispell-set-spellchecker-params has to be called
-;;   ;; before ispell-hunspell-add-multi-dic will work
-;;   ;;(ispell-set-spellchecker-params)
-;; ;;  (ispell-hunspell-add-multi-dic "en_US,fr_CA")
-;;   )
-;;  ((executable-find "aspell")
-;;   (setq ispell-program-name "aspell"))
-;;  )
 
 ;; pdf-tools, only run this on windows
 (use-package pdf-tools
