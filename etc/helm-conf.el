@@ -1,9 +1,7 @@
 (use-package ivy :ensure t
   :diminish (ivy-mode . "")
-  :bind
-  (:map ivy-mode-map  ("C-'" . ivy-avy))
+  :hook (after-init . ivy-mode)
   :config
-  (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
   ;;number of result lines to display
   (setq ivy-count-format "(%d/%d) ")
@@ -24,23 +22,27 @@
   ;;for git setup
   ("C-c g" . counsel-git)
   ("C-c j" . counsel-git-grep)
-  ("C-c k" . counsel-ag)
+  ("C-c L" . counsel-git-log)
+  ("C-c k" . counsel-rg)
   )
 
-;; using tramp mode
-(use-package counsel-tramp :ensure t
+;; using consuel-tramp
+(use-package counsel-tramp
+  :after (counsel tramp)
+  :ensure t
+  :init
+  (setq auth-source-save-behavior nil)  ;; don't store the password the package
+  ;; does not load immediately, if you have previous opened plinkw file in
+  ;; recentf, you may have error on buffer-switching, simply call counsel-tramp
+  ;; to load plinkw method in
   :bind ("C-c s" . counsel-tramp)
-  :if (eq window-system 'w32)
-  :config
-  (setq auth-source-save-behavior nil)  ;; don't store the password
-
   ;; Here is the config to make trump work on windows; forget ssh, emacs will
   ;; find /c/windows/system32/openssh first, the git ssh won't work either. For
   ;; plink to work, you have to run pink in terminal first to add it to the
   ;; REGISTRY, otherwise it will spit whole bunch of thing tramp will not
   ;; understand.
-  (when (eq system-type 'windows-nt)
-
+  :config
+  (when (and (eq system-type 'windows-nt)  (executable-find "plink"))
     (add-to-list 'tramp-methods
 		 `("plinkw"
                    (tramp-login-program "plink")
