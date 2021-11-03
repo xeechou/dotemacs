@@ -5,7 +5,10 @@
 	 (text-mode . flyspell-mode) ;;for markdown, org, nxml
 	 ;;also disable it for specific mode
 	 (change-log-mode . (turn-off-flyspell)))
-  ;; :config
+  :init ;;for flyspell to work, you need to set LANG first
+  (when (not (getenv "LANG"))
+    (setenv "LANG" "en_US"))
+  ;;:config
   ;;TODO flyspell correct ivy,
   ;;TODO flyspell languagetool
   )
