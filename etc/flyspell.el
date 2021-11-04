@@ -9,9 +9,19 @@
   (when (not (getenv "LANG"))
     (setenv "LANG" "en_US"))
   ;;:config
-  ;;TODO flyspell correct ivy,
-  ;;TODO flyspell languagetool
+  ;;TODO flyspell language-tool
   )
+;; correcting word and save it to personal dictionary
+(use-package flyspell-correct
+  :ensure t
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-c ;" . flyspell-correct-wrapper))
+  )
+(use-package flyspell-correct-popup
+  :ensure t
+  :after (ivy flyspell-correct))
+
+
 ;; flyspell
 ;; (setq flyspell-issue-message-flag nil)
 ;; (defun spell-switch-dictionary()

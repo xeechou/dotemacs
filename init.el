@@ -78,16 +78,9 @@
  '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
  '(lsp-log-io nil nil nil "Customized with use-package lsp-mode")
- '(lsp-prefer-flymake nil t)
- '(lsp-print-performance nil)
- '(lsp-trace nil t)
- '(lsp-ui-flycheck-enable t t)
- '(lsp-ui-sideline-enable t)
- '(lsp-ui-sideline-ignore-duplicate t)
- '(lsp-ui-sideline-show-diagnostics t)
  '(objed-cursor-color "#d02b61")
  '(package-selected-packages
-   '(which-key lsp-jedi counsel-tramp exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
+   '(flyspell-correct-popup flyspell-correct which-key lsp-jedi counsel-tramp exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
