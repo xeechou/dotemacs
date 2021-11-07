@@ -1,3 +1,7 @@
+;;-3 coding system
+(prefer-coding-system 'utf-8-unix)
+(set-default-coding-systems 'utf-8-unix)
+
 ;;-2) delete selection mode
 (delete-selection-mode 1)
 ;;-1)set default fill column
