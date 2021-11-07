@@ -38,14 +38,6 @@
   (require 'bind-key)
   (require 'diminish))
 
-;;now we setup themes directly in init file
-(use-package ample-theme
-  :defer t
-  :ensure t
-  :init
-  (load-theme 'ample t)
-  )
-
 ;;match the PATH from emacs to shell
 (when (or (memq window-system '(mac ns x pgtk)) (daemonp))
   (use-package exec-path-from-shell
@@ -136,5 +128,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "outline" :slant normal :weight normal :height 143 :width normal))))
  '(show-paren-match ((t (:background "yellow" :foreground "gainsboro" :slant oblique :weight ultra-bold)))))
