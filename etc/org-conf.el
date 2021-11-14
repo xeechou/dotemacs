@@ -43,6 +43,17 @@
   :bind (:map global-map
 	      ("\C-ca" . org-agenda)
 	      ("\C-cc" . org-capture))
+  :config
+  ;;activate babel languages
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp  . t)
+     (shell       . t)
+     (python      . (if (executable-find "python") t nil))
+     (C           . (if (and (executable-find "gcc")
+			     (executable-find "g++"))
+			t nil))
+     ))
   )
 
 ;; org-roam minor mode
