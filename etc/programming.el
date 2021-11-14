@@ -162,7 +162,10 @@
 	 ("\\.fs\\'" . glsl-mode)
 	 ("\\.frag\\'" . glsl-mode)
 	 ("\\.gs\\'" . glsl-mode)
-	 ("\\.comp\\'" . glsl-mode))
+	 ("\\.comp\\'" . glsl-mode)
+	 ("\\.rgen\\'" . glsl-mode)
+	 ("\\.rchit\\'" . glsl-mode)
+	 ("\\.rmiss\\'" . glsl-mode))
   )
 
 ;; golang
