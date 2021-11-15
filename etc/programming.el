@@ -146,7 +146,7 @@
 ;;cmake
 (use-package cmake-mode
   :ensure t
-  :config (use-package company-cmake :load-path "lisp/")
+  :config
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
 	 ("\\.cmake\\'" . cmake-mode))
   :hook ((cmake-mode . company-mode)
