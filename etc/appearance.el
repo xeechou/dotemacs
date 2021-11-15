@@ -6,6 +6,12 @@
   (load-theme 'ample t)
   )
 
+(use-package company-emoji
+  :defer t
+  :ensure t
+  :after company
+  :hook (company-mode . (lambda () (company-emoji-init))))
+
 ;; Ligature Settings
 (use-package ligature :load-path "lisp/"
   :if (string-match "HARFBUZZ" system-configuration-features)

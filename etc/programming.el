@@ -80,7 +80,8 @@
 (use-package company
   :ensure t
   :defer t
-  :hook ((emacs-lisp-mode . company-mode)
+  :hook ((outline-mode    . company-mode) ;;enable for markdown, org mode
+	 (emacs-lisp-mode . company-mode)
 	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-elisp))))
   :config
