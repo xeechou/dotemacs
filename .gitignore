@@ -19,3 +19,8 @@ org-roam.db
 eln-cache/
 projects
 tramp
+
+#dap-mode
+.dap-breakpoints
+.extension/
+url/
