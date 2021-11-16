@@ -1,64 +1,63 @@
-(use-package org-mode
-  :ensure org
+(use-package org :ensure t
   :mode (("\\.org$" . org-mode))
   :custom
   (org-directory "~/org/")
-  :init
-  (setq org-todo-keywords
-	'((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
-  (setq org-todo-keyword-faces
-	'(("TODO" . error)
-	  ("DOIN" . org-document-title)
-	  ("DONE" . org-level-5)
-	  ("CANC" . org-level-4)
-	  ("PEND" . org-level-3)))
-  (setq org-clock-persist 'history)
-  (org-clock-persistence-insinuate)
-  ;; org-latex-preview settings, requires we have program latex and dvipng
-  (setq org-latex-create-formula-image-program 'dvipng)
-  (setq org-preview-latex-image-directory
-	(concat temporary-file-directory "ltximg/"))
-
-  (setq org-default-notes-file (concat org-directory "miscs.org"))
-  ;; you have to set this before loading org-mode
-  (setq org-agenda-files (list (concat org-directory "work.org")
+  (org-log-done  'time)
+  (org-clock-persist 'history)
+  ;;faces
+  (org-todo-keywords '((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
+  (org-todo-keyword-faces '(("TODO" . error)
+			    ("DOIN" . org-document-title)
+			    ("DONE" . org-level-5)
+			    ("CANC" . org-level-4)
+			    ("PEND" . org-level-3)))
+  ;;latex
+  (org-latex-create-formula-image-program 'dvipng)
+  (org-preview-latex-image-directory (concat temporary-file-directory "ltximg/"))
+  ;;note files
+  (org-default-notes-file (concat org-directory "notes.org"))
+  (org-agenda-files (list (concat org-directory "work.org")
 			       (concat org-directory "training.org")
 			       (concat org-directory "goals-habits.org")
 			       (concat org-directory "miscs.org")
 			       (concat org-directory "social.org")))
-  ;; it seems if we use org-mobile-files, it is the only list we move
-  (setq org-mobile-files (append org-agenda-files
-				 (list (concat org-directory "notes.org")
-				       (concat org-directory "journal.org")
-				       (concat org-directory "today.org"))))
-  (setq org-log-done 'time)
-  ;; recursively update the parents TODO
-  (defun org-summary-todo (n-done n-not-done)
-    "Switch entry to DONE when all subentries are don, to TODO otherwise"
-    (let (org-log-done org-log-states) ; turn off logging
-      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
   :hook (org-after-todo-statistics . org-summary-todo)
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
   :bind (:map global-map
 	      ("\C-ca" . org-agenda)
 	      ("\C-cc" . org-capture))
-  :config
+  :init
+  ;; recursively update the parents TODO
+  (defun org-summary-todo (n-done n-not-done)
+    "Switch entry to DONE when all subentries are don, to TODO otherwise"
+    (let (org-log-done org-log-states) ; turn off logging
+      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
   ;;activate babel languages
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp  . t)
-     (shell       . t)
-     (python      . (if (executable-find "python") t nil))
-     (C           . (if (and (executable-find "gcc")
-			     (executable-find "g++"))
-			t nil))
-     ))
+  :config
+  (org-clock-persistence-insinuate)
+  (setq org-mobile-files (append org-agenda-files
+				 (list (concat org-directory "notes.org")
+				       (concat org-directory "journal.org")
+				       (concat org-directory "today.org"))))
+  (let ((has_python (if (executable-find "python") t nil))
+	(has_c (if (and (executable-find "gcc") (executable-find "g++")) t nil))
+	)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp  . t)
+       (shell       . t)
+       (python      . (eval has_python))
+       (C           . (eval has_c))
+       ))
+    )
   )
 
 ;; org-roam minor mode
 (use-package org-roam
   :ensure t
+  :after org
   :init (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory (concat org-directory "roam/"))
