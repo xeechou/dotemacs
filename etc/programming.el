@@ -106,6 +106,25 @@
       (indent-according-to-mode)))
   )
 
+;; (use-package dap-mode :ensure t :defer t
+;;   :disabled
+;;   :commands dap-debug
+;;   :after lsp-mode
+;;   :config
+;;   (dap-ui-mode)
+;;   (dap-ui-controls-mode 1)
+;;   (add-hook 'dap-stopped-hook
+;;	    (lambda (arg) (call-interactively #'dap-hydra)))
+;;   ;;there is a dap-debugging minor mode you can borrow
+;;   ;; (add-hook 'dap-terminated-hook
+;;   ;;	    (dap-mode -1))
+;;   (let ((dap-lldb-vscode-path (executable-find "lldb-vscode")))
+;;     (when dap-lldb-vscode-path
+;;       (require 'dap-lldb)
+;;       (setq dap-lldb-debug-program `(, dap-lldb-vscode-path))
+;;       (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
+;;       ))
+;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hideshow
