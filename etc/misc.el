@@ -1,3 +1,5 @@
+(require 'diminish)
+
 ;;-3 coding system
 (prefer-coding-system 'utf-8-unix)
 (set-default-coding-systems 'utf-8-unix)
@@ -16,6 +18,10 @@
 (add-hook 'text-mode-hook 'column-number-mode)
 (add-hook 'prog-mode-hook 'column-number-mode)
 
+;; diminish some builtin packages
+(diminish 'eldoc-mode)
+(diminish 'abbrev-mode)
+
 ;;-3) winner-mode
 (use-package winner
   :defer t
@@ -24,6 +30,7 @@
 
 (use-package whitespace-cleanup-mode
   :ensure t
+  :diminish whitespace-cleanup-mode
   :hook ((prog-mode . whitespace-cleanup-mode)))
 
 ;; 2) using electric pair instead of autopair
