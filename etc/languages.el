@@ -31,21 +31,12 @@
   :config
   :hook (python-mode . lsp))
 
-(cond ((executable-find "jedi-language-server")
-       (use-package lsp-jedi
-	 :ensure t
-	 :config (with-eval-after-load "lsp-mode"
-	      (add-to-list 'lsp-disabled-clients 'pyls)
-	      (add-to-list 'lsp-enabled-clients  'jedi))))
-      ;;pyls is kind of duplicate jedi
-      ((executable-find "pyls")
-       (with-eval-after-load "lsp-mode"
-	 (add-to-list 'lsp-disable-clients 'jedi)
-	 (add-to-list 'lsp-enabled-clients 'pyls)))
-      ((executable-find "pylsp")
-       (with-eval-after-load "lsp-mode"
-	 (add-to-list 'lsp-enabled-clients 'pylsp)
-	 (add-to-list 'lsp-disabled-clients 'pyls))))
+(use-package lsp-jedi
+  :if (executable-find "jedi-language-server")
+  :ensure t
+  :config (with-eval-after-load "lsp-mode"
+	    (add-to-list 'lsp-disabled-clients 'pyls)
+	    (add-to-list 'lsp-disabled-clients 'pylsp)))
 
 ;;cmake
 (use-package cmake-mode
