@@ -1,7 +1,9 @@
 (use-package org :ensure t
   :mode (("\\.org$" . org-mode))
   :custom
-  (org-directory "~/org/")
+  (org-directory (if (org-dir-set (getenv "ORG_DIR"))
+		     (getenv "ORG_DIR")
+		   "~/org/"))
   (org-log-done  'time)
   (org-clock-persist 'history)
   ;;faces
@@ -11,6 +13,7 @@
 			    ("DONE" . org-level-5)
 			    ("CANC" . org-level-4)
 			    ("PEND" . org-level-3)))
+  (org-hide-emphasis-markers t)
   ;;latex
   (org-latex-create-formula-image-program 'dvipng)
   (org-preview-latex-image-directory (concat temporary-file-directory "ltximg/"))
@@ -28,11 +31,15 @@
 	      ("\C-ca" . org-agenda)
 	      ("\C-cc" . org-capture))
   :init
-  ;; recursively update the parents TODO
   (defun org-summary-todo (n-done n-not-done)
     "Switch entry to DONE when all subentries are don, to TODO otherwise"
     (let (org-log-done org-log-states) ; turn off logging
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+  ;;set org_dir
+  (defun org-dir-set (dir)
+    (and dir (not (string= dir "")) (file-exists-p dir)))
+  ;; (let ((dir (getenv "ORG_DIR")))
+  ;;   (setq org-directory (if (org-dir-set dir) dir "~/org/")))
 
   ;;activate babel languages
   :config
@@ -48,8 +55,8 @@
      'org-babel-load-languages
      '((emacs-lisp  . t)
        (shell       . t)
-       (python      . (eval has_python))
-       (C           . (eval has_c))
+       (python      . has_python)
+       (C           . has_c)
        ))
     )
   )
@@ -108,3 +115,9 @@
   (org-msync-local-dir org-directory)
   (org-msync-remote-dir "~/Documents/org-remote/")
   )
+
+;; using org bullets
+(use-package org-bullets
+  :ensure t
+  :after org
+  :hook ((org-mode . org-bullets-mode)))
