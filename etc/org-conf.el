@@ -6,8 +6,10 @@
 		   "~/org/"))
   (org-log-done  'time)
   (org-clock-persist 'history)
+  (org-adapt-indentation t)
   ;;faces
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
+  ;;TODO, change those faces
   (org-todo-keyword-faces '(("TODO" . error)
 			    ("DOIN" . org-document-title)
 			    ("DONE" . org-level-5)
@@ -19,17 +21,21 @@
   (org-preview-latex-image-directory (concat temporary-file-directory "ltximg/"))
   ;;note files
   (org-default-notes-file (concat org-directory "notes.org"))
-  (org-agenda-files (list (concat org-directory "work.org")
-			       (concat org-directory "training.org")
-			       (concat org-directory "goals-habits.org")
-			       (concat org-directory "miscs.org")
-			       (concat org-directory "social.org")))
+  (org-agenda-files (list (concat org-directory "reading.org")
+			  (concat org-directory "writing.org")
+			  (concat org-directory "coding.org")
+			  (concat org-directory "goals-habits.org")
+			  (concat org-directory "miscs.org")
+			  (concat org-directory "social.org")))
   :hook (org-after-todo-statistics . org-summary-todo)
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
   :bind (:map global-map
-	      ("\C-ca" . org-agenda)
-	      ("\C-cc" . org-capture))
+	      ("\C-ca"   . org-agenda)
+	      ("\C-cc"   . org-capture)
+	      :map org-mode-map
+	      ("M-<left>"  . org-metaleft)
+	      ("M-<right>" . org-metaright))
   :init
   (defun org-summary-todo (n-done n-not-done)
     "Switch entry to DONE when all subentries are don, to TODO otherwise"
@@ -38,8 +44,6 @@
   ;;set org_dir
   (defun org-dir-set (dir)
     (and dir (not (string= dir "")) (file-exists-p dir)))
-  ;; (let ((dir (getenv "ORG_DIR")))
-  ;;   (setq org-directory (if (org-dir-set dir) dir "~/org/")))
 
   ;;activate babel languages
   :config
@@ -53,12 +57,20 @@
 	)
     (org-babel-do-load-languages
      'org-babel-load-languages
-     '((emacs-lisp  . t)
+     `((emacs-lisp  . t)
        (shell       . t)
-       (python      . has_python)
-       (C           . has_c)
+       (python      . ,has_python)
+       (C           . ,has_c)
        ))
     )
+  ;;face settings, well setting different sizes for levels is Well, I am not
+  ;;very sure, need to be in the same color, didn't look as pretty as I
+  ;;expected, and it breaks the TODOs.
+
+  ;; (set-face-attribute 'org-level-1 nil :height 1.5 :weight 'bold)
+  ;; (set-face-attribute 'org-level-2 nil :height 1.25 :weight 'bold)
+  ;; (set-face-attribute 'org-level-3 nil :height 1.1 :weight 'bold)
+  ;; (set-face-attribute 'org-level-4 nil :height 1.05 :weight 'bold)
   )
 
 ;; org-roam minor mode
@@ -121,3 +133,13 @@
   :ensure t
   :after org
   :hook ((org-mode . org-bullets-mode)))
+
+;; Org-download
+(use-package org-download
+  :if window-system
+  :ensure t
+  :after org
+  :bind (:map org-mode-map
+	      (("s-Y" . org-download-screenshot)
+	       ("s-y" . org-download-yank)
+	       ("s-T" . org-download-clipboard))))
