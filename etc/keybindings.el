@@ -75,8 +75,8 @@
   :bind (:map backward-forward-mode-map
               ("<C-left>" . nil)
               ("<C-right>" . nil)
-              ("<M-left>" . backward-forward-previous-location)
-              ("<M-right>" . backward-forward-next-location)
+              ("C-c C-<left>" . backward-forward-previous-location)
+              ("C-c C-<right>" . backward-forward-next-location)
               ("<mouse-8>" . backward-forward-previous-location)
               ("<mouse-9>" . backward-forward-next-location)
               )

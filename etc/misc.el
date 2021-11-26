@@ -1,5 +1,9 @@
 (require 'diminish)
 
+;;-4 removing the ugly tool bars
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
 ;;-3 coding system
 (prefer-coding-system 'utf-8-unix)
 (set-default-coding-systems 'utf-8-unix)
