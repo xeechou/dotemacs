@@ -3,10 +3,15 @@
   :custom
   (org-directory (if (org-dir-set (getenv "ORG_DIR"))
 		     (getenv "ORG_DIR")
-		   "~/org/"))
+		   "~/org/")) ;;org-directory has to have trailing "/"
   (org-log-done  'time)
   (org-clock-persist 'history)
-  (org-adapt-indentation t)
+  (org-adapt-indentation nil)
+  ;;agenda, show unplanned tasks in global TO-DO list.
+  (org-agenda-skip-scheduled-if-done t)
+  (org-agenda-skip-deadline-if-done t)
+  (org-agenda-todo-ignore-deadlines t)
+  (org-agenda-todo-ignore-scheduled t)
   ;;faces
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
   ;;TODO, change those faces
@@ -24,9 +29,9 @@
   (org-agenda-files (list (concat org-directory "reading.org")
 			  (concat org-directory "writing.org")
 			  (concat org-directory "coding.org")
+			  (concat org-directory "social.org")
 			  (concat org-directory "goals-habits.org")
-			  (concat org-directory "miscs.org")
-			  (concat org-directory "social.org")))
+			  (concat org-directory "miscs.org")))
   :hook (org-after-todo-statistics . org-summary-todo)
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
@@ -35,8 +40,14 @@
 	      ("\C-cc"   . org-capture)
 	      :map org-mode-map
 	      ("M-<left>"  . org-metaleft)
-	      ("M-<right>" . org-metaright))
+	      ("M-<right>" . org-metaright)
+	      ("M-<up>"    . org-metaup)
+	      ("M-<down>"  . org-metadown))
   :init
+  ;; enable images
+  (setq org-startup-with-inline-images t)
+  ;; using org-indent-mode
+  (setq org-startup-indented t)
   (defun org-summary-todo (n-done n-not-done)
     "Switch entry to DONE when all subentries are don, to TODO otherwise"
     (let (org-log-done org-log-states) ; turn off logging
@@ -48,10 +59,32 @@
   ;;activate babel languages
   :config
   (org-clock-persistence-insinuate)
-  (setq org-mobile-files (append org-agenda-files
-				 (list (concat org-directory "notes.org")
-				       (concat org-directory "journal.org")
-				       (concat org-directory "today.org"))))
+  ;; I just use PEND to define stuck projects.
+  (setq org-stuck-projects
+      '("/-DONE-CANC" ("DOIN" "TODO") nil ""))
+  ;;capture templates
+  (setq org-capture-templates
+	;; misc tasks, moving coding or writing later?
+	`(("m" "Miscs" entry
+	   (file+headline ,(concat org-directory "miscs.org") "Tasks")
+           "* TODO %?\n%i\n  %a")
+	  ;; my ideas
+	  ("s" "Thoughts" entry
+	   (file+headline ,(concat org-directory "thoughts.org") "Ideas")
+	   "* %?\n %i\n %c\n\n")
+	  ;; Learning items
+	  ("r" "Reading" entry
+	   (file+headline ,(concat org-directory "reading.org") "Articles")
+	   "** TODO %?\n%i\n %^L\n \n") ;;why the linebreak didn't work?
+	  ;; my journals
+          ("j" "Journal" entry
+	   (file+olp+datetree ,(concat org-directory "journal.org"))
+           "* %t\n %? %i\n")
+	  ("p" "Review+Planning" entry
+	   (file+headline ,(concat org-directory "writing.org") "Review+Planning")
+	   "** On %t\n*** Review:\n - %? \n*** Planned:\n\n %i \n ")
+	  ))
+
   (let ((has_python (if (executable-find "python") t nil))
 	(has_c (if (and (executable-find "gcc") (executable-find "g++")) t nil))
 	)
@@ -134,12 +167,18 @@
   :after org
   :hook ((org-mode . org-bullets-mode)))
 
+;; org clip link
+(use-package org-cliplink
+  :ensure t
+  :bind ("C-c p i" . org-cliplink))
+
 ;; Org-download
 (use-package org-download
   :if window-system
   :ensure t
   :after org
+  :custom (org-download-image-dir (concat org-directory "imgs/"))
   :bind (:map org-mode-map
-	      (("s-Y" . org-download-screenshot)
-	       ("s-y" . org-download-yank)
-	       ("s-T" . org-download-clipboard))))
+	      (("C-c d s" . org-download-screenshot)
+	       ("C-c d y" . org-download-yank)
+	       ("C-c d c" . org-download-clipboard))))
