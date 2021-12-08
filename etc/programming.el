@@ -113,6 +113,21 @@
       (indent-according-to-mode)))
   )
 
+;; debugging with dap-mode
+
+;; (use-package dap-mode :ensure t :defer t
+;;   :commands dap-debug
+;;   :after lsp-mode
+;;   :config
+;;   (dap-ui-mode)
+;;   (dap-ui-controls-mode)
+;;   (let ((dap-lldb-vscode-path (executable-find "lldb-vscode")))
+;;     (when dap-lldb-vscode-path
+;;       (require 'dap-lldb)
+;;       (setq dap-lldb-debug-program `(, dap-lldb-vscode-path))
+;;       (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
+;;       ))
+;;   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hideshow

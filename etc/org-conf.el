@@ -1,9 +1,6 @@
 (use-package org :ensure t
   :mode (("\\.org$" . org-mode))
   :custom
-  (org-directory (if (org-dir-set (getenv "ORG_DIR"))
-		     (getenv "ORG_DIR")
-		   "~/org/")) ;;org-directory has to have trailing "/"
   (org-log-done  'time)
   (org-clock-persist 'history)
   (org-adapt-indentation nil)
@@ -44,6 +41,12 @@
 	      ("M-<up>"    . org-metaup)
 	      ("M-<down>"  . org-metadown))
   :init
+  ;;set org_dir
+  (defun org-dir-set (dir)
+    (and dir (not (string= dir "")) (file-exists-p dir)))
+  (setq org-directory (if (org-dir-set (getenv "ORG_DIR"))
+			  (getenv "ORG_DIR")
+			"~/org/")) ;;org-directory has to have trailing "/"
   ;; enable images
   (setq org-startup-with-inline-images t)
   ;; using org-indent-mode
@@ -52,9 +55,6 @@
     "Switch entry to DONE when all subentries are don, to TODO otherwise"
     (let (org-log-done org-log-states) ; turn off logging
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-  ;;set org_dir
-  (defun org-dir-set (dir)
-    (and dir (not (string= dir "")) (file-exists-p dir)))
 
   ;;activate babel languages
   :config
@@ -82,7 +82,7 @@
            "* %t\n %? %i\n")
 	  ("p" "Review+Planning" entry
 	   (file+headline ,(concat org-directory "writing.org") "Review+Planning")
-	   "** On %t\n*** Review:\n - %? \n*** Planned:\n\n %i \n ")
+	   "** On %t\n*** Review:\n- %? \n*** Planned:\n\n %i \n ")
 	  ))
 
   (let ((has_python (if (executable-find "python") t nil))
@@ -177,7 +177,21 @@
   :if window-system
   :ensure t
   :after org
-  :custom (org-download-image-dir (concat org-directory "imgs/"))
+  ;; :custom (org-download-image-dir (concat org-directory "imgs/"))
+  ;; this hook will run twice because of org-clock
+  ;; :hook (org-mode . (lambda ()
+  ;;		      (message "buffer file name %s" (buffer-file-name))
+  ;;		      ;;only set download-image-dir for org-dir and roam-dir
+  ;;		      (let* ((curdir (file-name-directory (buffer-file-name)))
+  ;;			     (orgdir org-directory)
+  ;;			     (roamdir (concat orgdir "roam/")))
+  ;;			(setq org-download-image-dir
+  ;;			      (if (and (not (boundp 'org-download-image-dir))
+  ;;				       (or (string= curdir orgdir)
+  ;;					   (string= curdir roamdir)))
+  ;;				  (concat curdir "imgs/")
+  ;;				nil)))
+  ;;		      ))
   :bind (:map org-mode-map
 	      (("C-c d s" . org-download-screenshot)
 	       ("C-c d y" . org-download-yank)

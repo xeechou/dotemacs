@@ -24,3 +24,12 @@ tramp
 .dap-breakpoints
 .extension/
 url/
+
+# temporary files
+*.#*
+[#]*[#]
+
+server/
+
+#magit
+transient/*
