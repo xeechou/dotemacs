@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: math
 # key: ma_
-# adding inline equation for org mode
+# adding equation for org mode
 # --
 \[ ${1:equation} \]

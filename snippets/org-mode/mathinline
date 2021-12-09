@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: math_inline
+# key: mai_
+# adding inline equation for org mode
+# --
+\\( ${1:equation} \\)
