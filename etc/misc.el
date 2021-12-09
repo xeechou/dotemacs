@@ -1,5 +1,8 @@
 (require 'diminish)
 
+;; global auto revert
+(global-auto-revert-mode t)
+
 ;;-4 removing the ugly tool bars
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
