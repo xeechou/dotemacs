@@ -107,6 +107,15 @@
 	 (lua-mode . (lambda ()
 		       (add-to-list (make-local-variable 'company-backends)
 				    'company-lua)))))
+;;dart
+(use-package dart-mode
+  :ensure t
+  :defer t
+  :mode (("\\.dart\\'" . dart-mode)))
+
+(use-package lsp-dart
+  :ensure t
+  :hook (dart-mode . lsp))
 
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t
