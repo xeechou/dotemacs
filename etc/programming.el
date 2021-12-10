@@ -6,6 +6,8 @@
 ;;sync
 (use-package magit
   :ensure t)
+(use-package ssh-agency :load-path "lisp/"
+  :hook (magit-credential . ssh-agency-ensure))
 
 (use-package format-all
   :ensure t
