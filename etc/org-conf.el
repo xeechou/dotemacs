@@ -196,3 +196,48 @@
 	      (("C-c d s" . org-download-screenshot)
 	       ("C-c d y" . org-download-yank)
 	       ("C-c d c" . org-download-clipboard))))
+
+(use-package ivy-bibtex
+  :ensure t
+  :after org
+  :init
+  (setq bibtex-completion-bibliography `,(concat org-directory "bib/references.bib")))
+
+(use-package org-ref
+  :ensure t
+  :after org
+  :init
+  (require 'org-ref-arxiv)
+  (require 'org-ref-scopus)
+  (require 'org-ref-wos)
+  (require 'org-ref-ivy)
+  (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+	org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+	org-ref-insert-label-function 'org-ref-insert-label-link
+	org-ref-insert-ref-function 'org-ref-insert-ref-link
+	org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
+  ;; setup auto generating bibtex keys
+  (require 'bibtex)
+  (setq bibtex-autokey-year-length 4
+	bibtex-autokey-name-year-separator "-"
+	bibtex-autokey-year-title-separator "-"
+	bibtex-autokey-titleword-separator "-"
+	bibtex-autokey-titlewords 2
+	bibtex-autokey-titlewords-stretch 1
+	bibtex-autokey-titleword-length 5)
+  ;; export to pdf with bibtex
+  ;;this is when you don't have latexmk
+  (setq org-latex-pdf-process
+	(if (executable-find "latexmk")
+	    ;;when you have latexmk
+	    (list "latexmk -shell-escape -bibtex -f -pdf %f")
+	  ;;when you don't have latexmk
+	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
+	    "bibtex %b" ;;using bibtex here, or you can use biber
+	    "pdflatex -interaction nonstopmode -output-directory %o %f"
+	    "pdflatex -interaction nonstopmode -output-directory %o %f")))
+
+  :bind (:map org-mode-map
+	      ("C-c [" . org-ref-insert-link-hydra/body)
+	      ("C-c ]" . org-ref-insert-link))
+  )

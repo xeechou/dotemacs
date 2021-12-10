@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: latex_header
+# key: lah_
+# adding equation for org mode
+# --
+
+#+OPTIONS: toc:nil
+#+TITLE: ${1:title}
+#+AUTHOR: ${2:author}
+#+latex_header: \usepackage[style=alphabetic, backend=bibtex, hyperref=true,backref=true,maxcitenames=3,url=true] {biblatex}
+#+latex_header: \bibliography{${3:/path/to/bib/file}}
