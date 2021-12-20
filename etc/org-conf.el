@@ -27,6 +27,7 @@
 			  (concat org-directory "writing.org")
 			  (concat org-directory "coding.org")
 			  (concat org-directory "social.org")
+			  (concat org-directory "thoughts.org")
 			  (concat org-directory "goals-habits.org")
 			  (concat org-directory "miscs.org")))
   :hook (org-after-todo-statistics . org-summary-todo)
