@@ -13,17 +13,26 @@
 
 ;;-2) delete selection mode
 (delete-selection-mode 1)
-;;-1)set default fill column
-(setq-default fill-column 79)
+;;-1) visual fill column
+(use-package visual-fill-column
+  :init
+  (setq-default fill-column 79)
+  :ensure t
+  :hook
+  (prog-mode . turn-on-auto-fill)
+  (visual-line-mode . visual-fill-column-mode)
+  ((text-mode outline-mode) . visual-line-mode)
+  )
+
 (setq make-backup-files nil)
 (delete-selection-mode 1)
 ;;0) save space
 (save-place-mode 1)
 ;;1) default text
 (setq default-major-mode 'text-mode)
-(add-hook 'text-mode-hook 'turn-on-auto-fill)
 (add-hook 'text-mode-hook 'column-number-mode)
 (add-hook 'prog-mode-hook 'column-number-mode)
+(add-hook 'outline-mode-hook 'column-number-mode)
 
 ;; diminish some builtin packages
 (diminish 'eldoc-mode)
@@ -49,7 +58,7 @@
 (use-package linum
   :diminish linum-mode
   :custom (linum-format "%4d\u2502")
-  :hook ((prog-mode text-mode) . linum-mode))
+  :hook (prog-mode . linum-mode))
 
 ;;4) which-key
 (use-package which-key :ensure t
