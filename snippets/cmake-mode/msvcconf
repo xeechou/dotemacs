@@ -21,8 +21,15 @@ set(PROJ_COMPILE_FLAGS
   /MP       # build with multiple processes
   /wd4653   # Ignore PCH for any individual file that has different optimization settings
   /wd4068   # Ignore unknow pragma
+  /wd4201   # non standard extensions like nameless struct union
+  /wd4244   # Ignore the annoying int conversion flags
+  /wd4267   # size_t to uint32_t conversion
+  /wd4100   # unused paramters
   )
 
+set(PROJ_LINK_FLAGS
+  /ignore:4099 #ignore unlinked pdb
+  )
 
 set(CMAKE_RC_FLAGS /nologo)
 add_definitions(-D_USE_MATH_DEFINES)
