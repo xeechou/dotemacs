@@ -106,7 +106,7 @@
   ;; Enable "www" ligature in every possible major mode
   (ligature-set-ligatures 't '("www")))
 
-(defun ligature-set-for-symbol (symbols)
+(defun my/ligature-set-for-symbol (symbols)
   (ligature-set-ligatures 'prog-mode symbols)
   (ligature-set-ligatures 'text-mode symbols))
 
@@ -116,23 +116,23 @@
 ;; This one is bit tricky, when you start Emacs as daemon, the font-family-list
 ;; will be nil for non
 
-(defun my-font-setup ()
+(defun my/font-setup ()
   ;; Set main font
   (cond
    ((member "Fira Code" (font-family-list)) ;; ligature fonts
     (set-frame-font "Fira Code-13" t t)
     (when (boundp 'ligature-fira-symbols)
-      (ligature-set-for-symbol ligature-fira-symbols)))
+      (my/ligature-set-for-symbol ligature-fira-symbols)))
    ;; Cascadia fonts is available for windows-terminal
    ((member "Cascadia Code" (font-family-list))
     (set-frame-font "Cascadia Code-13" t t)
     (when (boundp 'ligature-cascadia-symbols)
-      (ligature-set-for-symbol ligature-cascadia-symbols)))
+      (my/ligature-set-for-symbol ligature-cascadia-symbols)))
    ;; JetBrains mono is also a good ligature font
    ((member "JetBrains Mono" (font-family-list))
     (set-frame-font "JetBrains Mono-13" t t)
     (when (boundp 'ligature-jetbrains-symbols)
-      (ligature-set-for-symbol ligature-jetbrains-symbols)))
+      (my/ligature-set-for-symbol ligature-jetbrains-symbols)))
    ;; Windows: Consolas should be available
    ((member "Consolas" (font-family-list))
     (set-frame-font "Consolas-13" t t))
@@ -192,6 +192,6 @@
 		  (select-frame frame))
 		(message "Setup up font for current frame")
 		(when (display-graphic-p)
-		  (my-font-setup))))
+		  (my/font-setup))))
   ;; starting Emacs individually
-  (add-hook 'window-setup-hook #'my-font-setup))
+  (add-hook 'window-setup-hook #'my/font-setup))

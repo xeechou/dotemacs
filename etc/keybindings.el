@@ -2,11 +2,11 @@
 ;;************************************************************
 ;;************************************************************
 ;;0) backward kill-line, this may not be a good idea
-(defun backward-kill-line (arg)
+(defun my/backward-kill-line (arg)
   "Kill ARG line backwards"
   (interactive "p")
   (kill-line (- 1 arg)))
-(global-set-key (kbd "C-c u") 'backward-kill-line) ;;`C-c u'
+(global-set-key (kbd "C-c u") 'my/backward-kill-line) ;;`C-c u'
 ;;************************************************************
 ;;************************************************************
 ;;************************************************************
@@ -19,27 +19,27 @@
        (move-to-column column))))
 (put 'save-column 'lisp-indent-function 0)
 
-(defun move-line-up ()
+(defun my/move-line-up ()
   (interactive)
   (save-column
    (transpose-lines 1)
    (forward-line -2)))
 
-(defun move-line-down ()
+(defun my/move-line-down ()
   (interactive)
   (save-column
    (forward-line 1)
    (transpose-lines 1)
    (forward-line -1)))
 
-(global-set-key (kbd "M-<up>") 'move-line-up)
-(global-set-key (kbd "M-<down>") 'move-line-down)
+(global-set-key (kbd "M-<up>") 'my/move-line-up)
+(global-set-key (kbd "M-<down>") 'my/move-line-down)
 
 ;;************************************************************
 ;;************************************************************
 ;;************************************************************
 ;;1) copy current lines char
-(defun my-copy-line ()
+(defun my/copy-line ()
   "copy current line, from the first character that is not \t or
   ' ', to the last of that line, this feature is from vim.
   Case to use this feature:
@@ -56,7 +56,7 @@
   ;;This is silly, find a way to print out last-kill.
   )
 
-(global-set-key "\C-c\C-k" 'my-copy-line)
+(global-set-key "\C-c\C-k" 'my/copy-line)
 ;;************************************************************
 ;;************************************************************
 ;;************************************************************
@@ -95,13 +95,13 @@
 ;;****************************E*******************************
 ;;************************************************************
 
-(defun my-next-word (p)
+(defun my/next-word (p)
   "Move point to the beginning of the next word, past by any space"
   (interactive "d")
   (forward-word)
   (forward-word)
   (backward-word))
-;;(global-set-key "\M-f" 'my-next-word)
+;;(global-set-key "\M-f" 'my/next-word)
 
 ;;for multiple windows convience
 (global-set-key (kbd "C-x <up>") 'windmove-up)
@@ -118,13 +118,13 @@
 ;;************************************************************
 ;;************************************************************
 ;; reload dir-locals.el
-(defun reload-dir-locals-for-current-buffer ()
+(defun my/reload-dir-locals-for-current-buffer ()
   "reload dir locals for the current buffer"
   (interactive)
   (let ((enable-local-variables :all))
     (hack-dir-local-variables-non-file-buffer)))
 
-(defun reload-dir-locals-for-all-buffer-in-this-directory ()
+(defun my/reload-dir-locals-for-all-buffer-in-this-directory ()
   "For every buffer with the same `default-directory` as the
 current buffer's, reload dir-locals."
   (interactive)
@@ -132,4 +132,4 @@ current buffer's, reload dir-locals."
     (dolist (buffer (buffer-list))
       (with-current-buffer buffer
         (when (equal default-directory dir)
-          (my-reload-dir-locals-for-current-buffer))))))
+          (my/reload-dir-locals-for-current-buffer))))))

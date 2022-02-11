@@ -30,7 +30,7 @@
 			  (concat org-directory "thoughts.org")
 			  (concat org-directory "goals-habits.org")
 			  (concat org-directory "miscs.org")))
-  :hook (org-after-todo-statistics . org-summary-todo)
+  :hook (org-after-todo-statistics . my/org-summary-todo)
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
   :bind (:map global-map
@@ -43,16 +43,16 @@
 	      ("M-<down>"  . org-metadown))
   :init
   ;;set org_dir
-  (defun org-dir-set (dir)
+  (defun my/org-dir-set (dir)
     (and dir (not (string= dir "")) (file-exists-p dir)))
-  (setq org-directory (if (org-dir-set (getenv "ORG_DIR"))
+  (setq org-directory (if (my/org-dir-set (getenv "ORG_DIR"))
 			  (getenv "ORG_DIR")
 			"~/org/")) ;;org-directory has to have trailing "/"
   ;; enable images
   (setq org-startup-with-inline-images t)
   ;; using org-indent-mode
   (setq org-startup-indented t)
-  (defun org-summary-todo (n-done n-not-done)
+  (defun my/org-summary-todo (n-done n-not-done)
     "Switch entry to DONE when all subentries are don, to TODO otherwise"
     (let (org-log-done org-log-states) ; turn off logging
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))

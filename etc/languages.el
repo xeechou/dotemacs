@@ -9,7 +9,7 @@
 	 ("\\.mm\\'" . c++-mode)
 	 ("\\.inl\\'" . c++-mode))
   :preface
-  (defun my-cmode-hook ()
+  (defun my/cmode-hook ()
     ;;default settings
     (setq c-default-style "linux"
 	  c-basic-offset 8)
@@ -18,7 +18,7 @@
     (c-set-offset 'inline-open 0)
     )
   :hook
-  ((c-mode-common . my-cmode-hook)
+  ((c-mode-common . my/cmode-hook)
    (c++-mode . flycheck-mode)
    (c++-mode . lsp)
    (c-mode . flycheck-mode)
