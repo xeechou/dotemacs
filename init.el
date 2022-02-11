@@ -36,7 +36,8 @@
 (eval-when-compile
   (require 'use-package)
   (require 'bind-key)
-  (require 'diminish))
+  (require 'diminish)
+  (require 'cl))
 
 ;;match the PATH from emacs to shell
 (when (or (memq window-system '(mac ns x pgtk)) (daemonp))
@@ -45,7 +46,13 @@
     :config
     (exec-path-from-shell-initialize)))
 
-;;;;;;;;;;;; load user configs ;;;;;;;;;;
+
+;;;;;;;;;;;; common functions ;;;;;;;;;;
+;;set org_dir
+(defun my/concat-path (&rest parts)
+  (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
+
+;;;;;;;;;;;; load user config ;;;;;;;;;;
 ;; we don't need do anything specificly for flyspell-mode so long as
 ;; you installed hunspell, make sure your emacs version is 24+
 (require 'load-dir)

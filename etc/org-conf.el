@@ -1,4 +1,8 @@
 (require 'org-funcs)
+(defun my/org-dir-set (dir)
+  (and dir (not (string= dir "")) (file-exists-p dir)))
+(defun my/org-file (path)
+  (my/concat-path org-directory path))
 
 (use-package org :ensure t
   :mode (("\\.org$" . org-mode))
@@ -20,14 +24,14 @@
   (org-latex-create-formula-image-program 'dvipng)
   (org-preview-latex-image-directory (concat temporary-file-directory "ltximg/"))
   ;;note files
-  (org-default-notes-file (concat org-directory "notes.org"))
-  (org-agenda-files (list (concat org-directory "reading.org")
-			  (concat org-directory "writing.org")
-			  (concat org-directory "coding.org")
-			  (concat org-directory "social.org")
-			  (concat org-directory "thoughts.org")
-			  (concat org-directory "goals-habits.org")
-			  (concat org-directory "miscs.org")))
+  (org-default-notes-file (my/concat-path org-directory "notes.org"))
+  (org-agenda-files (list (my/concat-path org-directory "reading.org")
+			  (my/concat-path org-directory "writing.org")
+			  (my/concat-path org-directory "coding.org")
+			  (my/concat-path org-directory "social.org")
+			  (my/concat-path org-directory "thoughts.org")
+			  (my/concat-path org-directory "goals-habits.org")
+			  (my/concat-path org-directory "miscs.org")))
   :hook
   ((org-after-todo-statistics . org-funcs-summary-todo)
    (org-checkbox-statistics . org-funcs-checkbox-todo))
@@ -43,9 +47,6 @@
 	      ("M-<up>"    . org-metaup)
 	      ("M-<down>"  . org-metadown))
   :init
-  ;;set org_dir
-  (defun my/org-dir-set (dir)
-    (and dir (not (string= dir "")) (file-exists-p dir)))
   (setq org-directory (if (my/org-dir-set (getenv "ORG_DIR"))
 			  (getenv "ORG_DIR")
 			"~/org/")) ;;org-directory has to have trailing "/"
@@ -64,22 +65,22 @@
   (setq org-capture-templates
 	;; misc tasks, moving coding or writing later?
 	`(("m" "Miscs" entry
-	   (file+headline ,(concat org-directory "miscs.org") "Tasks")
+	   (file+headline ,(my/org-file "miscs.org") "Tasks")
            "* TODO %?\n%i\n  %a")
 	  ;; my ideas
 	  ("s" "Thoughts" entry
-	   (file+headline ,(concat org-directory "thoughts.org") "Ideas")
+	   (file+headline ,(my/org-file "thoughts.org") "Ideas")
 	   "* %?\n %i\n %c\n\n")
 	  ;; Learning items
 	  ("r" "Reading" entry
-	   (file+headline ,(concat org-directory "reading.org") "Articles")
+	   (file+headline ,(my/org-file "reading.org") "Articles")
 	   "** TODO %?\n%i\n %^L\n \n") ;;why the linebreak didn't work?
 	  ;; my journals
           ("j" "Journal" entry
-	   (file+olp+datetree ,(concat org-directory "journal.org"))
+	   (file+olp+datetree ,(my/org-file "journal.org"))
            "* %t\n %? %i\n")
 	  ("p" "Review+Planning" entry
-	   (file+headline ,(concat org-directory "writing.org") "Review+Planning")
+	   (file+headline ,(my/org-file "writing.org") "Review+Planning")
 	   "** On %t\n*** Review:\n- %? \n*** Planned:\n\n %i \n ")
 	  ))
   (org-funcs-load-babel-compiler)
@@ -95,7 +96,7 @@
   :after org
   :init (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory (concat org-directory "roam/"))
+  (org-roam-directory (my/org-file "roam/"))
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
 	  ("C-c n f" . org-roam-node-find)
 	  ("C-c n c" . org-roam-capture)
@@ -184,7 +185,7 @@
   :ensure t
   :after org
   :init
-  (setq bibtex-completion-bibliography `,(concat org-directory "bib/references.bib")))
+  (setq bibtex-completion-bibliography `,(my/org-file "bib/references.bib")))
 
 (use-package org-ref
   :ensure t
