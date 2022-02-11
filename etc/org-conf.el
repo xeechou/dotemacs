@@ -14,11 +14,7 @@
   ;;faces
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
   ;;TODO, change those faces
-  (org-todo-keyword-faces '(("TODO" . error)
-			    ("DOIN" . org-document-title)
-			    ("DONE" . org-level-5)
-			    ("CANC" . org-level-4)
-			    ("PEND" . org-level-3)))
+
   (org-hide-emphasis-markers t)
   ;;latex
   (org-latex-create-formula-image-program 'dvipng)
@@ -86,26 +82,11 @@
 	   (file+headline ,(concat org-directory "writing.org") "Review+Planning")
 	   "** On %t\n*** Review:\n- %? \n*** Planned:\n\n %i \n ")
 	  ))
-
-  (let ((has_python (if (executable-find "python") t nil))
-	(has_c (if (and (executable-find "gcc") (executable-find "g++")) t nil))
-	)
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     `((emacs-lisp  . t)
-       (shell       . t)
-       (python      . ,has_python)
-       (C           . ,has_c)
-       ))
-    )
+  (org-funcs-load-babel-compiler)
+  (org-funcs-define-faces)
   ;;face settings, well setting different sizes for levels is Well, I am not
   ;;very sure, need to be in the same color, didn't look as pretty as I
   ;;expected, and it breaks the TODOs.
-
-  ;; (set-face-attribute 'org-level-1 nil :height 1.5 :weight 'bold)
-  ;; (set-face-attribute 'org-level-2 nil :height 1.25 :weight 'bold)
-  ;; (set-face-attribute 'org-level-3 nil :height 1.1 :weight 'bold)
-  ;; (set-face-attribute 'org-level-4 nil :height 1.05 :weight 'bold)
   )
 
 ;; org-roam minor mode

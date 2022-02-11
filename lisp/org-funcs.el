@@ -48,7 +48,33 @@
 		(unless (string-equal todo-state "TODO")
 		  (org-todo "TODO")))))))))
 
+;;;###autoload
+(defun org-funcs-load-babel-compiler ()
+  "load babel compilers"
+  (let ((has_python (if (executable-find "python") t nil))
+	(has_c (if (and (executable-find "gcc") (executable-find "g++")) t nil))
+	)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     `((emacs-lisp  . t)
+       (shell       . t)
+       (python      . ,has_python)
+       (C           . ,has_c)
+       ))
+    ))
 
-
+;;;###autoload
+(defun org-funcs-define-faces ()
+  "define org faces"
+  (setq org-todo-keyword-faces '(("TODO" . org-warning)
+				 ("DOIN" . org-document-title)
+				 ("DONE" . (:foreground "green" :weight bold))
+				 ("CANC" . (:foreground "grey"  :weight bold))
+				 ("PEND" . (:foreground "blue"  :weight bold))))
+  (set-face-attribute 'org-level-1 nil :height 1.5 :weight 'bold)
+  (set-face-attribute 'org-level-2 nil :height 1.25 :weight 'bold)
+  (set-face-attribute 'org-level-3 nil :height 1.1 :weight 'bold)
+  (set-face-attribute 'org-level-4 nil :height 1.05 :weight 'bold)
+  )
 
 (provide 'org-funcs)
