@@ -1,3 +1,5 @@
+(require 'org-funcs)
+
 (use-package org :ensure t
   :mode (("\\.org$" . org-mode))
   :custom
@@ -10,7 +12,7 @@
   (org-agenda-todo-ignore-deadlines t)
   (org-agenda-todo-ignore-scheduled t)
   ;;faces
-  (org-todo-keywords '((sequence "TODO" "DOIN" "|" "PEND" "DONE" "CANC")))
+  (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
   ;;TODO, change those faces
   (org-todo-keyword-faces '(("TODO" . error)
 			    ("DOIN" . org-document-title)
@@ -30,7 +32,10 @@
 			  (concat org-directory "thoughts.org")
 			  (concat org-directory "goals-habits.org")
 			  (concat org-directory "miscs.org")))
-  :hook (org-after-todo-statistics . my/org-summary-todo)
+  :hook
+  ((org-after-todo-statistics . org-funcs-summary-todo)
+   (org-checkbox-statistics . org-funcs-checkbox-todo))
+
   ;I am not sure this global key setting is good or not, capture stuff globally
   ;is great
   :bind (:map global-map
@@ -52,10 +57,6 @@
   (setq org-startup-with-inline-images t)
   ;; using org-indent-mode
   (setq org-startup-indented t)
-  (defun my/org-summary-todo (n-done n-not-done)
-    "Switch entry to DONE when all subentries are don, to TODO otherwise"
-    (let (org-log-done org-log-states) ; turn off logging
-      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
   ;;activate babel languages
   :config
