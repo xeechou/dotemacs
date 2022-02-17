@@ -71,10 +71,18 @@
 				 ("DONE" . (:foreground "green" :weight bold))
 				 ("CANC" . (:foreground "grey"  :weight bold))
 				 ("PEND" . (:foreground "blue"  :weight bold))))
+  (setq base-font-color     (face-foreground 'default nil 'default))
+
+  ;; the color thing... doesn't really work
   (set-face-attribute 'org-level-1 nil :height 1.5 :weight 'bold)
+  ;; (set-face-foreground 'org-level-1 base-font-color)
   (set-face-attribute 'org-level-2 nil :height 1.25 :weight 'bold)
+  ;; (set-face-foreground 'org-level-2 base-font-color)
   (set-face-attribute 'org-level-3 nil :height 1.1 :weight 'bold)
+  ;; (set-face-foreground 'org-level-3 base-font-color)
   (set-face-attribute 'org-level-4 nil :height 1.05 :weight 'bold)
+  ;; (set-face-foreground 'org-level-4 base-font-color)
+  ;; (set-face-foreground 'org-headline-done base-font-color)
   )
 
 (provide 'org-funcs)
