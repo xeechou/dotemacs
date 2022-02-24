@@ -28,8 +28,12 @@
 (delete-selection-mode 1)
 ;;0) save space
 (save-place-mode 1)
+
+(setq initial-major-mode 'org-mode)
+(setq initial-scratch-message "")
 ;;1) default text
 (setq default-major-mode 'text-mode)
+
 (add-hook 'text-mode-hook 'column-number-mode)
 (add-hook 'prog-mode-hook 'column-number-mode)
 (add-hook 'outline-mode-hook 'column-number-mode)
