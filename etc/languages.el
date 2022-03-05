@@ -52,16 +52,26 @@
 (use-package glsl-mode
   :ensure t
   :mode (("\\.glsl\\'" . glsl-mode)
-	 ("\\.vs\\'" . glsl-mode)
 	 ("\\.vert\\'" . glsl-mode)
-	 ("\\.fs\\'" . glsl-mode)
 	 ("\\.frag\\'" . glsl-mode)
-	 ("\\.gs\\'" . glsl-mode)
+	 ("\\.geom\\'" . glsl-mode)
 	 ("\\.comp\\'" . glsl-mode)
 	 ("\\.rgen\\'" . glsl-mode)
 	 ("\\.rchit\\'" . glsl-mode)
 	 ("\\.rmiss\\'" . glsl-mode))
   )
+
+;; hlsl
+(use-package hlsl-mode :load-path "lisp"
+  :mode (("\\.fxh\\'"  . hlsl-mode)
+	 ("\\.hlsl\\'" . hlsl-mode)
+	 ("\\.vs\\'"   . hlsl-mode)
+	 ("\\.ps\\'"   . hlsl-mode)
+	 ("\\.hs\\'"   . hlsl-mode)
+	 ("\\.ds\\'"   . hlsl-mode)
+	 ("\\.cs\\'"   . hlsl-mode)
+	 ("\\.ms\\'"   . hlsl-mode)
+	 ("\\.as\\'"   . hlsl-mode)))
 
 ;; golang
 (use-package go-mode
