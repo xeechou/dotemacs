@@ -76,11 +76,9 @@
  '(jdee-db-active-breakpoint-face-colors (cons "#1b1d1e" "#fc20bb"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
- '(lsp-log-io nil nil nil "Customized with use-package lsp-mode")
  '(objed-cursor-color "#d02b61")
- '(org-preview-latex-default-process 'dvipng nil nil "Customized with use-package org")
  '(package-selected-packages
-   '(visual-fill-column org-ref ivy-bibtex lsp-dart dart-mode format-all magit org-bullets company-emoji flyspell-correct-popup flyspell-correct which-key lsp-jedi counsel-tramp exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
+   '(auctex visual-fill-column org-ref ivy-bibtex lsp-dart dart-mode format-all magit org-bullets company-emoji flyspell-correct-popup flyspell-correct which-key lsp-jedi counsel-tramp exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
  '(pdf-view-midnight-colors (cons "#dddddd" "#1b1d1e"))
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
@@ -89,18 +87,18 @@
       (innamespace . 0)
       (block-open . 0))
      (eval progn
-	   (c-set-offset 'innamespace '+)
-	   (setq c-basic-offset 4))
+           (c-set-offset 'innamespace '+)
+           (setq c-basic-offset 4))
      (eval progn
-	   (c-set-offset 'innamespace '+)
-	   (setq c-basic-offset 4)
-	   (add-hook 'c++-mode-hook
-		     (lambda nil
-		       (smart-tabs-mode-enable)
-		       (smart-tabs-advice c-indent-line c-basic-offset)
-		       (smart-tabs-advice c-indent-region c-basic-offset))))
+           (c-set-offset 'innamespace '+)
+           (setq c-basic-offset 4)
+           (add-hook 'c++-mode-hook
+                     (lambda nil
+                       (smart-tabs-mode-enable)
+                       (smart-tabs-advice c-indent-line c-basic-offset)
+                       (smart-tabs-advice c-indent-region c-basic-offset))))
      (eval progn
-	   (c-set-offset 'innamespace '+))
+           (c-set-offset 'innamespace '+))
      (indent-tab-mode)
      (cmake-tab-width . 4)
      (eval c-set-offset 'innamespace 0)

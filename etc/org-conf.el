@@ -80,8 +80,8 @@
 	   (file+olp+datetree ,(my/org-file "journal.org"))
            "* %t\n %? %i\n")
 	  ("p" "Review+Planning" entry
-	   (file+headline ,(my/org-file "writing.org") "Review+Planning")
-	   "** On %t\n*** Review:\n- %? \n*** Planned:\n\n %i \n ")
+	   (file+headline ,(my/org-file "goals-habits.org") "Review+Planning")
+	   "*** On %t\n**** Review:\n- %? \n**** Planned:\n\n %i \n ")
 	  ))
   (org-funcs-load-babel-compiler)
   (org-funcs-define-faces)
@@ -154,7 +154,9 @@
 ;; org clip link
 (use-package org-cliplink
   :ensure t
-  :bind ("C-c p i" . org-cliplink))
+  :bind (:map org-mode-map
+	 ("C-c p i" . org-cliplink)
+	 ("C-c p l" . org-store-link)))
 
 ;; Org-download
 (use-package org-download

@@ -127,6 +127,8 @@
   :ensure t
   :hook (dart-mode . lsp))
 
+(use-package tex :ensure auctex)
+
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t
   :mode (("\\.dot\\'" . graphviz-dot-mode)))
