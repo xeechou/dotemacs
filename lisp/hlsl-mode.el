@@ -124,7 +124,8 @@
   (defvar hlsl-keyword-list
     '("break" "continue" "do" "for" "while" "if" "else" "subroutine" "extern"
       "discard" "return" "precision" "struct" "class" "switch" "default" "case"
-      "namespace" "void" "volatile" "static"  "extern" "inout" "in" "out"
+      "namespace" "void" "volatile" "static" "extern" "inout" "in" "out"
+      "inline"
       ))
 
   (defvar hlsl-reserved-list
@@ -206,8 +207,11 @@
     (,(hlsl-ppre hlsl-type-list)      . 'font-lock-type-face)
     (,(hlsl-ppre hlsl-qualifier-list) . 'font-lock-keyword-face)
     (,(hlsl-ppre hlsl-keyword-list)   . 'font-lock-keyword-face)
-    ("SV_[A-Za-z_]+"                         . 'font-lock-variable-name-face)
-    (,(hlsl-pp hlsl-semantics-list)  . 'font-lock-variable-name-face)
+    ;;function name
+    ("\\<\\(\\sw+\\) ?(" (1 'font-lock-function-name-face))
+    ;;others
+    ("SV_[A-Za-z_]+"                  . 'font-lock-variable-name-face)
+    (,(hlsl-pp hlsl-semantics-list)   . 'font-lock-variable-name-face)
     (,(hlsl-ppre hlsl-const-list)     . 'font-lock-constant-face)
     (,(hlsl-ppre hlsl-builtin-list)   . 'font-lock-builtin-face)
     )
