@@ -87,18 +87,18 @@
       (innamespace . 0)
       (block-open . 0))
      (eval progn
-           (c-set-offset 'innamespace '+)
-           (setq c-basic-offset 4))
+	   (c-set-offset 'innamespace '+)
+	   (setq c-basic-offset 4))
      (eval progn
-           (c-set-offset 'innamespace '+)
-           (setq c-basic-offset 4)
-           (add-hook 'c++-mode-hook
-                     (lambda nil
-                       (smart-tabs-mode-enable)
-                       (smart-tabs-advice c-indent-line c-basic-offset)
-                       (smart-tabs-advice c-indent-region c-basic-offset))))
+	   (c-set-offset 'innamespace '+)
+	   (setq c-basic-offset 4)
+	   (add-hook 'c++-mode-hook
+		     (lambda nil
+		       (smart-tabs-mode-enable)
+		       (smart-tabs-advice c-indent-line c-basic-offset)
+		       (smart-tabs-advice c-indent-region c-basic-offset))))
      (eval progn
-           (c-set-offset 'innamespace '+))
+	   (c-set-offset 'innamespace '+))
      (indent-tab-mode)
      (cmake-tab-width . 4)
      (eval c-set-offset 'innamespace 0)

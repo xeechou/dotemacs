@@ -127,7 +127,18 @@
   :ensure t
   :hook (dart-mode . lsp))
 
-(use-package tex :ensure auctex)
+(use-package tex :ensure auctex
+  :custom
+  (TeX-master              nil)
+  (Tex-auto-save           t)
+  (Tex-parse-self          t)
+  (Tex-save-query          nil)
+  (reftex-plug-into-AUCTeX t)
+  :hook
+  ((latex-mode . flyspell-mode)
+   (latex-mode . turn-on-reftex))
+  )
+
 
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t
