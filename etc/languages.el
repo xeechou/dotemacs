@@ -136,7 +136,8 @@
   (reftex-plug-into-AUCTeX t)
   :hook
   ((latex-mode . flyspell-mode)
-   (latex-mode . turn-on-reftex))
+   (latex-mode . turn-on-reftex)
+   (LaTeX-mode . turn-on-reftex))
   )
 
 
