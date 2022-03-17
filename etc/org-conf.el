@@ -10,6 +10,9 @@
   (org-log-done  'time)
   (org-clock-persist 'history)
   (org-adapt-indentation nil)
+  ;;setup the column, this max length for the first level we can go, maybe we
+  ;;can somehow calculate it?
+  (org-tags-column -54)
   ;;agenda, show unplanned tasks in global TO-DO list.
   (org-agenda-skip-scheduled-if-done t)
   (org-agenda-skip-deadline-if-done t)
