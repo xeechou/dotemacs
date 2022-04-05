@@ -195,3 +195,5 @@
 		  (my/font-setup))))
   ;; starting Emacs individually
   (add-hook 'window-setup-hook #'my/font-setup))
+
+(add-hook 'outline-mode-hook (lambda () (variable-pitch-mode t)))

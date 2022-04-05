@@ -57,6 +57,8 @@
   (setq org-startup-with-inline-images t)
   ;; using org-indent-mode
   (setq org-startup-indented t)
+  ;; using fixed pitch for tables
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 
   ;;activate babel languages
   :config

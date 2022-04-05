@@ -14,9 +14,57 @@
   :diminish format-all-mode
   :hook (prog-mode . format-all-mode))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; editing packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; linenum, you should never have more than 9999 lines of code in a file
+
+(use-package linum
+  :diminish linum-mode
+  :custom (linum-format "%4d\u2502")
+  :hook (prog-mode . linum-mode))
+
+;; which-key
+(use-package which-key :ensure t
+  :diminish which-key-mode
+  :hook ((prog-mode text-mode) . which-key-mode))
+
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :diminish whitespace-cleanup-mode
+  :hook ((prog-mode . whitespace-cleanup-mode)))
+
+;; using electric pair instead of autopair
+(use-package electric-pair
+  :diminish electric-pair-mode
+  :hook ((prog-mode text-mod) . electric-pair-mode))
+
+;;-3) winner-mode
+(use-package winner
+  :defer t
+  :diminish winner-mode
+  :hook ((prog-mode text-mode) . winner-mode))
+
+;; visual fill column
+(use-package visual-fill-column
+  :init
+  (setq-default fill-column 79)
+  :ensure t
+  :hook
+  (prog-mode . turn-on-auto-fill)
+  (visual-line-mode . visual-fill-column-mode)
+  ((text-mode outline-mode) . visual-line-mode)
+  )
+
+;; diminish some builtin packages
+(diminish 'eldoc-mode)
+(diminish 'abbrev-mode)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functional packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (use-package company-c-headers :ensure t)
 ;; (setq clang-known-modes '(c++-mode c-mode))
@@ -99,7 +147,10 @@
   :hook ((outline-mode    . company-mode) ;;enable for markdown, org mode
 	 (emacs-lisp-mode . company-mode)
 	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
-						    'company-elisp))))
+						    'company-elisp)))
+	 (outline-mode    . (lambda () (add-to-list (make-local-variable 'company-backends)
+						    'company-dabbrev)))
+	 )
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (setq company-minimum-prefix-length 2
