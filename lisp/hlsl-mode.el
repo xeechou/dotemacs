@@ -112,6 +112,8 @@
       "tbuffer" "cbuffer" "AppendStructuredBuffer" "ConsumeStructuredBuffer"
       "ConstantBuffer"
       "RWBuffer" "RWByteAddressBuffer" "RWStructuredBuffer"
+      ;;ray tracing
+      "RaytracingAccelerationStructure"
       ;;user defined typedef vector<bool, 1>
       "vector" "matrix"
       ))
