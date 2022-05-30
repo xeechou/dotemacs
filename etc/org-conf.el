@@ -18,6 +18,7 @@
   (org-agenda-skip-deadline-if-done t)
   (org-agenda-todo-ignore-deadlines t)
   (org-agenda-todo-ignore-scheduled t)
+  (org-deadline-warning-days 7)
   ;;faces
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
   ;;TODO, change those faces
@@ -86,7 +87,7 @@
            "* %t\n %? %i\n")
 	  ("p" "Review+Planning" entry
 	   (file+headline ,(my/org-file "goals-habits.org") "Review+Planning")
-	   "*** On %t\n**** Review:\n- %? \n**** Planned:\n\n %i \n ")
+	   "*** On %t\n**** Planned:\n\n %i \n ")
 	  ))
   (org-funcs-load-babel-compiler)
   (org-funcs-define-faces)
