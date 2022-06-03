@@ -15,7 +15,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;; MELPA ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'package) ;; you may already have this line
+
+;; using straight.el instead package.el for now
+(let ((bootstrap-file (concat user-emacs-directory
+			      "straight/repos/straight.el/bootstrap.el"))
+      (bootstrap-version 3))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+(eval-and-compile (require 'straight))
+(setq package-enable-at-startup nil)
+
+;; (require 'package) ;; you may already have this line
+(straight-use-package 'use-package)
 ;; In China
 ;; (setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
 ;;                          ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
@@ -26,12 +43,14 @@
 			 ("org"   . "https://orgmode.org/elpa/")))
 (package-initialize) ;;you may already have this line
 
-;;install use-package if we don't have, but package refresh-content gonna take really long time
-(unless (package-installed-p 'use-package)
-  ;(package-refresh-contents)
-  (package-install 'use-package)
-  (package-install 'diminish)
-  )
+(straight-use-package 'use-package)
+(straight-use-package 'diminish)
+
+;; (unless (package-installed-p 'use-package)
+;;   ;(package-refresh-contents)
+;;   (package-install 'use-package)
+;;   (package-install 'diminish)
+;;   )
 
 (eval-when-compile
   (require 'use-package)
