@@ -32,19 +32,21 @@
 (setq package-enable-at-startup nil)
 
 ;; (require 'package) ;; you may already have this line
+(straight-use-package 'diminish)
 (straight-use-package 'use-package)
+(use-package straight
+  :custom (straight-use-package-by-default t))
 ;; In China
 ;; (setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
 ;;                          ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
 ;;			 ("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
 ;; Canada
-(setq package-archives '(("gnu"   . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-			 ("org"   . "https://orgmode.org/elpa/")))
-(package-initialize) ;;you may already have this line
+;; (setq package-archives '(("gnu"   . "http://elpa.gnu.org/packages/")
+;;                          ("melpa" . "https://melpa.org/packages/")
+;; 			 ("org"   . "https://orgmode.org/elpa/")))
+;;(package-initialize) ;;you may already have this line
 
-(straight-use-package 'use-package)
-(straight-use-package 'diminish)
+
 
 ;; (unless (package-installed-p 'use-package)
 ;;   ;(package-refresh-contents)
@@ -145,7 +147,7 @@
     (cons 340 "#505050")
     (cons 360 "#505050")))
  '(vc-annotate-very-old-color nil)
- '(warning-suppress-types '((comp)))
+ '(warning-suppress-types '((ox-pandoc) (comp)))
  '(whitespace-style
    '(face trailing tabs spaces lines newline empty space-before-tab space-mark tab-mark newline-mark)))
 (custom-set-faces

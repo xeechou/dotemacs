@@ -1,10 +1,14 @@
+;;need this to avoid issue
+(straight-use-package 'org)
+
 (require 'org-funcs)
 (defun my/org-dir-set (dir)
   (and dir (not (string= dir "")) (file-exists-p dir)))
 (defun my/org-file (path)
   (my/concat-path org-directory path))
 
-(use-package org :ensure t
+(use-package org
+  :ensure t
   :mode (("\\.org$" . org-mode))
   :custom
   (org-log-done  'time)
@@ -96,7 +100,10 @@
   ;;expected, and it breaks the TODOs.
   )
 
-;; org-roam minor mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-roam
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package org-roam
   :ensure t
   :after org
@@ -143,13 +150,13 @@
   )
 
 ;; My synchronizer
-(use-package org-msync :load-path "lisp/"
-  :hook ((org-mode . org-msync-after-save-hook)
-	 (auto-save . org-msync-auto-save-hook))
-  :custom
-  (org-msync-local-dir org-directory)
-  (org-msync-remote-dir "~/Documents/org-remote/")
-  )
+;; (use-package org-msync :load-path "lisp/"
+;;   :hook ((org-mode . org-msync-after-save-hook)
+;; 	 (auto-save . org-msync-auto-save-hook))
+;;   :custom
+;;   (org-msync-local-dir org-directory)
+;;   (org-msync-remote-dir "~/Documents/org-remote/")
+;;   )
 
 ;; using org bullets
 (use-package org-bullets
@@ -164,7 +171,25 @@
 	 ("C-c p i" . org-cliplink)
 	 ("C-c p l" . org-store-link)))
 
-;; Org-download
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-roam-ui
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-roam-ui
+  :straight
+  (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :after org-roam
+  :hook (org-mode . org-roam-ui-mode)
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-ref
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package org-download
   :if window-system
   :ensure t
@@ -195,6 +220,9 @@
   :init
   (setq bibtex-completion-bibliography `,(my/org-file "bib/references.bib")))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-ref
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-ref
   :ensure t
   :after org
@@ -233,3 +261,4 @@
 	      ("C-c [" . org-ref-insert-link-hydra/body)
 	      ("C-c ]" . org-ref-insert-link))
   )
+

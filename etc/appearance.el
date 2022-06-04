@@ -13,7 +13,8 @@
   :hook (company-mode . (lambda () (company-emoji-init))))
 
 ;; Ligature Settings
-(use-package ligature :load-path "lisp/"
+(use-package ligature
+  :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
   :if (string-match "HARFBUZZ" system-configuration-features)
   :hook ((prog-mode text-mode) . ligature-mode)
   ;; Enable all Cascadia Code ligatures in programming modes

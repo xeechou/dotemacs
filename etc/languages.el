@@ -62,7 +62,8 @@
   )
 
 ;; hlsl
-(use-package hlsl-mode :load-path "lisp"
+(use-package hlsl-mode
+  :straight (hlsl-mode :type git :host github :repo "xeechou/hlsl-mode.el")
   :mode (("\\.fxh\\'"  . hlsl-mode)
 	 ("\\.hlsl\\'" . hlsl-mode)
 	 ("\\.vs\\'"   . hlsl-mode)
@@ -127,18 +128,18 @@
   :ensure t
   :hook (dart-mode . lsp))
 
-(use-package tex :ensure auctex
-  :custom
-  (TeX-master              nil)
-  (Tex-auto-save           t)
-  (Tex-parse-self          t)
-  (Tex-save-query          nil)
-  (reftex-plug-into-AUCTeX t)
-  :hook
-  ((latex-mode . flyspell-mode)
-   (latex-mode . turn-on-reftex)
-   (LaTeX-mode . turn-on-reftex))
-  )
+;; (use-package tex :ensure auctex
+;;   :custom
+;;   (TeX-master              nil)
+;;   (Tex-auto-save           t)
+;;   (Tex-parse-self          t)
+;;   (Tex-save-query          nil)
+;;   (reftex-plug-into-AUCTeX t)
+;;   :hook
+;;   ((latex-mode . flyspell-mode)
+;;    (latex-mode . turn-on-reftex)
+;;    (LaTeX-mode . turn-on-reftex))
+;;   )
 
 
 ;;graphviz dot

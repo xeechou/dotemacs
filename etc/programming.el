@@ -6,7 +6,9 @@
 ;;sync
 (use-package magit
   :ensure t)
-(use-package ssh-agency :load-path "lisp/"
+
+(use-package ssh-agency
+  :straight (ssh-agency :type git :host github :repo "magit/ssh-agency")
   :hook (magit-credential . ssh-agency-ensure))
 
 (use-package format-all
@@ -37,6 +39,7 @@
 
 ;; using electric pair instead of autopair
 (use-package electric-pair
+  :straight (electric-pair :type built-in)
   :diminish electric-pair-mode
   :hook ((prog-mode text-mod) . electric-pair-mode))
 
@@ -87,11 +90,13 @@
   :config (setq show-paren-style 'parenthesis))
 
 (use-package fic-mode
-  :load-path "lisp/"
+  :straight (fic-mode :type git :host github :repo "lewang/fic-mode")
   :diminish fic-mode
-  :hook (prog-mode . turn-on-fic-mode))
+  :hook (prog-mode . fic-mode))
 
-(use-package color-rg :load-path "lisp/" )
+(use-package color-rg
+  :straight (color-rg :type git :host github :repo "manateelazycat/color-rg"))
+
 
 ;; yasnippet
 (use-package yasnippet-snippets
