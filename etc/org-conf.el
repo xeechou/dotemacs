@@ -70,7 +70,9 @@
   (org-clock-persistence-insinuate)
   ;; I just use PEND to define stuck projects.
   (setq org-stuck-projects
-      '("/-DONE-CANC" ("DOIN" "TODO") nil ""))
+	'("/-DONE-CANC" ("DOIN" "TODO") nil ""))
+  ;;set latex preview scale
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
   ;;capture templates
   (setq org-capture-templates
 	;; misc tasks, moving coding or writing later?
@@ -177,8 +179,9 @@
 (use-package org-roam-ui
   :straight
   (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :diminish org-roam-ui-mode
   :after org-roam
-  :hook (org-mode . org-roam-ui-mode)
+  :hook (after-init . org-roam-ui-mode)
   :config
   (setq org-roam-ui-sync-theme t
         org-roam-ui-follow t
