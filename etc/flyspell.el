@@ -8,8 +8,11 @@
   :init
   ;;for flyspell to work, you need to set LANG first
   ;; on windows, getenv has strange behavior, getenv-internal seems to work correctly.
-  (when (not (getenv-internal "LANG" initial-environment))
-    (setenv "LANG" "en_US"))
+  ;; (when (not (getenv-internal "LANG" initial-environment))
+  (setenv "LANG" "en_US")
+  :custom  (ispell-program-name (or (executable-find "hunspell")
+				    (executable-find "aspell")
+				    (executable-find "ispell")))
   ;;:config
   ;;TODO flyspell language-tool
   )
