@@ -41,7 +41,7 @@
 (use-package electric-pair
   :straight (electric-pair :type built-in)
   :diminish electric-pair-mode
-  :hook ((prog-mode text-mod) . electric-pair-mode))
+  :hook ((prog-mode text-mod outline-mode) . electric-pair-mode))
 
 ;;-3) winner-mode
 (use-package winner
