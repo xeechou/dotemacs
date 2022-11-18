@@ -78,22 +78,26 @@
 	;; misc tasks, moving coding or writing later?
 	`(("m" "Miscs" entry
 	   (file+headline ,(my/org-file "miscs.org") "Tasks")
-           "* TODO %?\n%i\n  %a")
+           "* TODO %?\n%i\n  %a" :prepend t)
 	  ;; my ideas
 	  ("s" "Thoughts" entry
 	   (file+headline ,(my/org-file "thoughts.org") "Ideas")
-	   "* %?\n %i\n %c\n\n")
+	   "* %?\n %i\n \n\n"
+	   :prepend t)
 	  ;; Learning items
 	  ("r" "Reading" entry
 	   (file+headline ,(my/org-file "reading.org") "Articles")
-	   "** TODO %?\n%i\n %^L\n \n") ;;why the linebreak didn't work?
+	   "** TODO %?\n%i\n %^L\n \n"
+	   :prepend t) ;;why the linebreak didn't work?
 	  ;; my journals
           ("j" "Journal" entry
 	   (file+olp+datetree ,(my/org-file "journal.org"))
-           "* %t\n %? %i\n")
+           "* %t\n %? %i\n"
+	   :prepend t)
 	  ("p" "Review+Planning" entry
 	   (file+headline ,(my/org-file "goals-habits.org") "Review+Planning")
-	   "*** On %t\n**** Planned:\n\n %i \n ")
+	   "*** On %t\n**** Planned:\n\n %i \n "
+	   :prepend t)
 	  ))
   (org-funcs-load-babel-compiler)
   (org-funcs-define-faces)

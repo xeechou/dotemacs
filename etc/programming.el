@@ -51,6 +51,8 @@
 
 ;; visual fill column
 (use-package visual-fill-column
+  :straight (visual-fill-column :type git :host github
+				:repo "joostkremers/visual-fill-column")
   :init
   (setq-default fill-column 79)
   :ensure t
