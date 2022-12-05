@@ -9,7 +9,7 @@
   (setq comp-deferred-compilation t
 	comp-deferred-compilation-black-list '("/mu4e.*\\.el$")))
 ;;(setq warning-minimum-level :error)
-
+(setq visible-bell 1)
 ;; disable org-roam warning
 (setq org-roam-v2-ack t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -36,23 +36,6 @@
 (straight-use-package 'use-package)
 (use-package straight
   :custom (straight-use-package-by-default t))
-;; In China
-;; (setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-;;                          ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-;;			 ("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
-;; Canada
-;; (setq package-archives '(("gnu"   . "http://elpa.gnu.org/packages/")
-;;                          ("melpa" . "https://melpa.org/packages/")
-;; 			 ("org"   . "https://orgmode.org/elpa/")))
-;;(package-initialize) ;;you may already have this line
-
-
-
-;; (unless (package-installed-p 'use-package)
-;;   ;(package-refresh-contents)
-;;   (package-install 'use-package)
-;;   (package-install 'diminish)
-;;   )
 
 (eval-when-compile
   (require 'use-package)
