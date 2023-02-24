@@ -30,7 +30,11 @@
   (org-hide-emphasis-markers t)
   ;;latex
   (org-latex-create-formula-image-program 'dvipng)
-  (org-preview-latex-image-directory (concat temporary-file-directory "ltximg/"))
+  (org-preview-latex-image-directory (concat temporary-file-directory
+					     "ltximg/"))
+  ;;set latex preview scale
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
   ;;note files
   (org-default-notes-file (my/concat-path org-directory "notes.org"))
   (org-agenda-files (list (my/concat-path org-directory "reading.org")
@@ -62,8 +66,14 @@
   (setq org-startup-with-inline-images t)
   ;; using org-indent-mode
   (setq org-startup-indented t)
-  ;; using fixed pitch for tables
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  ;; using fixed pitch for code
+  (dolist (face '(org-block
+		  org-block-begin-line
+		  org-block-end-line
+                  org-verbatim
+		  org-code
+		  org-table))
+    (set-face-attribute face nil :inherit 'fixed-pitch))
 
   ;;activate babel languages
   :config
@@ -71,8 +81,6 @@
   ;; I just use PEND to define stuck projects.
   (setq org-stuck-projects
 	'("/-DONE-CANC" ("DOIN" "TODO") nil ""))
-  ;;set latex preview scale
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
   ;;capture templates
   (setq org-capture-templates
 	;; misc tasks, moving coding or writing later?
