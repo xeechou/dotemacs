@@ -20,12 +20,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; editing packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; linenum, you should never have more than 9999 lines of code in a file
 
-(use-package linum
-  :diminish linum-mode
-  :custom (linum-format "%4d\u2502")
-  :hook (prog-mode . linum-mode))
 
 ;; which-key
 (use-package which-key :ensure t

@@ -35,3 +35,12 @@
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
   :custom
   (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+
+(use-package openwith
+  :straight (:host github :type git :repo "garberw/openwith")
+  :init (openwith-mode 1)
+  :config (setq openwith-associations '(("\\.pdf\\'" "sioyek" (file))))
+  )
+
+(when (version<= "26.0.50" emacs-version)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode))
