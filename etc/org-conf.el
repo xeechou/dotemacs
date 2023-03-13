@@ -25,9 +25,7 @@
   (org-deadline-warning-days 7)
   ;;faces
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
-  ;;TODO, change those faces
 
-  (org-hide-emphasis-markers t)
   ;;latex
   (org-latex-create-formula-image-program 'dvipng)
   (org-preview-latex-image-directory (concat temporary-file-directory
@@ -64,16 +62,7 @@
 			"~/org/")) ;;org-directory has to have trailing "/"
   ;; enable images
   (setq org-startup-with-inline-images t)
-  ;; using org-indent-mode
-  (setq org-startup-indented t)
-  ;; using fixed pitch for code
-  (dolist (face '(org-block
-		  org-block-begin-line
-		  org-block-end-line
-                  org-verbatim
-		  org-code
-		  org-table))
-    (set-face-attribute face nil :inherit 'fixed-pitch))
+  
 
   ;;activate babel languages
   :config
@@ -113,6 +102,31 @@
   ;;very sure, need to be in the same color, didn't look as pretty as I
   ;;expected, and it breaks the TODOs.
   )
+
+(use-package org-modern
+  :ensure t
+  ;; :straight
+  ;; (:host github :repo "minad/org-modern" :branch "main")
+  :after org
+  :hook
+  (org-mode . org-modern-mode)
+  (org-agenda-finalize . org-modern-agenda)
+  (org-mode . (lambda () (variable-pitch-mode t)))
+  ;; :custom
+  ;; (org-startup-indented t)
+  ;; (org-hide-emphasis-markers t)
+  :config
+  (dolist (face '(org-block
+		  org-block-begin-line
+		  org-block-end-line
+                  org-verbatim
+		  org-code
+		  org-table))
+    (set-face-attribute face nil
+			:foreground "dim gray"
+			:inherit 'fixed-pitch))
+  )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-roam
@@ -171,12 +185,6 @@
 ;;   (org-msync-local-dir org-directory)
 ;;   (org-msync-remote-dir "~/Documents/org-remote/")
 ;;   )
-
-;; using org bullets
-(use-package org-bullets
-  :ensure t
-  :after org
-  :hook ((org-mode . org-bullets-mode)))
 
 ;; org clip link
 (use-package org-cliplink

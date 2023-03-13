@@ -74,12 +74,13 @@
    ["#000000" "#8b0000" "#00ff00" "#ffa500" "#7b68ee" "#dc8cc3" "#93e0e3" "#dcdccc"])
  '(column-number-mode t)
  '(custom-safe-themes
-   '("36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "9b01a258b57067426cc3c8155330b0381ae0d8dd41d5345b5eddac69f40d409b" "e074be1c799b509f52870ee596a5977b519f6d269455b84ed998666cf6fc802a" "bf798e9e8ff00d4bf2512597f36e5a135ce48e477ce88a0764cfb5d8104e8163" "c9ddf33b383e74dac7690255dd2c3dfa1961a8e8a1d20e401c6572febef61045" "7aaee3a00f6eb16836f5b28bdccde9e1079654060d26ce4b8f49b56689c51904" "2d835b43e2614762893dc40cbf220482d617d3d4e2c35f7100ca697f1a388a0e" default))
+   '("30dc9873c16a0efb187bb3f8687c16aae46b86ddc34881b7cae5273e56b97580" "dde643b0efb339c0de5645a2bc2e8b4176976d5298065b8e6ca45bc4ddf188b7" "bfc0b9c3de0382e452a878a1fb4726e1302bf9da20e69d6ec1cd1d5d82f61e3d" "36ca8f60565af20ef4f30783aa16a26d96c02df7b4e54e9900a5138fb33808da" "9b01a258b57067426cc3c8155330b0381ae0d8dd41d5345b5eddac69f40d409b" "e074be1c799b509f52870ee596a5977b519f6d269455b84ed998666cf6fc802a" "bf798e9e8ff00d4bf2512597f36e5a135ce48e477ce88a0764cfb5d8104e8163" "c9ddf33b383e74dac7690255dd2c3dfa1961a8e8a1d20e401c6572febef61045" "7aaee3a00f6eb16836f5b28bdccde9e1079654060d26ce4b8f49b56689c51904" "2d835b43e2614762893dc40cbf220482d617d3d4e2c35f7100ca697f1a388a0e" default))
  '(display-time-mode t)
  '(fci-rule-color "#383838")
  '(jdee-db-active-breakpoint-face-colors (cons "#1b1d1e" "#fc20bb"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1b1d1e" "#60aa00"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1b1d1e" "#505050"))
+ '(lsp-log-io nil nil nil "Customized with use-package lsp-mode")
  '(objed-cursor-color "#d02b61")
  '(package-selected-packages
    '(auctex visual-fill-column org-ref ivy-bibtex lsp-dart dart-mode format-all magit org-bullets company-emoji flyspell-correct-popup flyspell-correct which-key lsp-jedi counsel-tramp exec-path-from-shell python-mode go-mode org-roam backward-forward typescript-mode jinja2-mode meson-mode smart-tabs-mode gdscript-mode ample-theme zenburn-theme cyberpunk-theme yaml-mode dockerfile-mode whitespace-cleanup-mode flycheck smex spacemacs-theme counsel ivy lsp-ui auto-mark company-c-headers company-lsp ccls lsp-mode graphviz-dot-mode dot-mode jedi-direx jam-mode yasnippet-snippets flycheck-rtags markdown-mode company-lua company-rtags rtags lua-mode cmake-mode rjsx-mode company-tern yasnippet glsl-mode use-package rust-mode org flycheck-rust diminish company-jedi bind-key))
