@@ -34,3 +34,6 @@ server/
 
 #magit
 transient/*
+
+projectile.cache
+projectile-bookmarks.eld

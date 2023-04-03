@@ -21,6 +21,16 @@
 ;; editing packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package projectile
+  :diminish projectile-mode
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+	      ("M-p" . projectile-command-map))
+  :custom
+  (projectile-enable-caching t)
+  )
+
 
 ;; which-key
 (use-package which-key :ensure t

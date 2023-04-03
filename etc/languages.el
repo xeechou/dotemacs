@@ -122,7 +122,16 @@
 (use-package dart-mode
   :ensure t
   :defer t
-  :mode (("\\.dart\\'" . dart-mode)))
+  :mode (("\\.dart\\'" . dart-mode))
+  :config
+  (with-eval-after-load 'projectile
+    (projectile-register-project-type 'flutter '("pubspec.yaml")
+				      :project-file "pubspec.yaml"
+				      :compile "flutter build"
+				      :test "flutter test"
+				      :run "flutter run"
+				      :src-dir "lib/"))
+  )
 
 (use-package lsp-dart
   :ensure t
