@@ -86,11 +86,6 @@
 	   (file+headline ,(my/org-file "reading.org") "Articles")
 	   "** TODO %?\n%i\n %^L\n \n"
 	   :prepend t) ;;why the linebreak didn't work?
-	  ;; my journals
-          ("j" "Journal" entry
-	   (file+olp+datetree ,(my/org-file "journal.org"))
-           "* %t\n %? %i\n"
-	   :prepend t)
 	  ("p" "Review+Planning" entry
 	   (file+headline ,(my/org-file "goals-habits.org") "Review+Planning")
 	   "*** On %t\n**** Planned:\n\n %i \n "
@@ -112,9 +107,10 @@
   (org-mode . org-modern-mode)
   (org-agenda-finalize . org-modern-agenda)
   (org-mode . (lambda () (variable-pitch-mode t)))
-  ;; :custom
+  :custom
   ;; (org-startup-indented t)
-  ;; (org-hide-emphasis-markers t)
+  (org-hide-emphasis-markers t)
+  (org-fontify-done-headline nil)
   :config
   (dolist (face '(org-block
 		  org-block-begin-line
@@ -137,12 +133,14 @@
   :after org
   :init (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory (my/org-file "roam/"))
+  (org-roam-directory (my/org-file "pages/"))
+  (org-roam-dailies-directory "journals/")  
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
 	  ("C-c n f" . org-roam-node-find)
 	  ("C-c n c" . org-roam-capture)
 	  ("C-c n i" . org-roam-node-insert)
-	  ("C-c n g" . org-roam-graph)) ;; doesn't work
+	  ("C-c n d" . org-roam-dailies-capture-today)
+	  ("C-c n g" . org-roam-ui-mode))
   :config
   ;;start db sync automatically, also you are able to refresh backlink buffer
   (org-roam-db-autosync-enable)
@@ -154,14 +152,14 @@
   (setq org-roam-capture-templates
         '(
           ("d" "default" plain "%?"
-	   :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+	   :if-new (file+head "${slug}.org"
                      "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
            :unnarrowed t
            :jump-to-captured t)
 
           ("l" "clipboard" plain (function org-roam--capture-get-point)
            "%c"
-           :file-name "%<%Y-%m-%d-%H-%M-%S>-${slug}"
+           :file-name "${slug}"
            :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n\
 #+ROAM_TAGS: %?\n"
            :unnarrowed t
@@ -285,3 +283,11 @@
 	      ("C-c ]" . org-ref-insert-link))
   )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-contrib
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-contrib
+  :ensure t
+  :after org
+  :init
+  (require 'ox-groff))
