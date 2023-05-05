@@ -88,7 +88,8 @@
  '(rustic-ansi-faces
    ["#1b1d1e" "#d02b61" "#60aa00" "#d08928" "#6c9ef8" "#b77fdb" "#00aa80" "#dddddd"])
  '(safe-local-variable-values
-   '((projectile-compilation-dir . "./build")
+   '((projectile-compilation-dir . "./build/ninja")
+     (projectile-compilation-dir . "./build")
      (c-file-offsets
       (innamespace . 0)
       (block-open . 0))

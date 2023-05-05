@@ -150,6 +150,10 @@
 ;;    (LaTeX-mode . turn-on-reftex))
 ;;   )
 
+(use-package unity
+  :straight (unity :type git :host github :repo "elizagamedev/unity.el")
+  :hook (after-init . unity-mode))
+
 
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t

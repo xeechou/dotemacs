@@ -26,7 +26,7 @@
   :init
   (projectile-mode +1)
   :bind (:map projectile-mode-map
-	      ("M-p" . projectile-command-map))
+	      ("C-c p" . projectile-command-map))
   :custom
   (projectile-enable-caching t)
   )

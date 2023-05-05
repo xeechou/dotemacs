@@ -188,8 +188,8 @@
 (use-package org-cliplink
   :ensure t
   :bind (:map org-mode-map
-	 ("C-c p i" . org-cliplink)
-	 ("C-c p l" . org-store-link)))
+	 ("C-c C-p i" . org-cliplink)
+	 ("C-c C-p l" . org-store-link)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-roam-ui
