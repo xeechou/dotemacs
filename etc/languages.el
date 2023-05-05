@@ -64,15 +64,17 @@
 ;; hlsl
 (use-package hlsl-mode
   :straight (hlsl-mode :type git :host github :repo "xeechou/hlsl-mode.el")
-  :mode (("\\.fxh\\'"  . hlsl-mode)
-	 ("\\.hlsl\\'" . hlsl-mode)
-	 ("\\.vs\\'"   . hlsl-mode)
-	 ("\\.ps\\'"   . hlsl-mode)
-	 ("\\.hs\\'"   . hlsl-mode)
-	 ("\\.ds\\'"   . hlsl-mode)
-	 ("\\.cs\\'"   . hlsl-mode)
-	 ("\\.ms\\'"   . hlsl-mode)
-	 ("\\.as\\'"   . hlsl-mode)))
+  :mode (("\\.fxh\\'"    . hlsl-mode)
+	 ("\\.hlsl\\'"   . hlsl-mode)
+	 ("\\.vs\\'"     . hlsl-mode)
+	 ("\\.ps\\'"     . hlsl-mode)
+	 ("\\.hs\\'"     . hlsl-mode)
+	 ("\\.ds\\'"     . hlsl-mode)
+	 ("\\.cs\\'"     . hlsl-mode)
+	 ("\\.ms\\'"     . hlsl-mode)
+	 ("\\.as\\'"     . hlsl-mode)
+	 ("\\.lib\\'"    . hlsl-mode)
+	 ("\\.shader\\'" . hlsl-mode)))
 
 ;; golang
 (use-package go-mode
