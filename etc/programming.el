@@ -14,7 +14,18 @@
 (use-package format-all
   :ensure t
   :diminish format-all-mode
-  :hook (prog-mode . format-all-mode))
+  :preface
+  (defun my/format-code()
+    "auto formatting code in the buffer"
+    (interactive)
+    (if (memq 'format-all-mode local-minor-modes)
+	(format-all-buffer)))
+  :hook ((format-all-mode . format-all-ensure-formatter)
+	 (prog-mode . format-all-mode)
+	 (before-save . my/format-code))
+  :custom
+  (format-all-formatters (("C++" clang-format)))
+  )
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -127,6 +138,7 @@
   (lsp-trace nil)
   (lsp-print-performance nil)
   (lsp-prefer-flymake nil)
+  (lsp-enable-on-type-formatting nil)
   :config
   (use-package lsp-ui
     :ensure t
