@@ -1,9 +1,10 @@
 ;; setup theme and fonts for Emacs
-(use-package ample-theme
+(use-package spacemacs-theme
   :defer t
   :ensure t
   :init
-  (load-theme 'ample t)
+  (load-theme 'spacemacs-dark t)
+
   )
 
 (use-package company-emoji

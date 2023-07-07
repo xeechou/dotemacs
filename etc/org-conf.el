@@ -14,6 +14,7 @@
   (org-log-done  'time)
   (org-clock-persist 'history)
   (org-adapt-indentation nil)
+  (org-image-actual-width nil)
   ;;setup the column, this max length for the first level we can go, maybe we
   ;;can somehow calculate it?
   (org-tags-column -54)
@@ -31,7 +32,8 @@
   (org-preview-latex-image-directory (concat temporary-file-directory
 					     "ltximg/"))
   ;;set latex preview scale
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+  (setq org-format-latex-options (plist-put
+				  org-format-latex-options :scale 2.0))
 
   ;;note files
   (org-default-notes-file (my/concat-path org-directory "notes.org"))
@@ -45,9 +47,8 @@
   :hook
   ((org-after-todo-statistics . org-funcs-summary-todo)
    (org-checkbox-statistics . org-funcs-checkbox-todo))
-
-  ;I am not sure this global key setting is good or not, capture stuff globally
-  ;is great
+  ;; I am not sure this global key setting is good or not, capture stuff
+  ;; globally is great
   :bind (:map global-map
 	      ("\C-ca"   . org-agenda)
 	      ("\C-cc"   . org-capture)
@@ -98,6 +99,13 @@
   ;;expected, and it breaks the TODOs.
   )
 
+(use-package mixed-pitch
+  :ensure t
+  :hook
+  (org-mode . mixed-pitch-mode)
+  :custom
+  (mixed-pitch-variable-pitch-cursor 'box))
+
 (use-package org-modern
   :ensure t
   ;; :straight
@@ -106,21 +114,44 @@
   :hook
   (org-mode . org-modern-mode)
   (org-agenda-finalize . org-modern-agenda)
-  (org-mode . (lambda () (variable-pitch-mode t)))
   :custom
   ;; (org-startup-indented t)
   (org-hide-emphasis-markers t)
+
   (org-fontify-done-headline nil)
   :config
-  (dolist (face '(org-block
-		  org-block-begin-line
-		  org-block-end-line
-                  org-verbatim
-		  org-code
-		  org-table))
-    (set-face-attribute face nil
-			:foreground "dim gray"
-			:inherit 'fixed-pitch))
+  :config
+  (let* ((base-font-color     (face-foreground 'default nil 'default))
+         (headline           `(:inherit default :weight bold :foreground
+					,base-font-color)))
+    (custom-theme-set-faces
+     'user
+     `(org-level-8 ((t (,@headline))))
+     `(org-level-7 ((t (,@headline))))
+     `(org-level-6 ((t (,@headline))))
+     `(org-level-5 ((t (,@headline))))
+     `(org-level-4 ((t (,@headline :height 1.1))))
+     `(org-level-3 ((t (,@headline :height 1.25))))
+     `(org-level-2 ((t (,@headline :height 1.5))))
+     `(org-level-1 ((t (,@headline :height 1.75))))
+     `(org-document-title ((t (,@headline :height 2.0
+					  :underline nil)))))
+    )
+
+  (custom-theme-set-faces
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
   )
 
 
