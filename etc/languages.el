@@ -74,7 +74,11 @@
 	 ("\\.ms\\'"     . hlsl-mode)
 	 ("\\.as\\'"     . hlsl-mode)
 	 ("\\.lib\\'"    . hlsl-mode)
-	 ("\\.shader\\'" . hlsl-mode)))
+	))
+
+(use-package shader-mode
+  :ensure t
+  :mode (("\\.shader\\'" . hlsl-mode)))
 
 ;; golang
 (use-package go-mode
