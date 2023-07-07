@@ -63,7 +63,6 @@
 			"~/org/")) ;;org-directory has to have trailing "/"
   ;; enable images
   (setq org-startup-with-inline-images t)
-  
 
   ;;activate babel languages
   :config
@@ -165,14 +164,22 @@
   :init (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory (my/org-file "pages/"))
-  (org-roam-dailies-directory "journals/")  
+  (org-roam-dailies-directory "journals/")
+  (org-roam-dailies-capture-templates
+   '(("d" "default" entry "* Review:\n %?\n* Planning:\n"
+      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
 	  ("C-c n f" . org-roam-node-find)
 	  ("C-c n c" . org-roam-capture)
 	  ("C-c n i" . org-roam-node-insert)
-	  ("C-c n d" . org-roam-dailies-capture-today)
-	  ("C-c n g" . org-roam-ui-mode))
+	  ("C-c n g" . org-roam-ui-mode)
+          :map org-roam-dailies-map
+          ("Y" . org-roam-dailies-capture-yesterday)
+          ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
   :config
+  (require 'org-roam-dailies)
   ;;start db sync automatically, also you are able to refresh backlink buffer
   (org-roam-db-autosync-enable)
   (setq org-roam-completion-system 'ivy)
@@ -184,7 +191,7 @@
         '(
           ("d" "default" plain "%?"
 	   :if-new (file+head "${slug}.org"
-                     "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
+			      "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
            :unnarrowed t
            :jump-to-captured t)
 
@@ -199,8 +206,9 @@
           ))
   ;; configure org-roam-buffer
   (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
+	       '("\\*org-roam\\*"
 		 (display-buffer-in-direction)
+		 (display-buffer-in-previous-window)
 		 (direction . right)
 		 (window-width . 0.33)
 		 (window-height . fit-window-to-buffer)))
