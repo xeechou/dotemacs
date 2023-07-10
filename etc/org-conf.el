@@ -119,7 +119,6 @@
 
   (org-fontify-done-headline nil)
   :config
-  :config
   (let* ((base-font-color     (face-foreground 'default nil 'default))
          (headline           `(:inherit default :weight bold :foreground
 					,base-font-color)))
@@ -132,9 +131,9 @@
      `(org-level-4 ((t (,@headline :height 1.1))))
      `(org-level-3 ((t (,@headline :height 1.25))))
      `(org-level-2 ((t (,@headline :height 1.5))))
-     `(org-level-1 ((t (,@headline :height 1.75))))
-     `(org-document-title ((t (,@headline :height 2.0
-					  :underline nil)))))
+     `(org-level-1 ((t (,@headline :height 2.0))))
+     `(org-document-title ((t (,@headline :underline nil))))
+     )
     )
 
   (custom-theme-set-faces
@@ -161,7 +160,8 @@
 (use-package org-roam
   :ensure t
   :after org
-  :init (setq org-roam-v2-ack t)
+  :init
+  (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory (my/org-file "pages/"))
   (org-roam-dailies-directory "journals/")
@@ -227,8 +227,8 @@
 (use-package org-cliplink
   :ensure t
   :bind (:map org-mode-map
-	 ("C-c C-p i" . org-cliplink)
-	 ("C-c C-p l" . org-store-link)))
+	      ("C-c C-p i" . org-cliplink)
+	      ("C-c C-p l" . org-store-link)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-roam-ui
