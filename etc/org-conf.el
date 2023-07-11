@@ -26,12 +26,15 @@
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
 
   ;;latex
+
+  ;;on archlinux, you need to install texlive-basic, texlive-bin, texlive-latex
+  ;;texlive-lateextra, texlive-latexrecommanded, texlive-pictures, texlive-plangeneric
   (org-latex-create-formula-image-program 'dvipng)
-  (org-preview-latex-image-directory (concat temporary-file-directory
-					     "ltximg/"))
+  (org-preview-latex-image-directory (my/concat-path temporary-file-directory
+						     "ltximg/"))
   ;;set latex preview scale
-  (setq org-format-latex-options (plist-put
-				  org-format-latex-options :scale 2.0))
+  (org-format-latex-options (plist-put
+			     org-format-latex-options :scale 2.0))
 
   ;;note files
   (org-default-notes-file (my/concat-path org-directory "notes.org"))
