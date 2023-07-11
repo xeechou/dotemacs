@@ -5,10 +5,11 @@
 ;;magit, which I used not only for daily drive but also implementation for org
 ;;sync
 (use-package magit
-  :ensure t)
+  :ensure t
+  :bind ("C-x g" . magit-status))
 
 (use-package ssh-agency
-  :straight (ssh-agency :type git :host github :repo "magit/ssh-agency")
+  :vc (:fetcher github :repo "magit/ssh-agency")
   :hook (magit-credential . ssh-agency-ensure))
 
 (use-package format-all
@@ -33,14 +34,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package projectile
+  :ensure t
   :diminish projectile-mode
   :init
   (projectile-mode +1)
   :bind (:map projectile-mode-map
 	      ("C-c p" . projectile-command-map))
   :custom
-  (projectile-enable-caching t)
-  )
+  (projectile-enable-caching t))
 
 
 ;; which-key
@@ -55,7 +56,6 @@
 
 ;; using electric pair instead of autopair
 (use-package electric-pair
-  :straight (electric-pair :type built-in)
   :diminish electric-pair-mode
   :hook ((prog-mode text-mod outline-mode) . electric-pair-mode))
 
@@ -67,11 +67,9 @@
 
 ;; visual fill column
 (use-package visual-fill-column
-  :straight (visual-fill-column :type git :host github
-				:repo "joostkremers/visual-fill-column")
+  :ensure t
   :init
   (setq-default fill-column 79)
-  :ensure t
   :hook
   (prog-mode . turn-on-auto-fill)
   (visual-line-mode . visual-fill-column-mode)
@@ -97,7 +95,7 @@
   :ensure t
   :init
   (smart-tabs-insinuate 'c 'c++)
-)
+  )
 
 (use-package flycheck :ensure t :commands flycheck-mode)
 
@@ -108,13 +106,12 @@
   :config (setq show-paren-style 'parenthesis))
 
 (use-package fic-mode
-  :straight (fic-mode :type git :host github :repo "lewang/fic-mode")
+  :vc (:fetcher github :repo "lewang/fic-mode")
   :diminish fic-mode
   :hook (prog-mode . fic-mode))
 
 (use-package color-rg
-  :straight (color-rg :type git :host github :repo "manateelazycat/color-rg"))
-
+  :vc (:fetcher github :repo "manateelazycat/color-rg"))
 
 ;; yasnippet
 (use-package yasnippet-snippets
@@ -158,11 +155,11 @@
   (lsp-ui-flycheck-enable t)
   (lsp-ui-doc-enable nil)
   ;; (lsp-ui-doc-position 'bottom)
-    ;; ;;don't create lsp-stderr buffer
-    ;; ;;I need to read lsp-ui code
-    ;; (setq lsp-ui-flycheck-enable t
-    ;;	  lsp-ui-imenu-enable t
-    ;;	  lsp-ui-sideline-ignore-duplicate t)
+  ;; ;;don't create lsp-stderr buffer
+  ;; ;;I need to read lsp-ui code
+  ;; (setq lsp-ui-flycheck-enable t
+  ;;	  lsp-ui-imenu-enable t
+  ;;	  lsp-ui-sideline-ignore-duplicate t)
   )
 
 (use-package company

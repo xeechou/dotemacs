@@ -1,5 +1,3 @@
-;;need this to avoid issue
-(straight-use-package 'org)
 
 (require 'org-funcs)
 (defun my/org-dir-set (dir)
@@ -107,8 +105,6 @@
 
 (use-package org-modern
   :ensure t
-  ;; :straight
-  ;; (:host github :repo "minad/org-modern" :branch "main")
   :after org
   :hook
   (org-mode . org-modern-mode)
@@ -120,18 +116,18 @@
   (org-fontify-done-headline nil)
   :config
   (let* ((base-font-color     (face-foreground 'default nil 'default))
-         (headline           `(:inherit default :weight bold :foreground
-					,base-font-color)))
+         (headline           `(:inherit default :weight bold
+					:foreground ,base-font-color)))
     (custom-theme-set-faces
      'user
      `(org-level-8 ((t (,@headline))))
      `(org-level-7 ((t (,@headline))))
      `(org-level-6 ((t (,@headline))))
      `(org-level-5 ((t (,@headline))))
-     `(org-level-4 ((t (,@headline :height 1.1))))
-     `(org-level-3 ((t (,@headline :height 1.25))))
-     `(org-level-2 ((t (,@headline :height 1.5))))
-     `(org-level-1 ((t (,@headline :height 2.0))))
+     `(org-level-4 ((t (,@headline :background unspecified :height 1.1))))
+     `(org-level-3 ((t (,@headline :background unspecified :height 1.25))))
+     `(org-level-2 ((t (,@headline :background unspecified :height 1.5))))
+     `(org-level-1 ((t (,@headline :background unspecified :height 2.0))))
      `(org-document-title ((t (,@headline :underline nil))))
      )
     )
@@ -152,16 +148,20 @@
    '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
   )
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-roam
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO remove this once upgrade to emacs-29, which uses emacs builtin sqlite
 
 (use-package org-roam
   :ensure t
   :after org
   :init
-  (setq org-roam-v2-ack t)
+  ;; setting the correct org-roam connector based on version
+  (if (version< emacs-version "29.0")
+      (setq org-roam-database-connector 'sqlite)
+    (setq org-roam-database-connector 'sqlite-builtin))
   :custom
   (org-roam-directory (my/org-file "pages/"))
   (org-roam-dailies-directory "journals/")
@@ -234,8 +234,7 @@
 ;; org-roam-ui
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-roam-ui
-  :straight
-  (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :ensure t
   :diminish org-roam-ui-mode
   :after org-roam
   :hook (after-init . org-roam-ui-mode)

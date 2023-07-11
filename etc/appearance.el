@@ -15,7 +15,7 @@
 
 ;; Ligature Settings
 (use-package ligature
-  :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
+  :vc (:fetcher github :repo "mickeynp/ligature.el")
   :if (string-match "HARFBUZZ" system-configuration-features)
   :hook ((prog-mode text-mode) . ligature-mode)
   ;; Enable all Cascadia Code ligatures in programming modes

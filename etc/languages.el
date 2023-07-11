@@ -46,7 +46,7 @@
 	 ("\\.cmake\\'" . cmake-mode))
   :hook ((cmake-mode . company-mode)
 	 (cmake-mode .  (lambda () (add-to-list (make-local-variable 'company-backends)
-				    'company-cmake)))))
+						'company-cmake)))))
 
 ;; glsl
 (use-package glsl-mode
@@ -63,7 +63,7 @@
 
 ;; hlsl
 (use-package hlsl-mode
-  :straight (hlsl-mode :type git :host github :repo "xeechou/hlsl-mode.el")
+  :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
   :mode (("\\.fxh\\'"    . hlsl-mode)
 	 ("\\.hlsl\\'"   . hlsl-mode)
 	 ("\\.vs\\'"     . hlsl-mode)
@@ -74,7 +74,7 @@
 	 ("\\.ms\\'"     . hlsl-mode)
 	 ("\\.as\\'"     . hlsl-mode)
 	 ("\\.lib\\'"    . hlsl-mode)
-	))
+	 ))
 
 (use-package shader-mode
   :ensure t
@@ -157,9 +157,8 @@
 ;;   )
 
 (use-package unity
-  :straight (unity :type git :host github :repo "elizagamedev/unity.el")
+  :vc (:fetcher github :repo "elizagamedev/unity.el")
   :hook (after-init . unity-mode))
-
 
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t
