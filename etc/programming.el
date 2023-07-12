@@ -91,11 +91,12 @@
 (setq enable-remote-dir-locals t)
 
 ;;--- -1) for all programming languages
-(use-package smart-tabs-mode
-  :ensure t
-  :init
-  (smart-tabs-insinuate 'c 'c++)
-  )
+;; smart-tabs mode is broken in emacs-29
+;; (use-package smart-tabs-mode
+;;   :ensure t
+;;   :init
+;;   (smart-tabs-insinuate 'c 'c++)
+;;   )
 
 (use-package flycheck :ensure t :commands flycheck-mode)
 
