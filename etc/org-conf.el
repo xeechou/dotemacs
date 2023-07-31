@@ -88,8 +88,8 @@
 	   "** TODO %?\n%i\n %^L\n \n"
 	   :prepend t) ;;why the linebreak didn't work?
 	  ("p" "Review+Planning" entry
-	   (file+headline ,(my/org-file "goals-habits.org") "Review+Planning")
-	   "*** On %t\n**** Planned:\n\n %i \n "
+	   (file+headline ,(my/org-file "goals-habits.org") "Review+TODOs+Plan+Journal")
+	   "**** On %t\n***** Planned:\n\n %i \n "
 	   :prepend t)
 	  ))
   (org-funcs-load-babel-compiler)
@@ -113,27 +113,28 @@
   (org-mode . org-modern-mode)
   (org-agenda-finalize . org-modern-agenda)
   :custom
-  ;; (org-startup-indented t)
+  (org-startup-indented t)
   (org-hide-emphasis-markers t)
+  (line-spaceing 0.3)
 
   (org-fontify-done-headline nil)
   :config
-  (let* ((base-font-color     (face-foreground 'default nil 'default))
-         (headline           `(:inherit default :weight bold
-					:foreground ,base-font-color)))
-    (custom-theme-set-faces
-     'user
-     `(org-level-8 ((t (,@headline))))
-     `(org-level-7 ((t (,@headline))))
-     `(org-level-6 ((t (,@headline))))
-     `(org-level-5 ((t (,@headline))))
-     `(org-level-4 ((t (,@headline :background unspecified :height 1.1))))
-     `(org-level-3 ((t (,@headline :background unspecified :height 1.25))))
-     `(org-level-2 ((t (,@headline :background unspecified :height 1.5))))
-     `(org-level-1 ((t (,@headline :background unspecified :height 2.0))))
-     `(org-document-title ((t (,@headline :underline nil))))
-     )
-    )
+  ;; (let* ((base-font-color     (face-foreground 'default nil 'default))
+  ;;        (headline           `(:inherit default :weight bold
+  ;; 					:foreground ,base-font-color)))
+  ;;   (custom-theme-set-faces
+  ;;    'user
+  ;;    `(org-level-8 ((t (,@headline))))
+  ;;    `(org-level-7 ((t (,@headline))))
+  ;;    `(org-level-6 ((t (,@headline))))
+  ;;    `(org-level-5 ((t (,@headline))))
+  ;;    `(org-level-4 ((t (,@headline :background unspecified :height 1.1))))
+  ;;    `(org-level-3 ((t (,@headline :background unspecified :height 1.25))))
+  ;;    `(org-level-2 ((t (,@headline :background unspecified :height 1.5))))
+  ;;    `(org-level-1 ((t (,@headline :background unspecified :height 2.0))))
+  ;;    `(org-document-title ((t (,@headline :underline nil))))
+  ;;    )
+  ;;   )
 
   (custom-theme-set-faces
    'user
