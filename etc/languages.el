@@ -97,6 +97,11 @@
   :config (setq js-indent-level 2)
   )
 
+(use-package web-mode
+  :ensure t
+  :defer t
+  :mode ("\\.html?\\'" . web-mode))
+
 ;;typescript
 (use-package typescript-mode
   :ensure t
