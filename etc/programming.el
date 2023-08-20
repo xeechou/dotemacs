@@ -166,12 +166,15 @@
 (use-package company
   :ensure t
   :defer t
-  :hook ((outline-mode    . company-mode) ;;enable for markdown, org mode
-	 (emacs-lisp-mode . company-mode)
+  :hook ((emacs-lisp-mode . company-mode)
 	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-elisp)))
+	 (outline-mode    . company-mode) ;;enable for org mode
 	 (outline-mode    . (lambda () (add-to-list (make-local-variable 'company-backends)
-						    'company-dabbrev)))
+						    'company-dabbrev 'company-emoji)))
+	 (text-mode       . company-mode)
+	 (text-mode       . (lambda () (add-to-list (make-local-variable 'company-backends)
+						    'company-dabbrev 'company-emoji)))
 	 )
   :config
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

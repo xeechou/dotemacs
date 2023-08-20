@@ -46,7 +46,7 @@
 	 ("\\.cmake\\'" . cmake-mode))
   :hook ((cmake-mode . company-mode)
 	 (cmake-mode .  (lambda () (add-to-list (make-local-variable 'company-backends)
-						'company-cmake)))))
+						'company-cmake 'company-dabbrev)))))
 
 ;; glsl
 (use-package glsl-mode
