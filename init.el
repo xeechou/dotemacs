@@ -71,25 +71,39 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "e1f4f0158cd5a01a9d96f1f7cdcca8d6724d7d33267623cc433fe1c196848554" "70b596389eac21ab7f6f7eb1cf60f8e60ad7c34ead1f0244a577b1810e87e58c" default))
+ '(lsp-log-io nil nil nil "Customized with use-package lsp-mode")
  '(package-selected-packages
-   '(org-modern org-roam-ui simple-httpd projectile lsp-ui yasnippet-snippets
-		flycheck smart-tabs-mode company-c-headers visual-fill-column
-		whitespace-cleanup-mode which-key format-all magit org-contrib
-		org-ref ivy-bibtex org-download org-cliplink org-roam
-		mixed-pitch gdscript-mode graphviz-dot-mode lsp-dart meson-mode
-		rjsx-mode shader-mode glsl-mode cmake-mode lsp-jedi python-mode
-		backward-forward smex counsel-tramp flyspell-correct-popup
-		flyspell-correct company-emoji exec-path-from-shell yaml-mode
-		websocket vc-use-package unity typescript-mode ssh-agency
-		spacemacs-theme rust-mode openwith modus-themes math-delimiters
-		markdown-mode lua-mode ligature hlsl-mode go-mode fic-mode
-		diminish dash dart-mode counsel color-rg))
+   '(doom-themes web-mode org-modern org-roam-ui simple-httpd projectile yasnippet-snippets smart-tabs-mode company-c-headers visual-fill-column whitespace-cleanup-mode which-key format-all magit org-contrib org-ref ivy-bibtex org-download org-cliplink org-roam mixed-pitch gdscript-mode graphviz-dot-mode meson-mode rjsx-mode shader-mode glsl-mode cmake-mode python-mode backward-forward smex counsel-tramp flyspell-correct-popup flyspell-correct company-emoji exec-path-from-shell yaml-mode websocket vc-use-package unity typescript-mode ssh-agency spacemacs-theme rust-mode openwith modus-themes markdown-mode lua-mode ligature hlsl-mode go-mode fic-mode diminish dash dart-mode counsel color-rg))
  '(package-vc-selected-packages
    '((ligature :vc-backend Git :url "https://github.com/mickeynp/ligature.el")))
- '(safe-local-variable-values '((projectile-compilation-dir . "./build/ninja"))))
+ '(safe-local-variable-values
+   '((org-image-actual-width)
+     (projectile-compilation-dir . "./build/ninja"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-block ((t (:inherit fixed-pitch))))
+ '(org-code ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-info ((t (:foreground "dark orange"))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-title ((t (:inherit default :weight bold :foreground "unspecified-fg" :underline nil))))
+ '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+ '(org-level-1 ((t (:inherit default :weight bold :foreground "unspecified-fg" :background unspecified :height 2.0))))
+ '(org-level-2 ((t (:inherit default :weight bold :foreground "unspecified-fg" :background unspecified :height 1.5))))
+ '(org-level-3 ((t (:inherit default :weight bold :foreground "unspecified-fg" :background unspecified :height 1.25))))
+ '(org-level-4 ((t (:inherit default :weight bold :foreground "unspecified-fg" :background unspecified :height 1.1))))
+ '(org-level-5 ((t (:inherit default :weight bold :foreground "unspecified-fg"))))
+ '(org-level-6 ((t (:inherit default :weight bold :foreground "unspecified-fg"))))
+ '(org-level-7 ((t (:inherit default :weight bold :foreground "unspecified-fg"))))
+ '(org-level-8 ((t (:inherit default :weight bold :foreground "unspecified-fg"))))
+ '(org-link ((t (:foreground "royal blue" :underline t))))
+ '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+ '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+ '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))

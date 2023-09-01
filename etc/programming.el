@@ -98,9 +98,6 @@
 ;;   (smart-tabs-insinuate 'c 'c++)
 ;;   )
 
-(use-package flycheck :ensure t :commands flycheck-mode
-  :hook ((c++-mode c-mode) . flycheck-mode))
-
 (use-package paren
   :ensure t
   :diminish show-paren-mode
@@ -122,59 +119,8 @@
   (yas-reload-all)
   :hook ((prog-mode outline-mode cmake-mode) . yas-minor-mode))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; lsp setup
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package lsp-mode
-  :ensure t
-  :after which-key
-  :commands (lsp lsp-deferred)
-  :hook (((c-mode c++-mode python-mode go-mode dart-mode typescript-mode) . lsp-mode)
-	 (lsp-mode . lsp-enable-which-key-integration)
-	 )
-  :custom
-  (lsp-auto-guess-root t)
-  (lsp-print-io nil)
-  (lsp-trace nil)
-  (lsp-print-performance nil)
-  (lsp-prefer-flymake nil)
-  (lsp-enable-on-type-formatting nil)
-  :config
-  (use-package lsp-ui
-    :ensure t
-    ;;:commands lsp-ui-mode
-    :hook
-    (lsp-mode . lsp-ui-mode)
-    :bind (:map lsp-ui-mode-map
-		;; remember M-, (which is xref function) to jump back
-		("M-." . lsp-ui-peek-find-definitions)
-		("M-?" . lsp-ui-peek-find-references)
-		("C-x t" . lsp-ui-imenu)))
-  (use-package lsp-jedi
-    :if (executable-find "jedi-language-server")
-    :ensure t
-    :config (with-eval-after-load "lsp-mode"
-	      (add-to-list 'lsp-disabled-clients 'pyls)
-	      (add-to-list 'lsp-disabled-clients 'pylsp)))
-  (use-package lsp-dart
-    :ensure t
-    :hook (dart-mode . lsp))
-  :custom
-  (lsp-ui-sideline-enable t)
-  (lsp-ui-sideline-ignore-duplicate t)
-  (lsp-ui-sideline-show-diagnostics t)
-  (lsp-ui-sideline-delay 2)
-  (lsp-ui-flycheck-enable t)
-  (lsp-ui-doc-enable nil)
-  ;; (lsp-ui-doc-position 'bottom)
-  ;; ;;don't create lsp-stderr buffer
-  ;; ;;I need to read lsp-ui code
-  ;; (setq lsp-ui-flycheck-enable t
-  ;;	  lsp-ui-imenu-enable t
-  ;;	  lsp-ui-sideline-ignore-duplicate t)
-  )
-
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; company mode
 (use-package company
   :ensure t
   :defer t
@@ -187,9 +133,10 @@
 	 (text-mode       . company-mode)
 	 (text-mode       . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-dabbrev 'company-emoji)))
+	 (prog-mode . company-mode)
 	 )
   :config
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   (setq company-minimum-prefix-length 2
 	company-idle-delay 0.1
 	company-async-timeout 10
@@ -208,6 +155,23 @@
     (if (looking-at "\\_>")
 	(company-complete-common)
       (indent-according-to-mode)))
+  )
+
+;; eglot configuration, switching to eglot after emacs 29
+(use-package eglot
+  :ensure t
+  :hook (((c++-mode c-mode) . eglot-ensure)
+	 (python-mode . eglot-ensure))
+  :custom
+  (eglot-extend-to-xref t)
+  ;;C++ requires clangd, python requires python-language server
+  :bind (:map eglot-mode-map
+	      ;; we just use the default binding here, so comment it out
+	      ;; ("M-." . xref-find-definitions)
+	      ;; ("M-?" . xref-find-references)
+	      ;; ("M-," . xref-go-back)
+	      ("C-c r"  . eglot-rename)
+	      ("C-c h"  . eldoc))
   )
 
 ;; debugging with dap-mode
