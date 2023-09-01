@@ -98,7 +98,8 @@
 ;;   (smart-tabs-insinuate 'c 'c++)
 ;;   )
 
-(use-package flycheck :ensure t :commands flycheck-mode)
+(use-package flycheck :ensure t :commands flycheck-mode
+  :hook ((c++-mode c-mode) . flycheck-mode))
 
 (use-package paren
   :ensure t
@@ -129,7 +130,9 @@
   :ensure t
   :after which-key
   :commands (lsp lsp-deferred)
-  :hook ((lsp-mode . lsp-enable-which-key-integration))
+  :hook (((c-mode c++-mode python-mode go-mode dart-mode typescript-mode) . lsp-mode)
+	 (lsp-mode . lsp-enable-which-key-integration)
+	 )
   :custom
   (lsp-auto-guess-root t)
   (lsp-print-io nil)
@@ -148,6 +151,15 @@
 		("M-." . lsp-ui-peek-find-definitions)
 		("M-?" . lsp-ui-peek-find-references)
 		("C-x t" . lsp-ui-imenu)))
+  (use-package lsp-jedi
+    :if (executable-find "jedi-language-server")
+    :ensure t
+    :config (with-eval-after-load "lsp-mode"
+	      (add-to-list 'lsp-disabled-clients 'pyls)
+	      (add-to-list 'lsp-disabled-clients 'pylsp)))
+  (use-package lsp-dart
+    :ensure t
+    :hook (dart-mode . lsp))
   :custom
   (lsp-ui-sideline-enable t)
   (lsp-ui-sideline-ignore-duplicate t)

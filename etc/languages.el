@@ -18,25 +18,8 @@
     (c-set-offset 'inline-open 0)
     )
   :hook
-  ((c-mode-common . my/cmode-hook)
-   (c++-mode . flycheck-mode)
-   (c++-mode . lsp)
-   (c-mode . flycheck-mode)
-   (c-mode . lsp))
-  )
+  ((c-mode-common . my/cmode-hook)))
 
-;;python has 3 different lsp server jedi, pyls(palantir), pylsp.
-(use-package python-mode
-  :ensure t
-  :config
-  :hook (python-mode . lsp))
-
-(use-package lsp-jedi
-  :if (executable-find "jedi-language-server")
-  :ensure t
-  :config (with-eval-after-load "lsp-mode"
-	    (add-to-list 'lsp-disabled-clients 'pyls)
-	    (add-to-list 'lsp-disabled-clients 'pylsp)))
 
 ;;cmake
 (use-package cmake-mode
@@ -85,9 +68,7 @@
   :ensure t
   :mode (("\\.go\\'" . go-mode)
 	 ("\\.mode\\'" . go-mode))
-  :hook ((go-mode . lsp-deferred)
-	 (go-mode . (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t))))
-  )
+  :hook ((go-mode . (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t)))))
 
 ;;javascript
 (use-package rjsx-mode
@@ -106,7 +87,6 @@
 (use-package typescript-mode
   :ensure t
   :mode "\\.ts\\'"
-  :hook (typescript-mode . lsp-deferred)
   :config
   (setq typescript-indent-level 2)
   (setq-default indent-tabs-mode nil)
@@ -144,9 +124,7 @@
 				      :src-dir "lib/"))
   )
 
-(use-package lsp-dart
-  :ensure t
-  :hook (dart-mode . lsp))
+
 
 ;; (use-package tex :ensure auctex
 ;;   :custom
