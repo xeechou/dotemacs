@@ -2,6 +2,19 @@
 ;; languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;treesitter: disable for now. the tree-sitter indentation is not working for
+;; me. https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html
+;; (when (treesit-available-p)
+;;   (require 'treesit)
+;;   (use-package treesit-auto
+;;     :demand t
+;;     :config
+;;     (global-treesit-auto-mode)
+;;     (setq treesit-auto-install 'prompt)
+;;     )
+;;   (setq-default treesit-font-lock-level 3)
+;;   )
+
 ;; C family
 (use-package cc-mode
   :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)

@@ -32,6 +32,9 @@ url/
 
 server/
 
+multisession/
+tree-sitter/
+
 #magit
 transient/*
 
