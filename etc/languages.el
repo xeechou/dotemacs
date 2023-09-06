@@ -26,10 +26,7 @@
   :ensure t
   :config
   :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
-	 ("\\.cmake\\'" . cmake-mode))
-  :hook ((cmake-mode . company-mode)
-	 (cmake-mode .  (lambda () (add-to-list (make-local-variable 'company-backends)
-						'company-cmake 'company-dabbrev)))))
+	 ("\\.cmake\\'" . cmake-mode)))
 
 ;; glsl
 (use-package glsl-mode
@@ -96,19 +93,14 @@
 (use-package meson-mode
   :ensure t
   :defer t
-  :hook (meson-mode . company-mode)
   :mode (("/meson\\.build\\'" . meson-mode))
   )
 
 ;;lua
 (use-package lua-mode
   :ensure t
-  :config (use-package company-lua :ensure t :defer t)
-  :mode (("\\.lua\\'" . lua-mode))
-  :hook ((lua-mode . company-mode)
-	 (lua-mode . (lambda ()
-		       (add-to-list (make-local-variable 'company-backends)
-				    'company-lua)))))
+  :mode (("\\.lua\\'" . lua-mode)))
+
 ;;dart
 (use-package dart-mode
   :ensure t

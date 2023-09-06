@@ -124,7 +124,9 @@
 (use-package company
   :ensure t
   :defer t
-  :hook ((emacs-lisp-mode . company-mode)
+  :hook (((c++-mode c++-ts-mode) . company-mode)
+	 ((c-mode c-ts-mode)     . company-mode)
+	 (emacs-lisp-mode . company-mode)
 	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-elisp)))
 	 (outline-mode    . company-mode) ;;enable for org mode
@@ -133,7 +135,17 @@
 	 (text-mode       . company-mode)
 	 (text-mode       . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-dabbrev 'company-emoji)))
-	 (prog-mode . company-mode)
+	 (meson-mode . company-mode)
+	 ;;cmake
+	 (cmake-mode . company-mode)
+	 (cmake-mode .  (lambda () (add-to-list (make-local-variable 'company-backends)
+						'company-cmake
+						'company-dabbrev)))
+	 ;;lua
+	 (lua-mode . company-mode)
+	 (lua-mode . (lambda ()
+		       (add-to-list (make-local-variable 'company-backends)
+				    'company-lua)))
 	 )
   :config
 
@@ -160,7 +172,8 @@
 ;; eglot configuration, switching to eglot after emacs 29
 (use-package eglot
   :ensure t
-  :hook (((c++-mode c-mode) . eglot-ensure)
+  :hook (((c++-mode c++-ts-mode) . eglot-ensure)
+	 ((c-mode c-ts-mode) . eglot-ensure)
 	 (python-mode . eglot-ensure))
   :custom
   (eglot-extend-to-xref t)
@@ -197,7 +210,7 @@
 (use-package hideif
   :ensure t
   :diminish hide-ifdef-mode
-  :hook (c-mode-common . hide-ifdef-mode)
+  :hook ((c++-mode c++-ts-mode c-mode c-ts-mode)  . hide-ifdef-mode)
   :config
   (setq hide-ifdef-read-only t)
   )
