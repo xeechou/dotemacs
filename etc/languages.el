@@ -4,19 +4,30 @@
 
 ;;treesitter: disable for now. the tree-sitter indentation is not working for
 ;; me. https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html
+;; also,
+;; https://casouri.github.io/note/2023/tree-sitter-starter-guide/index.html#Indentation
+;; is very useful.
 (when (treesit-available-p)
   (require 'treesit)
 
   (defun my/indent-rules ()
     `(;;here is my custom rule just to disable namespace indentation
-      ((parent-is "namespace_definition") parent-bol 0)
+      ;;(setq treesit--indent-verbose t) to see if your rule works
+      ;;(treesit-check-indent c++-mode) to check your rules against c++-mode
+
+      ((n-p-gp "declaration" "declaration_list" "namespace_definition")
+       parent-bol 0)
+      ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
+      ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
+      ((n-p-gp "function_definition" "declaration_list" "namespace_definition") parent-bol 0)
+
       ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp)))
     )
 
   (use-package treesit-auto
     :demand t
     :custom
-    (c-ts-mode-indent-style #'my-indent-style)
+    (c-ts-mode-indent-style #'my/indent-rules)
     :config
     (global-treesit-auto-mode)
     (setq treesit-auto-install 'prompt))
