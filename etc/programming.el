@@ -177,6 +177,9 @@
 	 (python-mode . eglot-ensure))
   :custom
   (eglot-extend-to-xref t)
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  :config
+  (setq eldoc-echo-area-use-multiline-p nil)
   ;;C++ requires clangd, python requires python-language server
   :bind (:map eglot-mode-map
 	      ;; we just use the default binding here, so comment it out

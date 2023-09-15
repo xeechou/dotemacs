@@ -19,8 +19,10 @@
        parent-bol 0)
       ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
       ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
-      ((n-p-gp "function_definition" "declaration_list" "namespace_definition") parent-bol 0)
-
+      ((n-p-gp "function_definition" "declaration_list" "namespace_definition")
+       parent-bol 0)
+      ((n-p-gp "template_declaration" "declaration_list" "namespace_definition")
+       parent-bol 0)
       ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp)))
     )
 
