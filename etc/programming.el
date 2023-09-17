@@ -274,6 +274,12 @@
 	      ("C-c h"  . eldoc))
   )
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Debugging packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;; debugging with dap-mode
 
 ;; (use-package dap-mode :ensure t :defer t
@@ -289,3 +295,35 @@
 ;;       (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
 ;;       ))
 ;;   )
+
+
+(use-package rmsbolt ;;compiler explorer in emacs
+  :ensure t
+  ;; rmsbolt changes keybinding C-c C-c, which is bonded to comment code.
+  ;; :bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))
+  :hook
+  ;;rmsbolt does not support tree-sitter. We have to manually set it, coping from
+  ;;rmsbolt.el
+  (rmsbolt-mode . (lambda ()
+		    (cond ((eq major-mode 'c-ts-mode)
+			   (setq rmsbolt-language-descriptor
+				 (make-rmsbolt-lang :compile-cmd "gcc"
+						    :supports-asm t
+						    :supports-disass t
+						    :demangler "c++filt"
+						    :compile-cmd-function #'rmsbolt--c-compile-cmd
+						    :disass-hidden-funcs
+						    rmsbolt--hidden-func-c)))
+			  ((eq major-mode 'c++-ts-mode)
+			   (setq rmsbolt-language-descriptor
+				 (make-rmsbolt-lang :compile-cmd "g++"
+						    :supports-asm t
+						    :supports-disass t
+						    :demangler "c++filt"
+						    :compile-cmd-function #'rmsbolt--c-compile-cmd
+						    :disass-hidden-funcs rmsbolt--hidden-func-c)))
+			  ) ;;cond
+
+		    ;;TODO adding GLSL/HLSL languages?
+		    )) ;;rmsbolt-mode-hook
+  )
