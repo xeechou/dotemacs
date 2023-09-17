@@ -28,11 +28,6 @@
   (format-all-formatters (("C++" clang-format)))
   )
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; editing packages
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (use-package projectile
   :ensure t
   :diminish projectile-mode
@@ -42,6 +37,10 @@
 	      ("C-c p" . projectile-command-map))
   :custom
   (projectile-enable-caching t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; editing packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;; which-key
@@ -59,10 +58,13 @@
   :diminish electric-pair-mode
   :hook ((prog-mode text-mod outline-mode) . electric-pair-mode))
 
-;;-3) winner-mode
+;;-3) winner-mode: undo and redo window operations, does not use very much
 (use-package winner
   :defer t
   :diminish winner-mode
+  ;; :bind ;;default binds, just here to remind you
+  ;; (("C-c left"  .  winner-undo)
+  ;;  ("C-c right" .  winner-redo))
   :hook ((prog-mode text-mode) . winner-mode))
 
 ;; visual fill column
@@ -80,10 +82,10 @@
 (diminish 'eldoc-mode)
 (diminish 'abbrev-mode)
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functional packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 
 (use-package company-c-headers :ensure t)
 ;; (setq clang-known-modes '(c++-mode c-mode))
@@ -104,7 +106,7 @@
   :hook (prog-mode . show-paren-mode)
   :config (setq show-paren-style 'parenthesis))
 
-(use-package fic-mode
+(use-package fic-mode ;;show FIXME/TODO in comments
   :vc (:fetcher github :repo "lewang/fic-mode")
   :diminish fic-mode
   :hook (prog-mode . fic-mode))
@@ -119,13 +121,17 @@
   (yas-reload-all)
   :hook ((prog-mode outline-mode cmake-mode) . yas-minor-mode))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; general setup ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; company mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; company and eglot
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package company
   :ensure t
   :defer t
   :hook (((c++-mode c++-ts-mode) . company-mode)
 	 ((c-mode c-ts-mode)     . company-mode)
+	 ((c++-mode c++-ts-mode c-mode c-ts-mode) .
+	  (lambda () (set (make-local-variable 'company-backends)
+			  '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
 	 (emacs-lisp-mode . company-mode)
 	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-elisp)))
@@ -169,6 +175,11 @@
       (indent-according-to-mode)))
   )
 
+(use-package company-emoji
+  :defer t
+  :ensure t
+  :after company)
+
 ;; eglot configuration, switching to eglot after emacs 29
 (use-package eglot
   :ensure t
@@ -177,8 +188,13 @@
 	 (python-mode . eglot-ensure))
   :custom
   (eglot-extend-to-xref t)
+  ;;inlay-hints are annoying
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
   :config
+  ;;by default eglot forces company to only use company-capf, I lose a lot of
+  ;;backends in this way
+  (setq eglot-stay-out-of '(company))
+  ;;eldoc's multi-line mini buffer is really annoying, turn it off
   (setq eldoc-echo-area-use-multiline-p nil)
   ;;C++ requires clangd, python requires python-language server
   :bind (:map eglot-mode-map
@@ -205,6 +221,7 @@
 ;;       (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
 ;;       ))
 ;;   )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hideshow
