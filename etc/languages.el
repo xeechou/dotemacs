@@ -1,12 +1,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; languages
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;treesitter: disable for now. the tree-sitter indentation is not working for
-;; me. https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html
+;; tree-sitter:  disabled for windows
+;;
+;; The difficult thing is to setup the indentations. See
+;; https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html
 ;; also,
 ;; https://casouri.github.io/note/2023/tree-sitter-starter-guide/index.html#Indentation
 ;; is very useful.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (when (treesit-available-p)
   (require 'treesit)
 
@@ -27,6 +28,7 @@
     )
 
   (use-package treesit-auto
+    :unless (eq system-type 'windows-nt) ;;treesit-auto does not work on windows?
     :demand t
     :custom
     (c-ts-mode-indent-style #'my/indent-rules)
@@ -35,6 +37,10 @@
     (setq treesit-auto-install 'prompt))
   (setq-default treesit-font-lock-level 3)
   )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; C family
 (use-package cc-mode
@@ -111,6 +117,7 @@
 
 (use-package web-mode
   :ensure t
+  :pin melpa
   :defer t
   :mode ("\\.html?\\'" . web-mode))
 
@@ -122,6 +129,15 @@
   (setq typescript-indent-level 2)
   (setq-default indent-tabs-mode nil)
   )
+
+(use-package json-mode
+  :ensure t
+  :pin melpa
+  :mode (("\\.json\\'" . json-mode)
+	 ;; O3DE passes and assets use json format
+	 ("\\.pass\\'"    . json-mode)
+	 ("\\.azasset\\'" . json-mode)
+	 ))
 
 ;;mesonbuild
 (use-package meson-mode
@@ -165,9 +181,9 @@
 ;;    (LaTeX-mode . turn-on-reftex))
 ;;   )
 
-(use-package unity
-  :vc (:fetcher github :repo "elizagamedev/unity.el")
-  :hook (after-init . unity-mode))
+;; (use-package unity
+;;   :vc (:fetcher github :repo "elizagamedev/unity.Eli")
+;;   :hook (after-init . unity-mode))
 
 ;;graphviz dot
 (use-package graphviz-dot-mode :ensure t

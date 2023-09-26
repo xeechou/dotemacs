@@ -1,17 +1,16 @@
-;;************************************************************
-;;************************************************************
-;;************************************************************
-;;0) backward kill-line, this may not be a good idea
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; backward kill-line, this may not be a good idea
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun my/backward-kill-line (arg)
   "Kill ARG line backwards"
   (interactive "p")
   (kill-line (- 1 arg)))
 (global-set-key (kbd "C-c u") 'my/backward-kill-line) ;;`C-c u'
-;;************************************************************
-;;************************************************************
-;;************************************************************
 
-;;1) move lines
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; move lines
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmacro save-column (&rest body)
   `(let ((column (current-column)))
      (unwind-protect
@@ -22,23 +21,23 @@
 (defun my/move-line-up ()
   (interactive)
   (save-column
-   (transpose-lines 1)
-   (forward-line -2)))
+    (transpose-lines 1)
+    (forward-line -2)))
 
 (defun my/move-line-down ()
   (interactive)
   (save-column
-   (forward-line 1)
-   (transpose-lines 1)
-   (forward-line -1)))
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1)))
 
 (global-set-key (kbd "M-<up>") 'my/move-line-up)
 (global-set-key (kbd "M-<down>") 'my/move-line-down)
 
-;;************************************************************
-;;************************************************************
-;;************************************************************
-;;1) copy current lines char
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; copy current lines char
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun my/copy-line ()
   "copy current line, from the first character that is not \t or
   ' ', to the last of that line, this feature is from vim.
@@ -57,16 +56,11 @@
   )
 
 (global-set-key "\C-c\C-k" 'my/copy-line)
-;;************************************************************
-;;************************************************************
-;;************************************************************
 
 
-;;************************************************************
-;;****************************S*******************************
-;;************************************************************
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;3) this backward-forward package helps us jump back-forward in the mark ring.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package backward-forward
   :ensure t
   :demand
@@ -81,6 +75,11 @@
               ("<mouse-9>" . backward-forward-next-location)
               )
   )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; auto-mark
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (use-package auto-mark
 ;;   :load-path "lisp"
 ;;   :config
@@ -91,10 +90,10 @@
 ;;   :bind ("C-c C-<SPC>"  . 'pop-to-mark-command)
 ;;   )
 
-;;************************************************************
-;;****************************E*******************************
-;;************************************************************
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; move to next word
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun my/next-word (p)
   "Move point to the beginning of the next word, past by any space"
   (interactive "d")
@@ -103,21 +102,25 @@
   (backward-word))
 ;;(global-set-key "\M-f" 'my/next-word)
 
-;;for multiple windows convience
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; window move operations
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd "C-x <up>") 'windmove-up)
 (global-set-key (kbd "C-x <down>") 'windmove-down)
 (global-set-key (kbd "C-x <left>") 'windmove-left)
 (global-set-key (kbd "C-x <right>") 'windmove-right)
 
-;;************************************************************
-;;************************************************************
-;;************************************************************
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; insert rectangle
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)
 
-;;************************************************************
-;;************************************************************
-;;************************************************************
-;; reload dir-locals.el
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; reload dir-locals
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun my/reload-dir-locals-for-current-buffer ()
   "reload dir locals for the current buffer"
   (interactive)
@@ -133,3 +136,17 @@ current buffer's, reload dir-locals."
       (with-current-buffer buffer
         (when (equal default-directory dir)
           (my/reload-dir-locals-for-current-buffer))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; get current file name and full path
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun my/filename ()
+  "Copy the filename of the current buffer."
+  (interactive)
+  (kill-new (buffer-name (window-buffer (minibuffer-selected-window)))))
+
+(defun my/full-path ()
+  "Copy the full path of the current buffer."
+  (interactive)
+  (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
