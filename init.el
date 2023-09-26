@@ -67,7 +67,7 @@
 
 (require 'load-env-paths)
 (when (eq system-type 'windows-nt) ;;use it only for windows now
-  (load-env-paths))
+  (load-env-paths "^.+_BINPATH="))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

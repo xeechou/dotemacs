@@ -4,15 +4,16 @@
 ;;;;;;;;;;;; load user config ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;add any additional environment variable like GIT_PATH RUST_PATH to PATH and
 ;;exec-path
-(defun load-env-paths ()
-  "add any additional environment variable like GIT_PATH RUST_PATH to PATH and exec-path"
+(defun load-env-paths (pattern)
+  "add any additional environment variable like GIT_PATH RUST_PATH to PATH and
+exec-path, the default pattern is \"^.+_PATH=\" which maps to any _PATH variable"
   (interactive)
 
   (let ((additional-path "")
 	(path-list (exec-path)))
     (progn
       (dolist (e process-environment)
-	(when (string-match "^.+_PATH=" e)
+	(when (string-match pattern e)
 	  ;;(car (cdr list)) :gets the second element
 	  (let* ((path (car (cdr (split-string e "="))))
 		 ;;posix path
