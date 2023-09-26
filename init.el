@@ -65,6 +65,9 @@
 (require 'load-dir)
 (load-dir "~/.emacs.d/etc")
 
+(require 'load-env-paths)
+(when (eq system-type 'windows-nt) ;;use it only for windows now
+  (load-env-paths))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
