@@ -82,6 +82,16 @@
 (diminish 'eldoc-mode)
 (diminish 'abbrev-mode)
 
+(use-package uuidgen
+  :ensure t
+  :pin melpa
+  :init
+  (defun my/insert-uuid ()
+    "insert UUID at the point"
+    (interactive)
+    (insert (uuidgen-4)))
+  )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hideshow
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
