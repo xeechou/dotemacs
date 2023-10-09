@@ -234,6 +234,11 @@
 	 ;; shaders
 	 (hlsl-mode . company-mode)
 	 (azsl-mode . company-mode)
+	 (glsl-mode . company-mode)
+	 (glsl-mode . (lambda ()
+			(when (executable-find "glslangValidator")
+			  (add-to-list (make-local-variable 'company-backends)
+				       'company-glsl))))
 	 )
   :config
 
@@ -258,6 +263,11 @@
   )
 
 (use-package company-emoji
+  :defer t
+  :ensure t
+  :after company)
+
+(use-package company-glsl
   :defer t
   :ensure t
   :after company)
