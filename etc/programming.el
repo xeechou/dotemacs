@@ -237,11 +237,11 @@
 	 (hlsl-mode . company-mode)
 	 (hlsl-mode . (lambda () (my/merge-list-to-list
 				  (make-local-variable 'company-backends)
-				  (list 'company-keywords 'company-abbrev))))
+				  (list 'company-keywords 'company-dabbrev))))
 	 (azsl-mode . company-mode)
 	 (azsl-mode . (lambda () (my/merge-list-to-list
 				  (make-local-variable 'company-backends)
-				  (list 'company-keywords 'company-abbrev))))
+				  (list 'company-keywords 'company-dabbrev))))
 	 (glsl-mode . company-mode)
 	 (glsl-mode . (lambda ()
 			(when (executable-find "glslangValidator")
