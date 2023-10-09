@@ -233,7 +233,13 @@
 				    'company-lua)))
 	 ;; shaders
 	 (hlsl-mode . company-mode)
+	 (hlsl-mode . (lambda ()
+			(add-to-list (make-local-variable 'company-backends)
+				     'company-keywords 'company-abbrev)))
 	 (azsl-mode . company-mode)
+	 (azsl-mode . (lambda ()
+			(add-to-list (make-local-variable 'company-backends)
+				     'company-keywords 'company-abbrev)))
 	 (glsl-mode . company-mode)
 	 (glsl-mode . (lambda ()
 			(when (executable-find "glslangValidator")
