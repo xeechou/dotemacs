@@ -208,6 +208,11 @@
            :prepend t
            :jump-to-captured t)
           ))
+  ;; displaying tags along with title for org roam
+  (setq org-roam-node-display-template
+        (concat "${title:*} "
+                (propertize "${tags:10}" 'face 'org-tag)))
+
   ;; configure org-roam-buffer
   (add-to-list 'display-buffer-alist
 	       '("\\*org-roam\\*"
