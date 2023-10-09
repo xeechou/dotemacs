@@ -58,6 +58,8 @@
 ;;set org_dir
 (defun my/concat-path (&rest parts)
   (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
+(defun my/merge-list-to-list (dst-list src-list)
+  (dolist (item src-list) (add-to-list dst-list item)))
 
 ;;;;;;;;;;;; load user config ;;;;;;;;;;
 ;; we don't need do anything specificly for flyspell-mode so long as

@@ -215,17 +215,19 @@
 	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
 						    'company-elisp)))
 	 (outline-mode    . company-mode) ;;enable for org mode
-	 (outline-mode    . (lambda () (add-to-list (make-local-variable 'company-backends)
-						    'company-dabbrev 'company-emoji)))
+	 (outline-mode    . (lambda () (my/merge-list-to-list
+					(make-local-variable 'company-backends)
+					(list'company-dabbrev 'company-emoji))))
 	 (text-mode       . company-mode)
-	 (text-mode       . (lambda () (add-to-list (make-local-variable 'company-backends)
-						    'company-dabbrev 'company-emoji)))
+	 (text-mode       . (lambda () (my/merge-list-to-list
+					(make-local-variable 'company-backends)
+					(list 'company-dabbrev 'company-emoji))))
 	 (meson-mode . company-mode)
 	 ;;cmake
 	 (cmake-mode . company-mode)
-	 (cmake-mode .  (lambda () (add-to-list (make-local-variable 'company-backends)
-						'company-cmake
-						'company-dabbrev)))
+	 (cmake-mode .  (lambda () (my/merge-list-to-list
+				    (make-local-variable 'company-backends)
+				    (list 'company-cmake 'company-dabbrev))))
 	 ;;lua
 	 (lua-mode . company-mode)
 	 (lua-mode . (lambda ()
@@ -233,13 +235,13 @@
 				    'company-lua)))
 	 ;; shaders
 	 (hlsl-mode . company-mode)
-	 (hlsl-mode . (lambda ()
-			(add-to-list (make-local-variable 'company-backends)
-				     'company-keywords 'company-abbrev)))
+	 (hlsl-mode . (lambda () (my/merge-list-to-list
+				  (make-local-variable 'company-backends)
+				  (list 'company-keywords 'company-abbrev))))
 	 (azsl-mode . company-mode)
-	 (azsl-mode . (lambda ()
-			(add-to-list (make-local-variable 'company-backends)
-				     'company-keywords 'company-abbrev)))
+	 (azsl-mode . (lambda () (my/merge-list-to-list
+				  (make-local-variable 'company-backends)
+				  (list 'company-keywords 'company-abbrev))))
 	 (glsl-mode . company-mode)
 	 (glsl-mode . (lambda ()
 			(when (executable-find "glslangValidator")
