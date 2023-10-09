@@ -88,13 +88,18 @@
 	 ("\\.hlsl\\'"   . hlsl-mode)
 	 ("\\.vs\\'"     . hlsl-mode)
 	 ("\\.ps\\'"     . hlsl-mode)
-	 ("\\.hs\\'"     . hlsl-mode)
-	 ("\\.ds\\'"     . hlsl-mode)
-	 ("\\.cs\\'"     . hlsl-mode)
-	 ("\\.ms\\'"     . hlsl-mode)
-	 ("\\.as\\'"     . hlsl-mode)
-	 ("\\.lib\\'"    . hlsl-mode)
+	 ("\\.hs\\'"     . hlsl-mode) ;;hull shader
+	 ("\\.ds\\'"     . hlsl-mode) ;;domain shader
+	 ("\\.cs\\'"     . hlsl-mode) ;;compute shader
+	 ("\\.ms\\'"     . hlsl-mode) ;;mesh shader
+	 ("\\.as\\'"     . hlsl-mode) ;;amplification shader
+	 ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
 	 ))
+
+(use-package azsl-mode
+  :vc (:fetcher github :repo "xeechou/azsl-mode.el")
+  :mode (("\\.azsl\\'"  . azsl-mode)
+	 ("\\.azsli\\'" . azsl-mode)))
 
 (use-package shader-mode
   :ensure t
