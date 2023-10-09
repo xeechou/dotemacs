@@ -208,6 +208,7 @@
   :hook (((c++-mode c++-ts-mode) . company-mode)
 	 ((c-mode c-ts-mode)     . company-mode)
 	 ((c++-mode c++-ts-mode c-mode c-ts-mode) .
+	  ;;override default company backends because eglot not compatible with company-clang
 	  (lambda () (set (make-local-variable 'company-backends)
 			  '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
 	 (emacs-lisp-mode . company-mode)
@@ -230,6 +231,9 @@
 	 (lua-mode . (lambda ()
 		       (add-to-list (make-local-variable 'company-backends)
 				    'company-lua)))
+	 ;; shaders
+	 (hlsl-mode . company-mode)
+	 (azsl-mode . company-mode)
 	 )
   :config
 
