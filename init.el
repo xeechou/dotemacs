@@ -47,7 +47,9 @@
   (require 'cl-lib))
 
 ;;match the PATH from emacs to shell
-(when (or (memq window-system '(mac ns x pgtk)) (daemonp))
+(when (and (or (memq window-system '(mac ns x pgtk)) (daemonp))
+	   ;; skip if manually defined PATH already
+	   (not (getenv "PATH")))
   (use-package exec-path-from-shell
     :ensure t
     :config
