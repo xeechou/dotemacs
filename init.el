@@ -46,15 +46,17 @@
   (require 'diminish)
   (require 'cl-lib))
 
-;;match the PATH from emacs to shell
-(when (and (or (memq window-system '(mac ns x pgtk)) (daemonp))
-	   ;; skip if manually defined PATH already
-	   (not (getenv "PATH")))
+;; match the PATH from emacs to shell only if
+;; 1. we are on linux/mac
+;; 2. we start as daemon
+;;
+;; since windows emacs shell is cmdproxy.exe, we will manually set the
+;; environment variables
+(when (and (memq window-system '(mac ns x pgtk)) (daemonp))
   (use-package exec-path-from-shell
     :ensure t
     :config
     (exec-path-from-shell-initialize)))
-
 
 ;;;;;;;;;;;; common functions ;;;;;;;;;;
 ;;set org_dir
