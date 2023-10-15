@@ -97,6 +97,7 @@
   ;;face settings, well setting different sizes for levels is Well, I am not
   ;;very sure, need to be in the same color, didn't look as pretty as I
   ;;expected, and it breaks the TODOs.
+  (require 'org-journal)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -237,23 +238,37 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org-journal
-  :ensure t :pin melpa :after org
+  :ensure t :pin melpa :after org :defer t
   :bind-keymap
   ("C-c n j" . org-journal-mode-map)
   :bind (:map org-journal-mode-map
-	      ("t"   . org-journal-new-entry)
 	      ("C-f" . org-journal-next-entry)
 	      ("C-b" . org-journal-previous-entry)
 	      ("C-s" . org-journal-search))
   :custom
+  (org-journal-file-type 'daily)
   (org-journal-dir (my/org-file "journals/"))
   (org-journal-time-format "")
   (org-journal-file-format "%Y-%m-%d.org")
   (org-journal-file-header "#+title: %A, %d %B %Y\n\n* Review:\n \n* Planning:\n")
-  (org-journal-date-format "%A, %d %B %Y")
-  (org-journal-enable-agenda-integration t)
-  )
+  (org-journal-enable-agenda-integration nil) ;;enabling agenda will pollute
+  ;;init.el
+  :config
+  (defun org-journal-find-location ()
+    ;; Open today's journal, but specify a non-nil prefix argument in order to
+    ;; inhibit inserting the heading; org-capture will insert the heading.
+    (org-journal-new-entry t)
+    (unless (eq org-journal-file-type 'daily)
+      (org-narrow-to-subtree))
+    (goto-char (point-max)))
 
+  (add-to-list 'org-capture-templates
+	       '("j" "Journal entry" plain (function org-journal-find-location)
+                 "\n** %?"
+                 :jump-to-captured t
+		 :immediate-finish t
+		 :prepend t))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; utilities
