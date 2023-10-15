@@ -232,10 +232,38 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; journal
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org-ref
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-journal
+  :ensure t :pin melpa :after org
+  :bind-keymap
+  ("C-c n j" . org-journal-mode-map)
+  :bind (:map org-journal-mode-map
+	      ("t"   . org-journal-new-entry)
+	      ("C-f" . org-journal-next-entry)
+	      ("C-b" . org-journal-previous-entry)
+	      ("C-s" . org-journal-search))
+  :custom
+  (org-journal-dir (my/org-file "journals/"))
+  (org-journal-time-format "")
+  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-file-header "#+title: %A, %d %B %Y\n\n* Review:\n \n* Planning:\n")
+  (org-journal-date-format "%A, %d %B %Y")
+  (org-journal-enable-agenda-integration t)
+  )
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; utilities
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package org-cliplink
+  :ensure t
+  :bind (:map org-mode-map
+	      ("C-c C-p i" . org-cliplink)
+	      ("C-c C-p l" . org-store-link)))
 
 (use-package org-download
   :if window-system
