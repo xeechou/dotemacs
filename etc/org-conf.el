@@ -99,6 +99,10 @@
   ;;expected, and it breaks the TODOs.
   )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; appearance
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package mixed-pitch
   :ensure t
   :hook
@@ -152,9 +156,10 @@
    '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-roam
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; TODO remove this once upgrade to emacs-29, which uses emacs builtin sqlite
 
@@ -168,22 +173,15 @@
     (setq org-roam-database-connector 'sqlite-builtin))
   :custom
   (org-roam-directory (my/org-file "pages/"))
-  (org-roam-dailies-directory "journals/")
-  (org-roam-dailies-capture-templates
-   '(("d" "default" entry "* Review:\n %?\n* Planning:\n"
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
 	  ("C-c n f" . org-roam-node-find)
 	  ("C-c n c" . org-roam-capture)
 	  ("C-c n i" . org-roam-node-insert)
 	  ("C-c n g" . org-roam-ui-mode)
-          :map org-roam-dailies-map
-          ("Y" . org-roam-dailies-capture-yesterday)
-          ("T" . org-roam-dailies-capture-tomorrow))
-  :bind-keymap
-  ("C-c n d" . org-roam-dailies-map)
+	  )
+
   :config
-  (require 'org-roam-dailies)
   ;;start db sync automatically, also you are able to refresh backlink buffer
   (org-roam-db-autosync-enable)
   (setq org-roam-completion-system 'ivy)
@@ -198,7 +196,6 @@
 			      "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
            :unnarrowed t
            :jump-to-captured t)
-
           ("l" "clipboard" plain (function org-roam--capture-get-point)
            "%c"
            :file-name "${slug}"
@@ -223,25 +220,7 @@
 		 (window-height . fit-window-to-buffer)))
   )
 
-;; My synchronizer
-;; (use-package org-msync :load-path "lisp/"
-;;   :hook ((org-mode . org-msync-after-save-hook)
-;; 	 (auto-save . org-msync-auto-save-hook))
-;;   :custom
-;;   (org-msync-local-dir org-directory)
-;;   (org-msync-remote-dir "~/Documents/org-remote/")
-;;   )
 
-;; org clip link
-(use-package org-cliplink
-  :ensure t
-  :bind (:map org-mode-map
-	      ("C-c C-p i" . org-cliplink)
-	      ("C-c C-p l" . org-store-link)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org-roam-ui
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-roam-ui
   :ensure t
   :diminish org-roam-ui-mode
@@ -288,9 +267,9 @@
   :init
   (setq bibtex-completion-bibliography `,(my/org-file "bib/references.bib")))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-ref
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-ref
   :ensure t
   :after org
@@ -330,11 +309,40 @@
 	      ("C-c ]" . org-ref-insert-link))
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-contrib
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-contrib
   :ensure t
   :after org
   :init
   (require 'ox-groff))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; disabled-config
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; My synchronizer
+;; (use-package org-msync :load-path "lisp/"
+;;   :hook ((org-mode . org-msync-after-save-hook)
+;; 	 (auto-save . org-msync-auto-save-hook))
+;;   :custom
+;;   (org-msync-local-dir org-directory)
+;;   (org-msync-remote-dir "~/Documents/org-remote/")
+;;   )
+
+;;disable org-roam-dailies in favor of org-journal
+;; (use-package org-roam
+;;   :custom
+;;   (org-roam-dailies-directory "journals/")
+;;   (org-roam-dailies-capture-templates
+;;    '(("d" "default" entry "* Review:\n %?\n* Planning:\n"
+;;       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+;;   :bind (:map org-roam-dailies-map
+;;               ("Y" . org-roam-dailies-capture-yesterday)
+;;               ("T" . org-roam-dailies-capture-tomorrow))
+;;   :bind-keymap
+;;   ("C-c n d" . org-roam-dailies-map)
+;;   :config
+;;   (require 'org-roam-dailies)
+;;   )
