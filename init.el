@@ -56,6 +56,8 @@
   (use-package exec-path-from-shell
     :ensure t
     :config
+    (dolist (var '("XDG_SESSION_TYPE"))
+      (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
 
 ;;;;;;;;;;;; common functions ;;;;;;;;;;
