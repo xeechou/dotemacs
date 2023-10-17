@@ -42,6 +42,15 @@
 ;; languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Elisp
+(use-package paredit
+  :ensure t :defer t :pin melpa
+  :hook ( (emacs-lisp-mode lisp-interaction-mode) . paredit-mode))
+
+(use-package rainbow-delimiters
+  :ensure t :defer t
+  :hook ((emacs-lisp-mode lisp-interaction-mode) . rainbow-delimiters-mode))
+
 ;; C family
 (use-package cc-mode
   :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
