@@ -29,6 +29,7 @@
 
   (use-package treesit-auto
     :unless (eq system-type 'windows-nt) ;;treesit-auto does not work on windows?
+    :ensure t
     :demand t
     :custom
     (c-ts-mode-indent-style #'my/indent-rules)
