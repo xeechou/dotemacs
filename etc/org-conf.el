@@ -130,8 +130,7 @@
   (org-journal-time-format "")
   (org-journal-file-format "%Y-%m-%d.org")
   (org-journal-file-header "#+title: %A, %d %B %Y\n\n* Review:\n \n* Planning:\n")
-  (org-journal-enable-agenda-integration nil) ;;enabling agenda will pollute
-  ;;init.el
+  (org-journal-enable-agenda-integration t)
 
   :bind-keymap
   ("C-c n j" . org-journal-mode-map)
