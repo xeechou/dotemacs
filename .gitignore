@@ -1,3 +1,6 @@
+# keep the custom file local
+custom.el*
+
 straight/*
 irony/*
 elpa/*
