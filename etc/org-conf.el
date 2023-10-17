@@ -106,6 +106,8 @@
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package org-journal
     :ensure t :pin melpa :after org :defer t
+    :init
+    (defun my/journal-dir () (my/org-file "journals/"))
     :bind-keymap
     ("C-c n j" . org-journal-mode-map)
     :bind (:map org-journal-mode-map
@@ -211,6 +213,7 @@
   (if (version< emacs-version "29.0")
       (setq org-roam-database-connector 'sqlite)
     (setq org-roam-database-connector 'sqlite-builtin))
+  (defun my/roam-dir () (my/org-file "pages/"))
   :custom
   (org-roam-directory (my/org-file "pages/"))
 
@@ -286,30 +289,33 @@
 	      ("C-c C-p i" . org-cliplink)
 	      ("C-c C-p l" . org-store-link)))
 
+;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-download
-  :if window-system
-  :ensure t
-  :after org
-  ;; :custom (org-download-image-dir (concat org-directory "imgs/"))
-  ;; this hook will run twice because of org-clock
-  ;; :hook (org-mode . (lambda ()
-  ;;		      (message "buffer file name %s" (buffer-file-name))
-  ;;		      ;;only set download-image-dir for org-dir and roam-dir
-  ;;		      (let* ((curdir (file-name-directory (buffer-file-name)))
-  ;;			     (orgdir org-directory)
-  ;;			     (roamdir (concat orgdir "roam/")))
-  ;;			(setq org-download-image-dir
-  ;;			      (if (and (not (boundp 'org-download-image-dir))
-  ;;				       (or (string= curdir orgdir)
-  ;;					   (string= curdir roamdir)))
-  ;;				  (concat curdir "imgs/")
-  ;;				nil)))
-  ;;		      ))
-  :bind (:map org-mode-map
-	      (("C-c d s" . org-download-screenshot)
-	       ("C-c d y" . org-download-yank)
-	       ("C-c d c" . org-download-clipboard))))
+  :if window-system :ensure t :after org
+  :init
+  (defun my/org-dir-is-fixed (currdir)
+    (let ((org-dir     org-directory)
+	  (roam-dir    (my/roam-dir))
+	  (journal-dir (my/journal-dir)))
+      (or (string= currdir org-dir)
+	  (string= currdir roam-dir)
+	  (string= currdir journal-dir))))
+  :hook   ;; this hook will run twice because of org-clock
+  (org-mode . (lambda ()
+		(let ((currdir    (file-name-directory (buffer-file-name))))
+		  ;;set org-download-iamge-dir to imgs/ if is
+		  ;;agenda/roam/journal, otherwise it is temporary, make it nil
+		  (set (make-local-variable 'org-download-image-dir)
+		       (if (my/org-dir-is-fixed currdir)
+			   (my/concat-path currdir "imgs/")
+			 nil)))))
+  :bind
+  (:map org-mode-map
+	(("C-c d s" . org-download-screenshot)
+	 ("C-c d y" . org-download-yank)
+	 ("C-c d c" . org-download-clipboard))))
 
+;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package ivy-bibtex
   :ensure t
   :after org
