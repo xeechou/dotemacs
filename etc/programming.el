@@ -190,7 +190,8 @@
   :hook (prog-mode . fic-mode))
 
 (use-package color-rg
-  :vc (:fetcher github :repo "manateelazycat/color-rg"))
+  :vc (:fetcher github :repo "manateelazycat/color-rg")
+  :custom (color-rg-search-no-ignore-file nil))
 
 ;; yasnippet
 (use-package yasnippet-snippets

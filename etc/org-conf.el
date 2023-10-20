@@ -290,7 +290,7 @@
 
 ;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-download
-  :if window-system :ensure t :after org
+  :ensure t :after org
   :init
   (defun my/org-dir-is-fixed (currdir)
     (let ((org-dir     org-directory)
@@ -299,20 +299,22 @@
       (or (string= currdir org-dir)
 	  (string= currdir roam-dir)
 	  (string= currdir journal-dir))))
-  :hook   ;; this hook will run twice because of org-clock
+  :hook
+  ;;this hook will run at-startup because of org-clock, and we do not have a
+  ;;(buffer-file-name) then, so we need to error check it
   (org-mode . (lambda ()
-		(let ((currdir    (file-name-directory (buffer-file-name))))
-		  ;;set org-download-iamge-dir to imgs/ if is
-		  ;;agenda/roam/journal, otherwise it is temporary, make it nil
-		  (set (make-local-variable 'org-download-image-dir)
-		       (if (my/org-dir-is-fixed currdir)
-			   (my/concat-path currdir "imgs/")
-			 nil)))))
-  :bind
-  (:map org-mode-map
-	(("C-c d s" . org-download-screenshot)
-	 ("C-c d y" . org-download-yank)
-	 ("C-c d c" . org-download-clipboard))))
+		(when (buffer-file-name)
+		  (let ((currdir (file-name-directory (buffer-file-name))))
+		    ;;set org-download-iamge-dir to imgs/ if is
+		    ;;agenda/roam/journal, otherwise it is temporary, make it nil
+		    (set (make-local-variable 'org-download-image-dir)
+			 (if (my/org-dir-is-fixed currdir)
+			     (my/concat-path currdir "imgs/")
+			   nil))))))
+  :bind (:map org-mode-map
+	      ("C-c d s" . org-download-screenshot)
+	      ("C-c d y" . org-download-yank)
+	      ("C-c d c" . org-download-clipboard)))
 
 ;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package ivy-bibtex

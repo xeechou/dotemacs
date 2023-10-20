@@ -63,10 +63,12 @@
 ;;
 ;; since windows emacs shell is cmdproxy.exe, we will manually set the
 ;; environment variables
-(when (and (memq window-system '(mac ns x pgtk)) (daemonp))
-  (use-package exec-path-from-shell
-    :ensure t
-    :config
+
+(use-package  exec-path-from-shell
+  :ensure t
+  :init
+  (when (and (not (eq system-type 'windows-nt))
+	     (daemonp))
     (dolist (var '("XDG_SESSION_TYPE"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
