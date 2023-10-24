@@ -150,8 +150,10 @@
   :pin melpa
   :mode (("\\.json\\'" . json-mode)
 	 ;; O3DE passes and assets use json format
-	 ("\\.pass\\'"    . json-mode)
-	 ("\\.azasset\\'" . json-mode)
+	 ("\\.pass\\'"         . json-mode)
+	 ("\\.azasset\\'"      . json-mode)
+	 ("\\.setreg\\'"       . json-mode)
+	 ("\\..setregpatch\\'" . json-mode)
 	 ))
 
 ;;mesonbuild
