@@ -12,21 +12,9 @@
   :vc (:fetcher github :repo "magit/ssh-agency")
   :hook (magit-credential . ssh-agency-ensure))
 
-(use-package format-all
-  :ensure t
-  :diminish format-all-mode
-  :preface
-  (defun my/format-code()
-    "auto formatting code in the buffer"
-    (interactive)
-    (if (memq 'format-all-mode local-minor-modes)
-	(format-all-buffer)))
-  :hook ((format-all-mode . format-all-ensure-formatter)
-	 (prog-mode . format-all-mode)
-	 (before-save . my/format-code))
-  :custom
-  (format-all-formatters (("C++" clang-format)))
-  )
+(use-package fmo-mode
+  :vc (:fetcher github :repo "xeechou/fmo-mode.el")
+  :hook (prog-mode . fmo-mode))
 
 (use-package projectile
   :ensure t
@@ -360,3 +348,19 @@
 		    ;;TODO adding GLSL/HLSL languages?
 		    )) ;;rmsbolt-mode-hook
   )
+
+;; (use-package format-all
+;;   :ensure t
+;;   :diminish format-all-mode
+;;   :preface
+;;   (defun my/format-code()
+;;     "auto formatting code in the buffer"
+;;     (interactive)
+;;     (if (memq 'format-all-mode local-minor-modes)
+;;	(format-all-buffer)))
+;;   :hook ((format-all-mode . format-all-ensure-formatter)
+;;	 (prog-mode . format-all-mode)
+;;	 (before-save . my/format-code))
+;;   :custom
+;;   (format-all-formatters (("C++" clang-format)))
+;;   )
