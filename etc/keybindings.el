@@ -150,3 +150,38 @@ current buffer's, reload dir-locals."
   "Copy the full path of the current buffer."
   (interactive)
   (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; proxy-functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun my/disable-proxy ()
+  "Disable the proxy used in emacs"
+  (interactive)
+  (setq url-proxy-services
+        `(("http" . nil)
+          ("https" . nil)
+	  ("no_proxy" . ,(getenv "no_proxy"))))
+  ;;backup the proxy settings
+  (setenv "http_proxy_backup" (getenv "http_proxy"))
+  (setenv "https_proxy_backup" (getenv "https_proxy"))
+  (setenv "ftp_proxy_backup" (getenv "ftp_proxy"))
+  ;;clean up the proxy settings
+  (setenv "http_proxy" nil)
+  (setenv "https_proxy" nil)
+  (setenv "ftp_proxy" nil)
+  )
+
+(defun my/enable-proxy ()
+  "Re-enable proxy from environment variables"
+  (interactive)
+  (setenv "http_proxy" (getenv "http_proxy_backup"))
+  (setenv "https_proxy" (getenv "https_proxy_backup"))
+  (setenv "ftp_proxy" (getenv "ftp_proxy_backup"))
+  
+  (setq url-proxy-services
+	`(("http" . ,(getenv "http_proxy"))
+	  ("https" . ,(getenv "https_proxy"))
+	  ("ftp_proxy" . ,(getenv "ftp_proxy"))
+	  ("no_proxy" . ,(getenv "no_proxy"))))
+  )
