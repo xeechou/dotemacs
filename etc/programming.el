@@ -14,7 +14,8 @@
 
 (use-package fmo-mode
   :vc (:fetcher github :repo "xeechou/fmo-mode.el")
-  :hook (prog-mode . fmo-mode))
+  :custom (fmo-ensure-formatters t)
+  :hook ((prog-mode . fmo-mode)))
 
 (use-package projectile
   :ensure t
