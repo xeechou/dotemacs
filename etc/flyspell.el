@@ -22,6 +22,10 @@
   :after flyspell
   :bind (:map flyspell-mode-map ("C-c ;" . flyspell-correct-wrapper))
   )
-(use-package flyspell-correct-popup
+
+(use-package flyspell-correct-ivy
+  ;;switch to use ivy interface
+  ;;TODO there is a face bug on popup interface
+  ;;NOTE: use M-o to access ivy menus
   :ensure t
   :after (ivy flyspell-correct))
