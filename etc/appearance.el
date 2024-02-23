@@ -22,7 +22,8 @@
 	       (<= hour 19))
 	  'modus-operandi-tinted
 	'modus-vivendi-tinted)))
-  (run-with-timer 0 3600 '(lambda () (modus-themes-select (my/theme-based-on-time)))))
+  ;; #' is for quoting function, like ' is for quoting symbol
+  (run-with-timer 0 3600 #'(lambda () (modus-themes-select (my/theme-based-on-time)))))
 
 
 ;; Ligature Settings
