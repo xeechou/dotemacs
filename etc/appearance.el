@@ -1,11 +1,19 @@
 ;; setup theme and fonts for Emacs
-(use-package spacemacs-theme
+(use-package modus-themes
   :defer t
   :ensure t
   :init
-  (load-theme 'spacemacs-dark t)
-
-  )
+  (defun my/theme-based-on-time ()
+    "get the right theme based on the time of day"
+    (let* ((time  (current-time-string))
+	   (clock (nth 3 (split-string time)))
+	   (h-m-s (split-string clock ":"))
+	   (hour  (string-to-number (car h-m-s))))
+      (if (and (>= hour 8)
+	       (<= hour 19))
+	  'modus-operandi-tinted
+	'modus-vivendi-tinted)))
+  (run-with-timer 0 3600 '(lambda () (modus-themes-select (my/theme-based-on-time)))))
 
 
 ;; Ligature Settings
