@@ -19,7 +19,7 @@
 	   (h-m-s (split-string clock ":"))
 	   (hour  (string-to-number (car h-m-s))))
       (if (and (>= hour 8)
-	       (<= hour 19))
+	       (<= hour 17))
 	  'modus-operandi-tinted
 	'modus-vivendi-tinted)))
   ;; #' is for quoting function, like ' is for quoting symbol

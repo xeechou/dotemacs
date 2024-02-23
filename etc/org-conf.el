@@ -221,8 +221,13 @@
 	  ("C-c n c" . org-roam-capture)
 	  ("C-c n i" . org-roam-node-insert)
 	  ("C-c n g" . org-roam-ui-mode)
-	  ;;TODO use C-u RET to open backlink in other windows, unfortunately I
-	  ;;can't map to the different keybindings at the moment.
+	  :map org-roam-mode-map
+	  ;; 1. remap to open in other window by default.
+	  ("RET" . (lambda ()
+		     (interactive)
+		     (org-roam-node-visit  (org-roam-node-at-point)
+					   'other-window)))
+	  ;;NOTE alternatively, use C-u RET to visit in other window
 	  )
 
   :config

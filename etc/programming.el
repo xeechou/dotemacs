@@ -176,7 +176,8 @@
 (use-package fic-mode ;;show FIXME/TODO in comments
   :vc (:fetcher github :repo "lewang/fic-mode")
   :diminish fic-mode
-  :hook (prog-mode . fic-mode))
+  :hook (prog-mode . fic-mode)
+  :custom (fic-highlighted-words '("FIXME" "TODO" "BUG" "NOTE")))
 
 (use-package color-rg
   :vc (:fetcher github :repo "manateelazycat/color-rg")
