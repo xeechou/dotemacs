@@ -3,6 +3,15 @@
   :defer t
   :ensure t
   :init
+  (setq modus-themes-mixed-fonts t)
+  (setq modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted))
+  (setq modus-themes-common-palette-overrides
+	`(
+	  ;; From the section "Make the mode line borderless"
+	  (border-mode-line-active unspecified)
+	  (border-mode-line-inactive unspecified)))
+
+  ;;load light dark theme based on time
   (defun my/theme-based-on-time ()
     "get the right theme based on the time of day"
     (let* ((time  (current-time-string))
