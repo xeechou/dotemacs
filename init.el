@@ -63,15 +63,15 @@
 ;;
 ;; since windows emacs shell is cmdproxy.exe, we will manually set the
 ;; environment variables
+(unless (package-installed-p 'exec-path-from-shell)
+  (use-package  exec-path-from-shell :ensure t))
 
-(use-package  exec-path-from-shell
-  :ensure t
-  :init
-  (when (and (not (eq system-type 'windows-nt))
-	     (daemonp))
-    (dolist (var '("XDG_SESSION_TYPE"))
-      (add-to-list 'exec-path-from-shell-variables var))
-    (exec-path-from-shell-initialize)))
+(require 'exec-path-from-shell)
+(when (and (not (eq system-type 'windows-nt))
+	   (daemonp))
+  (dolist (var '("XDG_SESSION_TYPE"))
+    (add-to-list 'exec-path-from-shell-variables var))
+  (exec-path-from-shell-initialize))
 
 ;;;;;;;;;;;; common functions ;;;;;;;;;;
 ;;set org_dir
