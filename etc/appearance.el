@@ -1,3 +1,12 @@
+;;load light dark theme based on time
+(defun my/theme-based-on-time (light-theme dark-theme)
+  "get the right theme based on the time of day"
+  (let* ((time  (current-time-string))
+	 (clock (nth 3 (split-string time)))
+	 (h-m-s (split-string clock ":"))
+	 (hour  (string-to-number (car h-m-s))))
+    (if (and (>= hour 8) (<= hour 17)) light-theme dark-theme)))
+
 ;; setup theme and fonts for Emacs
 (use-package modus-themes
   :defer t
@@ -10,21 +19,11 @@
 	  ;; From the section "Make the mode line borderless"
 	  (border-mode-line-active unspecified)
 	  (border-mode-line-inactive unspecified)))
-
-  ;;load light dark theme based on time
-  (defun my/theme-based-on-time ()
-    "get the right theme based on the time of day"
-    (let* ((time  (current-time-string))
-	   (clock (nth 3 (split-string time)))
-	   (h-m-s (split-string clock ":"))
-	   (hour  (string-to-number (car h-m-s))))
-      (if (and (>= hour 8)
-	       (<= hour 17))
-	  'modus-operandi-tinted
-	'modus-vivendi-tinted)))
   ;; #' is for quoting function, like ' is for quoting symbol
-  (run-with-timer 0 3600 #'(lambda () (modus-themes-select (my/theme-based-on-time)))))
-
+  (run-with-timer 0 3600
+		  #'(lambda () (modus-themes-select (my/theme-based-on-time
+						     'modus-operandi-tinted
+						     'modus-vivendi-tinted)))))
 
 ;; Ligature Settings
 (use-package ligature
