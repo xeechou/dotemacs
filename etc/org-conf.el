@@ -213,8 +213,30 @@
       (setq org-roam-database-connector 'sqlite)
     (setq org-roam-database-connector 'sqlite-builtin))
   (defun my/roam-dir () (my/org-file "pages/"))
+  (defun my/roam-visit () (interactive) (org-roam-node-visit
+					 (org-roam-node-at-point) 'other-window) )
   :custom
   (org-roam-directory (my/org-file "pages/"))
+  (org-roam-completion-everywhere t)
+  (org-roam-db-update-on-save t)
+  ;;template for v2
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?"
+      :if-new (file+head "${slug}.org"
+			 "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
+      :unnarrowed t
+      :jump-to-captured t)
+     ("l" "clipboard" plain (function org-roam--capture-get-point)
+      "%c"
+      :file-name "${slug}"
+      :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n\
+#+ROAM_TAGS: %?\n"
+      :unnarrowed t
+      :prepend t
+      :jump-to-captured t)))
+  ;; displaying tags along with title for org roam
+  (org-roam-node-display-template
+   (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
   :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
 	  ("C-c n f" . org-roam-node-find)
@@ -222,42 +244,12 @@
 	  ("C-c n i" . org-roam-node-insert)
 	  ("C-c n g" . org-roam-ui-mode)
 	  :map org-roam-mode-map
-	  ;; 1. remap to open in other window by default.
-	  ("RET" . (lambda ()
-		     (interactive)
-		     (org-roam-node-visit  (org-roam-node-at-point)
-					   'other-window)))
 	  ;;NOTE alternatively, use C-u RET to visit in other window
-	  )
-
+	  ("RET" . my/roam-visit))
   :config
-  ;;start db sync automatically, also you are able to refresh backlink buffer
+  ;;start db sync automatically, also you are able to refresh back link buffer,
+  ;;alternatively you hook org-roam-db-auto-sync-mode to org-roam-mode
   (org-roam-db-autosync-enable)
-  (setq org-roam-completion-system 'ivy)
-  ;;setup for windows
-  (when (eq system-type 'windows-nt)
-    (setq org-roam-db-update-method 'immediate))
-  ;; template for v2
-  (setq org-roam-capture-templates
-        '(
-          ("d" "default" plain "%?"
-	   :if-new (file+head "${slug}.org"
-			      "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
-           :unnarrowed t
-           :jump-to-captured t)
-          ("l" "clipboard" plain (function org-roam--capture-get-point)
-           "%c"
-           :file-name "${slug}"
-           :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n\
-#+ROAM_TAGS: %?\n"
-           :unnarrowed t
-           :prepend t
-           :jump-to-captured t)
-          ))
-  ;; displaying tags along with title for org roam
-  (setq org-roam-node-display-template
-        (concat "${title:*} "
-                (propertize "${tags:10}" 'face 'org-tag)))
 
   ;; configure org-roam-buffer
   (add-to-list 'display-buffer-alist
@@ -268,7 +260,6 @@
 		 (window-width . 0.33)
 		 (window-height . fit-window-to-buffer)))
   )
-
 
 (use-package org-roam-ui
   :ensure t
