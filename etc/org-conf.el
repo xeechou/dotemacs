@@ -23,6 +23,8 @@
   (org-agenda-todo-ignore-deadlines t)
   (org-agenda-todo-ignore-scheduled t)
   (org-deadline-warning-days 7)
+  ;;log state changes into a drawer, instead of insert inside org files
+  (org-log-into-drawer t)
   ;;faces
   (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
 
