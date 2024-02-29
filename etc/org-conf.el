@@ -291,9 +291,9 @@
   :ensure t :after org
   :init
   (defun my/org-dir-is-fixed (currdir)
-    (let ((org-dir     org-directory)
-	  (roam-dir    (my/roam-dir))
-	  (journal-dir (my/journal-dir)))
+    (let ((org-dir     (file-truename org-directory))     ;;get abs path
+	  (roam-dir    (file-truename (my/roam-dir)))     ;;get abs path
+	  (journal-dir (file-truename (my/journal-dir)))) ;;get abs path
       (or (string= currdir org-dir)
 	  (string= currdir roam-dir)
 	  (string= currdir journal-dir))))
