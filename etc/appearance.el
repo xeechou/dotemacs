@@ -195,6 +195,12 @@
    ;; GNU Emacs Removes Color Emoji Support on the Mac
    ;; http://ergoemacs.org/misc/emacs_macos_emoji.html
    )
+
+  ;;use Fira Sans font when it's available
+  (when (member "Fira Sans" (font-family-list))
+    (custom-theme-set-faces
+     'user
+     '(variable-pitch ((t (:family "Fira Sans"))))))
   )
 
 (if (daemonp)
