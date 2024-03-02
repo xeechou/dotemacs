@@ -43,3 +43,6 @@ transient/*
 
 projectile.cache
 projectile-bookmarks.eld
+
+# LLM
+ellama-sessions/
