@@ -66,6 +66,7 @@
 ;;;###autoload
 (defun org-funcs-define-faces ()
   "define org faces"
+  (interactive)
   (setq org-todo-keyword-faces '(("TODO" . org-warning)
 				 ("DOIN" . org-document-title)
 				 ("DONE" . (:foreground "green" :weight bold))

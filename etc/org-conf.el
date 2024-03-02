@@ -50,7 +50,8 @@
 			  (my/concat-path org-directory "miscs.org")))
   :hook
   ((org-after-todo-statistics . org-funcs-summary-todo)
-   (org-checkbox-statistics . org-funcs-checkbox-todo))
+   (org-checkbox-statistics . org-funcs-checkbox-todo)
+   (org-mode . org-funcs-define-faces))
   ;; I am not sure this global key setting is good or not, capture stuff
   ;; globally is great
   :bind (:map global-map
@@ -96,13 +97,7 @@
 	   "**** On %t\n***** Planned:\n\n %i \n "
 	   :prepend t)
 	  ))
-  (org-funcs-load-babel-compiler)
-  (org-funcs-define-faces)
-  ;;face settings, well setting different sizes for levels is Well, I am not
-  ;;very sure, need to be in the same color, didn't look as pretty as I
-  ;;expected, and it breaks the TODOs.
-
-  )
+  (org-funcs-load-babel-compiler))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; journal
