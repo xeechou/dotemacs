@@ -5,10 +5,11 @@
 ;; 2. modus-themes ;;
 ;; 3. apropospriate-theme :: low contrast, seems pretty good
 
-(use-package modus-themes :defer t :ensure t
+(use-package modus-themes
+  ;; TODO have to disable defer to get circadian to work
+  :ensure t
   :init
   (setq modus-themes-mixed-fonts t)
-  (setq modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi-tinted))
   (setq modus-themes-common-palette-overrides
 	`(
 	  ;; From the section "Make the mode line borderless"
@@ -18,8 +19,9 @@
 (use-package circadian
   :ensure t
   :config
-  (setq circadian-themes '(("8:00" . modus-operandi-tinted)
-			   ("17:30" . modus-vivendi-tinted)))
+  (setq circadian-themes
+	'(("8:00" . modus-operandi-tinted)
+	  ("17:30" . modus-vivendi-tinted)))
   (circadian-setup))
 
 ;; Ligature Settings
