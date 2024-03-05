@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: math_multiline
+# key: mam_
+# adding a multi-line equation for org mode
+# --
+\begin{equation}
+\begin{split}
+${1:equation}
+\end{split}
+\end{equation}
