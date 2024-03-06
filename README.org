@@ -1,0 +1,51 @@
+* My Vanilla yet powerful Emacs environment
+:PROPERTIES:
+:CUSTOM_ID: my-vanilla-yet-powerful-emacs-environment
+:END:
+
+* Introduction
+For years I have been perfecting my Emacs configuration, it is now the
+essential part of my digital life. This is my personal configuration but
+you may also find it useful to your needs. Feel free to grab some of my
+config snippets to work for you.
+
+Here is a list of incomplete features you get from this config set:
+- Clean configuration with [[https://github.com/jwiegley/use-package][use-package]]
+ - Some programming language support.
+    + C/C++
+    + Python
+    + typescript.
+    + golang.
+    + glsl.
+    + many others.
+- Some of my collected code snippets for different languages.
+- Code auto-complete support via eglot and [[https://company-mode.github.io/][Company-mode]].
+- Completion framework using [[https://github.com/abo-abo/swiper][Ivy]].
+- keybinding look-up with [[https://github.com/justbur/emacs-which-key][which-key]].
+- FlySpell support via Hunspell.
+- minimal LLM support through [[https://github.com/s-kostyaev/ellama][Ellama]].
+- many others.
+
+** Run-time requirement for some packages.
+Some of the packages requires not only Emacs-Lisp code but also other
+binaries to work. Here is the list of binaries required for all the
+features.
+
+- Clang installation for LSP back-end.
+- Compiler or Interpreter for the targeting programming languages.
+- SQLite3 for org-roam.
+- Latex installation for =org-latex-preview=
+- [[https://github.com/BurntSushi/ripgrep][ripgrep]] for refactoring
+  support.
+- Hunspell installation for flyspell.
+- Ollama for ellama package.
+
+Note that none of those are hard requirements, you will simply lose some
+features if you don't have them.
+
+*** Binaries for Windows
+On Linux, those run-time requires can be easily satisfied with package managers
+like =apt-get= or =dnf install=. On windows, it's another story, for this purpose,
+I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for those dependencies on Windows.
+
+
