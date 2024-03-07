@@ -13,10 +13,11 @@
 
 (require 'cc-styles)
 
-(c-add-style "O3DE"
-	     '("linux"
-	       (c-basic-offset . 4)	; Guessed value
-	       (c-offsets-alist
+(defvar cc-file-style-o3de
+  (cons "O3DE"
+	'("linux"
+	  (c-basic-offset . 4)	; Guessed value
+	  (c-offsets-alist
 		(access-label . 0)	; Guessed value
 		(arglist-cont . 0)	; Guessed value
 		(arglist-intro . +)	; Guessed value
@@ -76,8 +77,7 @@
 		(module-open . 0)
 		(objc-method-args-cont . c-lineup-ObjC-method-args)
 		(objc-method-call-cont c-lineup-ObjC-method-call-colons c-lineup-ObjC-method-call +)
-		(objc-method-intro .
-				   [0])
+		(objc-method-intro . [0])
 		(statement . 0)
 		(statement-block-intro . +)
 		(statement-case-intro . +)
@@ -89,14 +89,13 @@
 		(substatement-label . 0)
 		(substatement-open . 0)
 		(template-args-cont c-lineup-template-args +)
-		(topmost-intro-cont . c-lineup-topmost-intro-cont))))
-
-
-(c-add-style "sparroh"
-	     '("linux"
-	       (c-basic-offset . 4)	; Guessed value
-	       (c-offsets-alist
-		(arglist-intro . +)	; Guessed value
+		(topmost-intro-cont . c-lineup-topmost-intro-cont)))))
+(defvar cc-file-style-sparroh
+  (cons "sparroh"
+	'("linux"
+	  (c-basic-offset . 4)	; Guessed value
+	  (c-offsets-alist
+	   (arglist-intro . +)	; Guessed value
 		(block-close . 0)	; Guessed value
 		(brace-list-close . 0)	; Guessed value
 		(brace-list-entry . 0)	; Guessed value
@@ -168,7 +167,9 @@
 		(string . -1000)
 		(substatement . +)
 		(substatement-label . 0)
-		(template-args-cont c-lineup-template-args +))))
-
+		(template-args-cont c-lineup-template-args +)))	))
 
 ;; Ref: https://stackoverflow.com/questions/39894233/extract-emacs-c-style-options-from-clang-format-style
+
+(provide 'cc-file-styles)
+;;cc-file-styles.el ends here

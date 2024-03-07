@@ -1,56 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; tree-sitter:  disabled for windows
-;;
-;; The difficult thing is to setup the indentations. See
-;; https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html
-;; also,
-;; https://casouri.github.io/note/2023/tree-sitter-starter-guide/index.html#Indentation
-;; is very useful.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (treesit-available-p)
-  (require 'treesit)
-
-  (defun my/indent-rules ()
-    `(;;here is my custom rule just to disable namespace indentation
-      ;;(setq treesit--indent-verbose t) to see if your rule works
-      ;;(treesit-check-indent c++-mode) to check your rules against c++-mode
-
-      ((n-p-gp "declaration" "declaration_list" "namespace_definition")
-       parent-bol 0)
-      ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
-      ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
-      ((n-p-gp "function_definition" "declaration_list" "namespace_definition")
-       parent-bol 0)
-      ((n-p-gp "template_declaration" "declaration_list" "namespace_definition")
-       parent-bol 0)
-      ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp)))
-    )
-
-  (use-package treesit-auto
-    :unless (eq system-type 'windows-nt) ;;treesit-auto does not work on windows?
-    :ensure t
-    :demand t
-    :custom
-    (c-ts-mode-indent-style #'my/indent-rules)
-    :config
-    (global-treesit-auto-mode)
-    (setq treesit-auto-install 'prompt))
-  (setq-default treesit-font-lock-level 3)
-  )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; languages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Elisp
-(use-package paredit
-  :ensure t :defer t :pin melpa
-  :hook ( (emacs-lisp-mode lisp-interaction-mode) . paredit-mode))
-
-(use-package rainbow-delimiters
-  :ensure t :defer t
-  :hook ((emacs-lisp-mode lisp-interaction-mode) . rainbow-delimiters-mode))
 
 ;; C family
 (use-package cc-mode
@@ -67,6 +17,12 @@
     (c-set-offset 'innamespace 0)
     (c-set-offset 'inline-open 0)
     )
+  :config
+  (require 'cc-file-styles)
+  (c-add-style (car cc-file-style-o3de)
+	       (cdr cc-file-style-o3de))
+  (c-add-style (car cc-file-style-sparroh)
+	       (cdr cc-file-style-sparroh))
   :hook
   ((c-mode-common . my/cmode-hook)))
 

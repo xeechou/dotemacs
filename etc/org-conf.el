@@ -13,7 +13,7 @@
   (org-log-done  'time)
   (org-clock-persist 'history)
   (org-adapt-indentation nil)
-  (org-image-actual-width nil)
+  (org-image-actual-width 300) ;;set to 300px
   ;;setup the column, this max length for the first level we can go, maybe we
   ;;can somehow calculate it?
   (org-tags-column -54)

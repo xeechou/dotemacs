@@ -1,5 +1,6 @@
 #+TITLE: My Vanilla yet powerful Emacs environment
 #+AUTHOR: Xichen Zhou
+#+OPTIONS: toc:1
 
 * Introduction
 For years I have been perfecting my Emacs configuration, it is now the
@@ -46,11 +47,11 @@ On Linux, those run-time requires can be easily satisfied with package managers
 like =apt-get= or =dnf install=. On windows, it's another story, for this purpose,
 I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for those dependencies on Windows.
 
-* Configuration
-** My personal function defines
+
+* My personal function defines
 All my functions are defined with prefix ~my/~.
 
-*** File operations
+** File operations
 #+begin_src emacs-lisp emacs-lisp
   (defun my/concat-path (&rest parts)
     (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
@@ -68,7 +69,7 @@ All my functions are defined with prefix ~my/~.
     (interactive)
     (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
 #+end_src
-*** Reload buffer for ~.dir-locals.el~
+** Reload buffer for ~.dir-locals.el~
 
 Sometimes you need to modify ~.dir-locals.el~ while editing. Following two functions helps you reload current buffer with modified ~.dir-locals.el~
 #+begin_src emacs-lisp
@@ -89,7 +90,7 @@ Sometimes you need to modify ~.dir-locals.el~ while editing. Following two funct
             (my/reload-dir-locals-for-current-buffer))))))  
 #+end_src
 
-*** Proxies functions
+** Proxies functions
 Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have two functions when you need to toggle on/off proxies.
 #+begin_src emacs-lisp
   (defun my/disable-proxy ()
@@ -124,7 +125,20 @@ Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have t
     )
 #+end_src
 
-** Global settings
+** Generate UUIDs
+#+begin_src emacs-lisp
+(use-package uuidgen
+  :ensure t
+  :pin melpa
+  :init
+  (defun my/insert-uuid ()
+    "insert UUID at the point"
+    (interactive)
+    (insert (uuidgen-4)))
+  )
+#+end_src
+
+* Global settings
 menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
 
 #+begin_src emacs-lisp
@@ -138,17 +152,18 @@ menu bar configuration. I disable tool bar and scroll bar for a minimalist look.
   (column-number-mode 1)
   (delete-selection-mode 1)
   ;;default to text mode
-  (setq-default major-mode 'markdown-mode)
+  (setq-default major-mode 'text-mode)
+  ;;displaying line numbers
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 
-
-*** Setup the default encoding environment
+** Setup the default encoding environment
 #+begin_src emacs-lisp
   (prefer-coding-system 'utf-8-unix)
   (set-default-coding-systems 'utf-8-unix)  
 #+end_src
 
-*** Backup files
+** Backup files
 copied from emacswiki
 #+begin_src emacs-lisp
 (setq
@@ -161,8 +176,8 @@ copied from emacswiki
    version-control t)       ; use versioned backups
 #+end_src
 
-** Editing/Keybindings
-*** Line operations 
+* Editing/Keybindings
+** Line operations 
 Define a backward kill a line:
 #+begin_src emacs-lisp
   (defun my/backward-kill-line (arg)
@@ -220,7 +235,7 @@ move line up and down:
 (define-key prog-mode-map (kbd "M-<down>") 'my/move-line-down)  
 #+end_src
 
-*** Moving in the mark ring
+** Moving in the mark ring
 backward-forward package helps us jump back-forward in the mark ring.
 #+begin_src emacs-lisp
   (use-package backward-forward
@@ -237,18 +252,29 @@ backward-forward package helps us jump back-forward in the mark ring.
                 ("<mouse-9>" . backward-forward-next-location)))
 #+end_src
 
-*** Window operations
+** Window operations
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x <up>") 'windmove-up)
   (global-set-key (kbd "C-x <down>") 'windmove-down)
   (global-set-key (kbd "C-x <left>") 'windmove-left)
   (global-set-key (kbd "C-x <right>") 'windmove-right)
 #+end_src
-*** Rectangle editing
+
+winner mode has two default keybinding
+- "C-c left" : for ~winner-undo~
+- "C-c right" : for ~winner-redo~
+#+begin_src emacs-lisp
+(use-package winner
+  :defer t
+  :diminish winner-mode
+  :hook ((prog-mode text-mode) . winner-mode))
+#+end_src
+
+** Rectangle editing
 #+begin_src emacs-lisp
   (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)  
 #+end_src
-*** IVY
+** IVY
 I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my editing need. Ivy is a multi-package setup. It contains ivy itself:
 #+begin_src emacs-lisp
 (use-package ivy :ensure t
@@ -261,7 +287,7 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
   (setq ivy-wrap t)
   )  
 #+end_src
-**** Counsel
+*** Counsel
 [[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
 #+begin_src emacs-lisp
 (use-package counsel :ensure t
@@ -283,7 +309,7 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
   ("C-c k" . counsel-rg))  
 #+end_src
 
-**** Counsel tramp
+*** Counsel tramp
 which I use for remote editing.
 #+begin_src emacs-lisp :noweb yes
 ;; using consuel-tramp
@@ -327,8 +353,12 @@ On windows, I use Plink for remote editing.
     )  
 #+end_src
 
+And also enable the ~.dir-locals.el~ on remote machine.
+#+begin_src emacs-lisp
+(setq enable-remote-dir-locals t)
+#+end_src
 
-*** Spell check
+** Spell check
 the excellent fly-spell to correct my common typing mistakes.
 #+begin_src emacs-lisp
 (use-package flyspell
@@ -369,9 +399,8 @@ Using our [[*IVY][IVY]] framework for correction prompts.
   :after (ivy flyspell-correct))    
 #+end_src
 
-
-** Appearance Settings
-*** Themes
+* Appearance Settings
+** Themes
 I have tried a few themes, not satisfied with most of them. Either the contrast is too high, or they are plain ugly. Among them, I like these themes.
 - [[https://github.com/nashamri/spacemacs-theme][spacemacs-theme]] : a well designed theme can be used for long time.
 - [[https://github.com/waymondo/apropospriate-theme][apropospriate-theme]] : low contrast yet colorful.
@@ -402,7 +431,7 @@ I use [[https://github.com/guidoschmidt/circadian.el][circadian.el]] to switch b
 #+end_src
 The package uses ~run-at-time~ to schedule theme change. It disable all your ~custom-enabled-themes~ and then load your desired theme. It also offer ~circadian-before-load-theme-hook~ and ~circadian-after-load-theme-hook~.
 
-*** Ligature and font settings
+** Ligature and font settings
 [[https://github.com/mickeynp/ligature.el][ligature]] is a typographical method to combine two or more glyphs or letters  to form a single glyph.
 
 #+begin_src emacs-lisp
@@ -436,19 +465,426 @@ I created a small package to manage my fixed width font(with ligature), proporti
 				   "Iosevka Aile")))  
 #+end_src
 
-** Programming Setup
-*** Display line numbers
+* Programming Setup
+** Project management 
+*** Magit for managing git repos
 #+begin_src emacs-lisp
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+;;sync
+(use-package magit
+  :ensure t
+  :bind ("C-x g" . magit-status))
+
+(use-package ssh-agency
+  :vc (:fetcher github :repo "magit/ssh-agency")
+  :hook (magit-credential . ssh-agency-ensure))
+#+end_src
+*** Projectile
+#+begin_src emacs-lisp
+
+(use-package projectile
+  :ensure t
+  :diminish projectile-mode
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map
+	      ("C-c p" . projectile-command-map))
+  :custom
+  (projectile-enable-caching t))
+#+end_src
+*** Color-rg for refactoring and code search.
+
+#+begin_src emacs-lisp
+(use-package color-rg
+  :vc (:fetcher github :repo "manateelazycat/color-rg")
+  :custom (color-rg-search-no-ignore-file nil))
 #+end_src
 
-** Miscellaneous
+** Editing packages
+*** [[https://github.com/xeechou/fmo-mode.el][fmo-mode]] for code re-formatting
+#+begin_src emacs-lisp
+(use-package fmo-mode
+  :vc (:fetcher github :repo "xeechou/fmo-mode.el")
+  :custom (fmo-ensure-formatters t)
+  :hook ((prog-mode . fmo-mode)))
+#+end_src
+
+*** Clean up the white spaces
+#+begin_src emacs-lisp
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :diminish whitespace-cleanup-mode
+  :hook ((prog-mode . whitespace-cleanup-mode)))
+#+end_src
+
+*** parenthesis management
+#+begin_src emacs-lisp
+  (use-package elec-pair
+    :diminish electric-pair-mode
+    :hook ((prog-mode text-mod outline-mode) . electric-pair-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package paren
+  :ensure t
+  :diminish show-paren-mode
+  :hook (prog-mode . show-paren-mode)
+  :config (setq show-paren-style 'parenthesis))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+  :ensure t :defer t
+  :hook ((emacs-lisp-mode lisp-interaction-mode) . rainbow-delimiters-mode))  
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package paredit
+  :ensure t :defer t :pin melpa
+  :hook ( (emacs-lisp-mode lisp-interaction-mode) . paredit-mode))  
+#+end_src
+
+*** fic-mode: keyword highlighting
+#+begin_src emacs-lisp
+(use-package fic-mode ;;show FIXME/TODO in comments
+  :vc (:fetcher github :repo "lewang/fic-mode")
+  :diminish fic-mode
+  :hook (prog-mode . fic-mode)
+  :custom (fic-highlighted-words '("FIXME" "TODO" "BUG" "NOTE")))
+#+end_src
+*** Snippets
+#+begin_src emacs-lisp
+;; yasnippet
+(use-package yasnippet-snippets
+  :ensure t
+  :config
+  (yas-reload-all)
+  :hook ((prog-mode outline-mode cmake-mode) . yas-minor-mode))
+#+end_src
+
+*** Column width setup
+#+begin_src emacs-lisp
+;; visual fill column
+(use-package visual-fill-column
+  :ensure t
+  :init
+  (setq-default fill-column 79)
+  :hook
+  (prog-mode . turn-on-auto-fill)
+  (visual-line-mode . visual-fill-column-mode)
+  ((text-mode outline-mode) . visual-line-mode)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+
+;; diminish some builtin packages
+(diminish 'eldoc-mode)
+(diminish 'abbrev-mode)
+#+end_src
+*** Hide show
+
+#+begin_src emacs-lisp
+(use-package hideif
+  :ensure t
+  :diminish hide-ifdef-mode
+  :hook ((c++-mode c++-ts-mode c-mode c-ts-mode)  . hide-ifdef-mode)
+  :config
+  (setq hide-ifdef-read-only t)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package hideshow
+  :hook ((prog-mode . hs-minor-mode)
+	 (nxml-mode . hs-minor-mode))
+  :diminish hs-minor-mode
+  :bind (;; the two map didn't work, polluting global map
+	 ("C-c C-h t" . hs-toggle-hiding)
+	 ("C-c C-h l" . hs-hide-level)
+	 ("C-c C-h a" . hs-hide-leafs)
+	 ("C-c C-h s" . hs-show-block)
+	 )
+  :config
+  (setq hs-isearch-open t)
+  (add-to-list 'hs-special-modes-alist
+	       '(nxml-mode
+		 "<!--\\|<[^/>]*[^/]>"
+		 "-->\\|</[^/>]*[^/]>"
+		 "<!--"
+		 sgml-skip-tag-forward
+		 nil))
+  :preface
+  (defun hs-hide-leafs-recursive (minp maxp)
+    "Hide blocks below point that do not contain further blocks in
+    region (MINP MAXP)."
+    (when (hs-find-block-beginning)
+      (setq minp (1+ (point)))
+      (funcall hs-forward-sexp-func 1)
+      (setq maxp (1- (point))))
+    (unless hs-allow-nesting
+      (hs-discard-overlays minp maxp))
+    (goto-char minp)
+    (let ((leaf t))
+      (while (progn
+	       (forward-comment (buffer-size))
+	       (and (< (point) maxp)
+		    (re-search-forward hs-block-start-regexp maxp t)))
+	(setq pos (match-beginning hs-block-start-mdata-select))
+	(if (hs-hide-leafs-recursive minp maxp)
+	    (save-excursion
+	      (goto-char pos)
+	      (hs-hide-block-at-point t)))
+	(setq leaf nil))
+      (goto-char maxp)
+      leaf))
+  (defun hs-hide-leafs ()
+    "Hide all blocks in the buffer that do not contain subordinate
+    blocks.  The hook `hs-hide-hook' is run; see `run-hooks'."
+    (interactive)
+    (hs-life-goes-on
+     (save-excursion
+       (message "Hiding blocks ...")
+       (save-excursion
+	 (goto-char (point-min))
+	 (hs-hide-leafs-recursive (point-min) (point-max)))
+       (message "Hiding blocks ... done"))
+     (run-hooks 'hs-hide-hook)))
+  )
+#+end_src
+
+** Tree-sitter
+[[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] is a new major mode managements package.
+
+*** Define indentation rules
+here is my custom rule just to disable namespace indentation ~(setq
+treesit--indent-verbose t)~ to see if your rule works ~(treesit-check-indent
+c++-mode)~ to check your rules against ~c++-mode~.
+
+#+begin_src emacs-lisp
+  (when (treesit-available-p)
+    (require 'treesit)
+
+    (defun my/indent-rules ()
+      `(
+        ((n-p-gp "declaration" "declaration_list" "namespace_definition")
+         parent-bol 0)
+        ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
+        ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
+        ((n-p-gp "function_definition" "declaration_list" "namespace_definition")
+         parent-bol 0)
+        ((n-p-gp "template_declaration" "declaration_list" "namespace_definition")
+         parent-bol 0)
+        ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp)))
+      ))
+  #+end_src
+
+The difficult thing is to setup the indentations. See [[https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html][gnu archive]] and this
+[[https://casouri.github.io/note/2023/tree-sitter-starter-guide/index.html#Indentation][blog-post]] is very useful.
+
+*** Treesit auto
+treesit-auto does not work on windows at moment.
+#+begin_src emacs-lisp
+  (use-package treesit-auto
+      :unless (or (eq system-type 'windows-nt)
+                  (not (treesit-available-p)))
+      :ensure t
+      :demand t
+      :custom
+      (c-ts-mode-indent-style #'my/indent-rules)
+      :config
+      (global-treesit-auto-mode)
+      (setq-default treesit-font-lock-level 3)      
+      (setq treesit-auto-install 'prompt))
+#+end_src
+
+** Company mode and LSP setup
+
+#+begin_src emacs-lisp
+(use-package company-c-headers :ensure t)
+;; (setq clang-known-modes '(c++-mode c-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package company
+  :ensure t
+  :defer t
+  :hook (((c++-mode c++-ts-mode) . company-mode)
+	 ((c-mode c-ts-mode)     . company-mode)
+	 ((c++-mode c++-ts-mode c-mode c-ts-mode) .
+	  ;;override default company backends because eglot not compatible with company-clang
+	  (lambda () (set (make-local-variable 'company-backends)
+			  '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
+	 (emacs-lisp-mode . company-mode)
+	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
+						    'company-elisp)))
+	 (outline-mode    . company-mode) ;;enable for org mode
+	 (outline-mode    . (lambda () (my/merge-list-to-list
+					(make-local-variable 'company-backends)
+					(list'company-dabbrev 'company-emoji))))
+	 (text-mode       . company-mode)
+	 (text-mode       . (lambda () (my/merge-list-to-list
+					(make-local-variable 'company-backends)
+					(list 'company-dabbrev 'company-emoji))))
+	 (meson-mode . company-mode)
+	 ;;cmake
+	 (cmake-mode . company-mode)
+	 (cmake-mode .  (lambda () (my/merge-list-to-list
+				    (make-local-variable 'company-backends)
+				    (list 'company-cmake 'company-dabbrev))))
+	 ;;lua
+	 (lua-mode . company-mode)
+	 (lua-mode . (lambda ()
+		       (add-to-list (make-local-variable 'company-backends)
+				    'company-lua)))
+	 ;; shaders
+	 (hlsl-mode . company-mode)
+	 (hlsl-mode . (lambda () (my/merge-list-to-list
+				  (make-local-variable 'company-backends)
+				  (list 'company-keywords 'company-dabbrev))))
+	 (azsl-mode . company-mode)
+	 (azsl-mode . (lambda () (my/merge-list-to-list
+				  (make-local-variable 'company-backends)
+				  (list 'company-keywords 'company-dabbrev))))
+	 (glsl-mode . company-mode)
+	 (glsl-mode . (lambda ()
+			(when (executable-find "glslangValidator")
+			  (add-to-list (make-local-variable 'company-backends)
+				       'company-glsl))))
+	 )
+  :config
+
+  (setq company-minimum-prefix-length 2
+	company-idle-delay 0.1
+	company-async-timeout 10
+	company-backends  '((company-files
+			     company-keywords
+			     company-yasnippet
+			     company-capf)))
+
+  (defun complete-or-indent ()
+    (interactive)
+    (if (company-manual-begin)
+	(company-complete-common)
+      (indent-according-to-mode)))
+  (defun indent-or-complete ()
+    (interactive)
+    (if (looking-at "\\_>")
+	(company-complete-common)
+      (indent-according-to-mode)))
+  )
+
+(use-package company-emoji
+  :defer t
+  :ensure t
+  :after company)
+
+(use-package company-glsl
+  :defer t
+  :ensure t
+  :after company)
+#+end_src
+** Eaglet mode
+It's builtin now
+#+begin_src emacs-lisp
+
+;; eglot configuration, switching to eglot after emacs 29
+(use-package eglot
+  :ensure t
+  :hook (((c++-mode c++-ts-mode) . eglot-ensure)
+	 ((c-mode c-ts-mode) . eglot-ensure)
+	 (python-mode . eglot-ensure))
+  :custom
+  (eglot-extend-to-xref t)
+  ;;inlay-hints are annoying
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  :config
+  ;;by default eglot forces company to only use company-capf, I lose a lot of
+  ;;backends in this way
+  (setq eglot-stay-out-of '(company))
+  ;;eldoc's multi-line mini buffer is really annoying, turn it off
+  (setq eldoc-echo-area-use-multiline-p nil)
+  ;;C++ requires clangd, python requires python-language server
+  :bind (:map eglot-mode-map
+	      ;; we just use the default binding here, so comment it out
+	      ;; ("M-." . xref-find-definitions)
+	      ;; ("M-?" . xref-find-references)
+	      ;; ("M-," . xref-go-back)
+	      ("C-c r"  . eglot-rename)
+	      ("C-c h"  . eldoc))
+  )
+#+end_src
+** Debugging
+*** Debugging with dap-mode.
+It is not ready, disable it now.
+#+begin_src emacs-lisp
+
+  (use-package dap-mode :ensure t :defer t
+    :disabled
+    :commands dap-debug
+    :after lsp-mode
+    :config
+    (dap-ui-mode)
+    (dap-ui-controls-mode)
+    (let ((dap-lldb-vscode-path (executable-find "lldb-vscode")))
+      (when dap-lldb-vscode-path
+        (require 'dap-lldb)
+        (setq dap-lldb-debug-program `(, dap-lldb-vscode-path))
+        (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
+        ))
+    )
+#+end_src
+*** [[https://github.com/rurban/rmsbolt][Rmsbolt]] mode
+#+begin_src emacs-lisp
+
+
+(use-package rmsbolt ;;compiler explorer in emacs
+  :ensure t
+  ;; rmsbolt changes keybinding C-c C-c, which is bonded to comment code.
+  ;; :bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))
+  :hook
+  ;;rmsbolt does not support tree-sitter. We have to manually set it, coping from
+  ;;rmsbolt.el
+  (rmsbolt-mode . (lambda ()
+		    (cond ((eq major-mode 'c-ts-mode)
+			   (setq rmsbolt-language-descriptor
+				 (make-rmsbolt-lang :compile-cmd "gcc"
+						    :supports-asm t
+						    :supports-disass t
+						    :demangler "c++filt"
+						    :compile-cmd-function #'rmsbolt--c-compile-cmd
+						    :disass-hidden-funcs
+						    rmsbolt--hidden-func-c)))
+			  ((eq major-mode 'c++-ts-mode)
+			   (setq rmsbolt-language-descriptor
+				 (make-rmsbolt-lang :compile-cmd "g++"
+						    :supports-asm t
+						    :supports-disass t
+						    :demangler "c++filt"
+						    :compile-cmd-function #'rmsbolt--c-compile-cmd
+						    :disass-hidden-funcs rmsbolt--hidden-func-c)))
+			  ) ;;cond
+
+		    ;;TODO adding GLSL/HLSL languages?
+		    )) ;;rmsbolt-mode-hook
+  )
+#+end_src
+
+* Miscellaneous
+** Common helpers
+
 [[https://github.com/garberw/openwith][openwith]] to open external program for file types.
 #+begin_src emacs-lisp
 (use-package openwith
   :vc (:fetcher github :repo "garberw/openwith" :rev "master")
   :init (openwith-mode 1)
   :config (setq openwith-associations '(("\\.pdf\\'" "sioyek" (file)))))  
+#+end_src
+
+
+#+begin_src emacs-lisp
+(use-package which-key :ensure t
+  :diminish which-key-mode
+  :hook ((prog-mode text-mode outline-mode) . which-key-mode))
 #+end_src
 
 pdftools _disabled_
@@ -469,7 +905,7 @@ pdftools _disabled_
   
 #+end_src
 
-*** Enable LLM with ellama
+** Enable LLM with ellama
 #+begin_src emacs-lisp
 (when (executable-find "ollama")
   (use-package ellama :ensure t
