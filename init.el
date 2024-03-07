@@ -82,11 +82,15 @@
        ;; disabled
        ;; (etc-dir   (expand-file-name "etc" dotfile-dir))
        ;; (etc-files (directory-files etc-dir t "\\.org$"))
-       (readme    (expand-file-name "README.org" dotfile-dir)))
+       (config-org  (expand-file-name "README.org" dotfile-dir))
+       (config-el   (expand-file-name "README.el"  dotfile-dir)))
   (require 'org)
   (require 'ob-tangle)
-  ;; load README.org
-  (org-babel-load-file readme t))
+  ;;tangle and load if newer than compiled
+  (if (or (not (file-exists-p config-el))
+          (file-newer-than-file-p config-org config-el))
+      (org-babel-load-file config-org t)
+    (load-file config-el)))
 
 ;; (require 'load-dir)
 ;; (load-dir (expand-file-name "etc" user-emacs-directory))
