@@ -1,16 +1,15 @@
 ;;make set-custom-variable elsewhere
-(customize-save-variable 'custom-file (expand-file-name "custom.el" user-emacs-directory))
-;; (unless (file-exists-p custom-file)
-;;   (write-region "(custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  )" nil custom-file))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(unless (file-exists-p custom-file)
+  (write-region "(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )" nil custom-file))
 
 
-(display-time)
-;; 1) this setting avoids subdirectory do not starts with letter or digit
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (let ((default-directory "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
@@ -19,10 +18,8 @@
 (when (fboundp 'native-compiled-async)
   (setq comp-deferred-compilation t
 	comp-deferred-compilation-black-list '("/mu4e.*\\.el$")))
-;;(setq warning-minimum-level :error)
-(setq visible-bell 1)
-;; disable org-roam warning
-(setq org-roam-v2-ack t)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;; MELPA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

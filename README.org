@@ -449,7 +449,8 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
     :after org
     :init
     <<ROAM_SQLITE>>
-
+    ;; disable org-roam warning
+    (setq org-roam-v2-ack t)
     (defun my/roam-dir () (my/org-file "pages/"))
     <<ROAM_VISIT>>
 
@@ -526,7 +527,6 @@ visiting roam pages using different other window. It's most case what you want.
   :ensure t
   :diminish org-roam-ui-mode
   :after org-roam
-  :hook (after-init . org-roam-ui-mode)
   :config
   (setq org-roam-ui-sync-theme nil
         org-roam-ui-follow t
