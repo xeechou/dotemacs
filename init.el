@@ -63,28 +63,36 @@
 ;;
 ;; since windows emacs shell is cmdproxy.exe, we will manually set the
 ;; environment variables
-(unless (package-installed-p 'exec-path-from-shell)
-  (use-package  exec-path-from-shell :ensure t))
+;; (unless (package-installed-p 'exec-path-from-shell)
+;;   (use-package  exec-path-from-shell :ensure t))
 
-(require 'exec-path-from-shell)
-(when (and (not (eq system-type 'windows-nt))
-	   (daemonp))
-  (dolist (var '("XDG_SESSION_TYPE"))
-    (add-to-list 'exec-path-from-shell-variables var))
-  (exec-path-from-shell-initialize))
+;; (require 'exec-path-from-shell)
+;; (when (and (not (eq system-type 'windows-nt))
+;;	   (daemonp))
+;;   (dolist (var '("XDG_SESSION_TYPE"))
+;;     (add-to-list 'exec-path-from-shell-variables var))
+;;   (exec-path-from-shell-initialize))
 
 ;;;;;;;;;;;; common functions ;;;;;;;;;;
 ;;set org_dir
-(defun my/concat-path (&rest parts)
-  (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
-(defun my/merge-list-to-list (dst-list src-list)
-  (dolist (item src-list) (add-to-list dst-list item)))
+
 
 ;;;;;;;;;;;; load user config ;;;;;;;;;;
 ;; we don't need do anything specificly for flyspell-mode so long as
 ;; you installed hunspell, make sure your emacs version is 24+
+
+(let* ((dotfile-dir (file-name-directory (or (buffer-file-name)
+					     load-file-name)))
+       (etc-dir   (expand-file-name "etc" dotfile-dir))
+       (readme    (expand-file-name "README.org" dotfile-dir))
+       (etc-files (directory-files etc-dir t "\\.org$")))
+  (require 'org)
+  (require 'ob-tangle)
+  ;; load README.org
+  (org-babel-load-file readme t))
+
 (require 'load-dir)
-(load-dir "~/.emacs.d/etc")
+(load-dir (expand-file-name "etc" user-emacs-directory))
 
 (require 'load-env-paths)
 (when (eq system-type 'windows-nt) ;;use it only for windows now

@@ -46,3 +46,6 @@ projectile-bookmarks.eld
 
 # LLM
 ellama-sessions/
+
+# Tangled files
+README.el*

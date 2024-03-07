@@ -1,7 +1,5 @@
-* My Vanilla yet powerful Emacs environment
-:PROPERTIES:
-:CUSTOM_ID: my-vanilla-yet-powerful-emacs-environment
-:END:
+#+TITLE: My Vanilla yet powerful Emacs environment
+#+AUTHOR: Xichen Zhou
 
 * Introduction
 For years I have been perfecting my Emacs configuration, it is now the
@@ -11,7 +9,7 @@ config snippets to work for you.
 
 Here is a list of incomplete features you get from this config set:
 - Clean configuration with [[https://github.com/jwiegley/use-package][use-package]]
- - Some programming language support.
+  - Some programming language support.
     + C/C++
     + Python
     + typescript.
@@ -48,4 +46,306 @@ On Linux, those run-time requires can be easily satisfied with package managers
 like =apt-get= or =dnf install=. On windows, it's another story, for this purpose,
 I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for those dependencies on Windows.
 
+* Configuration
+** My personal function defines
+All my functions are defined with prefix ~my/~.
 
+*** File operations
+#+begin_src emacs-lisp emacs-lisp
+  (defun my/concat-path (&rest parts)
+    (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
+
+  (defun my/merge-list-to-list (dst-list src-list)
+    (dolist (item src-list) (add-to-list dst-list item)))
+
+  (defun my/filename ()
+    "Copy the filename of the current buffer."
+    (interactive)
+    (kill-new (buffer-name (window-buffer (minibuffer-selected-window)))))
+
+  (defun my/full-path ()
+    "Copy the full path of the current buffer."
+    (interactive)
+    (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+#+end_src
+*** Reload buffer for ~.dir-locals.el~
+
+Sometimes you need to modify ~.dir-locals.el~ while editing. Following two functions helps you reload current buffer with modified ~.dir-locals.el~
+#+begin_src emacs-lisp
+  (defun my/reload-dir-locals-for-current-buffer ()
+    "reload dir locals for the current buffer"
+    (interactive)
+    (let ((enable-local-variables :all))
+      (hack-dir-local-variables-non-file-buffer)))
+
+  (defun my/reload-dir-locals-for-all-buffer-in-this-directory ()
+    "For every buffer with the same `default-directory` as the
+  current buffer's, reload dir-locals."
+    (interactive)
+    (let ((dir default-directory))
+      (dolist (buffer (buffer-list))
+        (with-current-buffer buffer
+          (when (equal default-directory dir)
+            (my/reload-dir-locals-for-current-buffer))))))  
+#+end_src
+
+*** Proxies functions
+Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have two functions when you need to toggle on/off proxies.
+#+begin_src emacs-lisp
+  (defun my/disable-proxy ()
+    "Disable the proxy used in emacs"
+    (interactive)
+    (setq url-proxy-services
+          `(("http" . nil)
+            ("https" . nil)
+            ("no_proxy" . ,(getenv "no_proxy"))))
+    ;;backup the proxy settings
+    (setenv "http_proxy_backup" (getenv "http_proxy"))
+    (setenv "https_proxy_backup" (getenv "https_proxy"))
+    (setenv "ftp_proxy_backup" (getenv "ftp_proxy"))
+    ;;clean up the proxy settings
+    (setenv "http_proxy" nil)
+    (setenv "https_proxy" nil)
+    (setenv "ftp_proxy" nil)
+    )
+
+  (defun my/enable-proxy ()
+    "Re-enable proxy from environment variables"
+    (interactive)
+    (setenv "http_proxy" (getenv "http_proxy_backup"))
+    (setenv "https_proxy" (getenv "https_proxy_backup"))
+    (setenv "ftp_proxy" (getenv "ftp_proxy_backup"))
+
+    (setq url-proxy-services
+          `(("http" . ,(getenv "http_proxy"))
+            ("https" . ,(getenv "https_proxy"))
+            ("ftp_proxy" . ,(getenv "ftp_proxy"))
+            ("no_proxy" . ,(getenv "no_proxy"))))
+    )
+#+end_src
+
+** Global settings
+menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
+
+#+begin_src emacs-lisp
+  (display-time)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq visible-bell 1)
+  ;;enabled global modes
+  (save-place-mode 1)
+  (global-auto-revert-mode t)
+  (column-number-mode 1)
+  (delete-selection-mode 1)
+  ;;default to text mode
+  (setq-default major-mode 'markdown-mode)
+#+end_src
+
+
+*** Setup the default encoding environment
+#+begin_src emacs-lisp
+  (prefer-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)  
+#+end_src
+
+*** Backup files
+copied from emacswiki
+#+begin_src emacs-lisp
+(setq
+   backup-by-copying t      ; don't clobber symlinks
+   backup-directory-alist
+    '(("." . "~/.saves/"))    ; don't litter my fs tree
+   delete-old-versions t
+   kept-new-versions 6
+   kept-old-versions 2
+   version-control t)       ; use versioned backups
+#+end_src
+
+** Key bindings
+*** Line operations 
+Define a backward kill a line:
+#+begin_src emacs-lisp
+  (defun my/backward-kill-line (arg)
+    "Kill ARG line backwards"
+    (interactive "p")
+    (kill-line (- 1 arg)))
+  (define-key prog-mode-map (kbd "C-c u") 'my/backward-kill-line)
+#+end_src
+
+Copy a line:
+#+begin_src emacs-lisp
+(defun my/copy-line ()
+  "copy current line, from the first character that is not \t or
+  ' ', to the last of that line, this feature is from vim.
+  Case to use this feature:
+  - repeat similar lines in the code.
+  "
+  (interactive)
+  (save-excursion
+    (back-to-indentation)
+    (let* ((beg (point))
+	   (end (line-end-position))
+	   (mystr (buffer-substring beg end)))
+      (kill-ring-save beg end)
+      (message "%s" mystr)))
+  ;;This is silly, find a way to print out last-kill.
+  )
+
+(define-key prog-mode-map (kbd "C-c C-k") 'my/copy-line)
+#+end_src
+
+move line up and down:
+#+begin_src emacs-lisp
+(defmacro save-column (&rest body)
+  `(let ((column (current-column)))
+     (unwind-protect
+         (progn ,@body)
+       (move-to-column column))))
+(put 'save-column 'lisp-indent-function 0)
+
+(defun my/move-line-up ()
+  (interactive)
+  (save-column
+    (transpose-lines 1)
+    (forward-line -2)))
+
+(defun my/move-line-down ()
+  (interactive)
+  (save-column
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1)))
+
+(define-key prog-mode-map (kbd "M-<up>") 'my/move-line-up)
+(define-key prog-mode-map (kbd "M-<down>") 'my/move-line-down)  
+#+end_src
+
+*** Moving in the mark ring
+backward-forward package helps us jump back-forward in the mark ring.
+#+begin_src emacs-lisp
+  (use-package backward-forward
+    :ensure t
+    :demand
+    :config
+    (backward-forward-mode t)
+    :bind (:map backward-forward-mode-map
+                ("<C-left>" . nil)
+                ("<C-right>" . nil)
+                ("C-c C-<left>" . backward-forward-previous-location)
+                ("C-c C-<right>" . backward-forward-next-location)
+                ("<mouse-8>" . backward-forward-previous-location)
+                ("<mouse-9>" . backward-forward-next-location)))
+#+end_src
+
+*** Window operations
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x <up>") 'windmove-up)
+  (global-set-key (kbd "C-x <down>") 'windmove-down)
+  (global-set-key (kbd "C-x <left>") 'windmove-left)
+  (global-set-key (kbd "C-x <right>") 'windmove-right)
+#+end_src
+*** Rectangle editing
+#+begin_src emacs-lisp
+  (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)  
+#+end_src
+
+
+** Appearance Settings
+*** Themes
+I have tried a few themes, not satisfied with most of them. Either the contrast is too high, or they are plain ugly. Among them, I like these themes.
+- [[https://github.com/nashamri/spacemacs-theme][spacemacs-theme]] : a well designed theme can be used for long time.
+- [[https://github.com/waymondo/apropospriate-theme][apropospriate-theme]] : low contrast yet colorful.
+- [[https://github.com/protesilaos/modus-themes][modus-themes]]: *current choice*. I like the tinted version of the theme, however I have to disable defer loading to make it work.
+
+#+begin_src emacs-lisp
+(use-package modus-themes
+  ;; TODO have to disable defer to get circadian to work
+  :ensure t
+  :init
+  (setq modus-themes-mixed-fonts t)
+  (setq modus-themes-common-palette-overrides
+	`(
+	  ;; From the section "Make the mode line borderless"
+	  (border-mode-line-active unspecified)
+	  (border-mode-line-inactive unspecified))))  
+#+end_src
+
+I use [[https://github.com/guidoschmidt/circadian.el][circadian.el]] to switch between light and dark theme. 
+#+begin_src emacs-lisp
+(use-package circadian
+  :ensure t
+  :config
+  (setq circadian-themes
+	'(("8:00" . modus-operandi-tinted)
+	  ("17:30" . modus-vivendi-tinted)))
+  (circadian-setup))
+#+end_src
+The package uses ~run-at-time~ to schedule theme change. It disable all your ~custom-enabled-themes~ and then load your desired theme. It also offer ~circadian-before-load-theme-hook~ and ~circadian-after-load-theme-hook~.
+
+*** Ligature and font settings
+[[https://github.com/mickeynp/ligature.el][ligature]] is a typographical method to combine two or more glyphs or letters  to form a single glyph.
+
+#+begin_src emacs-lisp
+(use-package ligature
+  :vc (:fetcher github :repo "mickeynp/ligature.el")
+  :if (string-match "HARFBUZZ" system-configuration-features)
+  :hook ((prog-mode text-mode) . ligature-mode)
+  :config
+  ;; Enable "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www")))  
+#+end_src
+
+I created a small package to manage my fixed width font(with ligature), proportional font, CJK font and emoji font.
+#+begin_src emacs-lisp
+(use-package appr
+  :load-path "lisp"
+  :hook (after-init . appr)
+  :custom
+  (appr-default-font-size 13)
+  (appr-cjk-font-list     '("WenQuanYi Micro Hei"
+			    "WenQuanYi Zen Hei"
+			    "Microsoft YaHei"
+			    "Microsoft JhengHei"))
+  (appr-emoji-font-list '("Noto Color Emoji"
+			  "Noto Emoji"
+			  "Segoe UI Emoji"
+			  "Symbola"
+			  "Apple Color Emoji"))
+
+  (appr-variable-pitch-font-list '("Fira Sans"
+				   "Iosevka Aile")))  
+#+end_src
+
+
+** Programming Setup
+*** Display line numbers
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
+
+** Miscellaneous
+[[https://github.com/garberw/openwith][openwith]] to open external program for file types.
+#+begin_src emacs-lisp
+(use-package openwith
+  :vc (:fetcher github :repo "garberw/openwith" :rev "master")
+  :init (openwith-mode 1)
+  :config (setq openwith-associations '(("\\.pdf\\'" "sioyek" (file)))))  
+#+end_src
+
+pdftools _disabled_
+#+begin_src emacs-lisp
+;; pdf-tools, only run this on windows
+(use-package pdf-tools
+  :if (eq system-type 'windows-nt)
+  :disabled
+  :defer t
+  :pin manual
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  :custom
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+  
+#+end_src
