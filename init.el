@@ -79,9 +79,10 @@
 
 (let* ((dotfile-dir (file-name-directory (or (buffer-file-name)
 					     load-file-name)))
-       (etc-dir   (expand-file-name "etc" dotfile-dir))
-       (readme    (expand-file-name "README.org" dotfile-dir))
-       (etc-files (directory-files etc-dir t "\\.org$")))
+       ;; disabled
+       ;; (etc-dir   (expand-file-name "etc" dotfile-dir))
+       ;; (etc-files (directory-files etc-dir t "\\.org$"))
+       (readme    (expand-file-name "README.org" dotfile-dir)))
   (require 'org)
   (require 'ob-tangle)
   ;; load README.org
