@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: break_src
+# key: bc_
+# breaking source code
+# --
+#+end_src
+
+#+begin_src ${1:emacs-lisp}

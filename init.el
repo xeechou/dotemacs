@@ -37,7 +37,7 @@
 ;;install use-package if we don't have, but package refresh-content gonna take
 ;;really long time
 (unless (package-installed-p 'use-package)
-  ;; (package-refresh-contents)
+  (package-refresh-contents)
   (package-install 'use-package)
   (package-install 'diminish))
 
@@ -63,19 +63,15 @@
 ;;
 ;; since windows emacs shell is cmdproxy.exe, we will manually set the
 ;; environment variables
-;; (unless (package-installed-p 'exec-path-from-shell)
-;;   (use-package  exec-path-from-shell :ensure t))
+(unless (package-installed-p 'exec-path-from-shell)
+  (use-package  exec-path-from-shell :ensure t))
 
-;; (require 'exec-path-from-shell)
-;; (when (and (not (eq system-type 'windows-nt))
-;;	   (daemonp))
-;;   (dolist (var '("XDG_SESSION_TYPE"))
-;;     (add-to-list 'exec-path-from-shell-variables var))
-;;   (exec-path-from-shell-initialize))
-
-;;;;;;;;;;;; common functions ;;;;;;;;;;
-;;set org_dir
-
+(require 'exec-path-from-shell)
+(when (and (not (eq system-type 'windows-nt))
+	   (daemonp))
+  (dolist (var '("XDG_SESSION_TYPE"))
+    (add-to-list 'exec-path-from-shell-variables var))
+  (exec-path-from-shell-initialize))
 
 ;;;;;;;;;;;; load user config ;;;;;;;;;;
 ;; we don't need do anything specificly for flyspell-mode so long as
@@ -91,8 +87,8 @@
   ;; load README.org
   (org-babel-load-file readme t))
 
-(require 'load-dir)
-(load-dir (expand-file-name "etc" user-emacs-directory))
+;; (require 'load-dir)
+;; (load-dir (expand-file-name "etc" user-emacs-directory))
 
 (require 'load-env-paths)
 (when (eq system-type 'windows-nt) ;;use it only for windows now
