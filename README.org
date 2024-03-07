@@ -1178,83 +1178,84 @@ treesit-auto does not work on windows at moment.
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package company
-  :ensure t
-  :defer t
-  :hook (((c++-mode c++-ts-mode) . company-mode)
-	 ((c-mode c-ts-mode)     . company-mode)
-	 ((c++-mode c++-ts-mode c-mode c-ts-mode) .
-	  ;;override default company backends because eglot not compatible with company-clang
-	  (lambda () (set (make-local-variable 'company-backends)
-			  '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
-	 (emacs-lisp-mode . company-mode)
-	 (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
-						    'company-elisp)))
-	 (outline-mode    . company-mode) ;;enable for org mode
-	 (outline-mode    . (lambda () (my/merge-list-to-list
-					(make-local-variable 'company-backends)
-					(list'company-dabbrev 'company-emoji))))
-	 (text-mode       . company-mode)
-	 (text-mode       . (lambda () (my/merge-list-to-list
-					(make-local-variable 'company-backends)
-					(list 'company-dabbrev 'company-emoji))))
-	 (meson-mode . company-mode)
-	 ;;cmake
-	 (cmake-mode . company-mode)
-	 (cmake-mode .  (lambda () (my/merge-list-to-list
-				    (make-local-variable 'company-backends)
-				    (list 'company-cmake 'company-dabbrev))))
-	 ;;lua
-	 (lua-mode . company-mode)
-	 (lua-mode . (lambda ()
-		       (add-to-list (make-local-variable 'company-backends)
-				    'company-lua)))
-	 ;; shaders
-	 (hlsl-mode . company-mode)
-	 (hlsl-mode . (lambda () (my/merge-list-to-list
-				  (make-local-variable 'company-backends)
-				  (list 'company-keywords 'company-dabbrev))))
-	 (azsl-mode . company-mode)
-	 (azsl-mode . (lambda () (my/merge-list-to-list
-				  (make-local-variable 'company-backends)
-				  (list 'company-keywords 'company-dabbrev))))
-	 (glsl-mode . company-mode)
-	 (glsl-mode . (lambda ()
-			(when (executable-find "glslangValidator")
-			  (add-to-list (make-local-variable 'company-backends)
-				       'company-glsl))))
-	 )
-  :config
+  (use-package company
+    :ensure t
+    :defer t
+    :hook (((c++-mode c++-ts-mode) . company-mode)
+           ((c-mode c-ts-mode)     . company-mode)
+           ((c++-mode c++-ts-mode c-mode c-ts-mode) .
+            ;;override default company backends because eglot not compatible with company-clang
+            (lambda () (set (make-local-variable 'company-backends)
+                            '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
+           (emacs-lisp-mode . company-mode)
+           ;; company-elisp is removed
+           ;; (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
+           ;;        				    'company-elisp)))
+           (outline-mode    . company-mode) ;;enable for org mode
+           (outline-mode    . (lambda () (my/merge-list-to-list
+                                          (make-local-variable 'company-backends)
+                                          (list'company-dabbrev 'company-emoji))))
+           (text-mode       . company-mode)
+           (text-mode       . (lambda () (my/merge-list-to-list
+                                          (make-local-variable 'company-backends)
+                                          (list 'company-dabbrev 'company-emoji))))
+           (meson-mode . company-mode)
+           ;;cmake
+           (cmake-mode . company-mode)
+           (cmake-mode .  (lambda () (my/merge-list-to-list
+                                      (make-local-variable 'company-backends)
+                                      (list 'company-cmake 'company-dabbrev))))
+           ;;lua
+           (lua-mode . company-mode)
+           (lua-mode . (lambda ()
+                         (add-to-list (make-local-variable 'company-backends)
+                                      'company-lua)))
+           ;; shaders
+           (hlsl-mode . company-mode)
+           (hlsl-mode . (lambda () (my/merge-list-to-list
+                                    (make-local-variable 'company-backends)
+                                    (list 'company-keywords 'company-dabbrev))))
+           (azsl-mode . company-mode)
+           (azsl-mode . (lambda () (my/merge-list-to-list
+                                    (make-local-variable 'company-backends)
+                                    (list 'company-keywords 'company-dabbrev))))
+           (glsl-mode . company-mode)
+           (glsl-mode . (lambda ()
+                          (when (executable-find "glslangValidator")
+                            (add-to-list (make-local-variable 'company-backends)
+                                         'company-glsl))))
+           )
+    :config
 
-  (setq company-minimum-prefix-length 2
-	company-idle-delay 0.1
-	company-async-timeout 10
-	company-backends  '((company-files
-			     company-keywords
-			     company-yasnippet
-			     company-capf)))
+    (setq company-minimum-prefix-length 2
+          company-idle-delay 0.1
+          company-async-timeout 10
+          company-backends  '((company-files
+                               company-keywords
+                               company-yasnippet
+                               company-capf)))
 
-  (defun complete-or-indent ()
-    (interactive)
-    (if (company-manual-begin)
-	(company-complete-common)
-      (indent-according-to-mode)))
-  (defun indent-or-complete ()
-    (interactive)
-    (if (looking-at "\\_>")
-	(company-complete-common)
-      (indent-according-to-mode)))
-  )
+    (defun complete-or-indent ()
+      (interactive)
+      (if (company-manual-begin)
+          (company-complete-common)
+        (indent-according-to-mode)))
+    (defun indent-or-complete ()
+      (interactive)
+      (if (looking-at "\\_>")
+          (company-complete-common)
+        (indent-according-to-mode)))
+    )
 
-(use-package company-emoji
-  :defer t
-  :ensure t
-  :after company)
+  (use-package company-emoji
+    :defer t
+    :ensure t
+    :after company)
 
-(use-package company-glsl
-  :defer t
-  :ensure t
-  :after company)
+  (use-package company-glsl
+    :defer t
+    :ensure t
+    :after company)
 #+end_src
 ** Eaglet mode
 It's builtin now
