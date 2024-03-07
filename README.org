@@ -1189,8 +1189,12 @@ treesit-auto does not work on windows at moment.
                             '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
            (emacs-lisp-mode . company-mode)
            ;; company-elisp is removed
-           ;; (emacs-lisp-mode . (lambda () (add-to-list (make-local-variable 'company-backends)
-           ;;        				    'company-elisp)))
+           (emacs-lisp-mode . (lambda () (my/merge-list-to-list
+                                          (make-local-variable 'company-backends)
+                                          (list
+                                           'company-dabbrev-code
+                                           'company-files
+                                           'company-keywords))))
            (outline-mode    . company-mode) ;;enable for org mode
            (outline-mode    . (lambda () (my/merge-list-to-list
                                           (make-local-variable 'company-backends)
