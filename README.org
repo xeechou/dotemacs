@@ -161,7 +161,7 @@ copied from emacswiki
    version-control t)       ; use versioned backups
 #+end_src
 
-** Key bindings
+** Editing/Keybindings
 *** Line operations 
 Define a backward kill a line:
 #+begin_src emacs-lisp
@@ -248,6 +248,126 @@ backward-forward package helps us jump back-forward in the mark ring.
 #+begin_src emacs-lisp
   (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)  
 #+end_src
+*** IVY
+I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my editing need. Ivy is a multi-package setup. It contains ivy itself:
+#+begin_src emacs-lisp
+(use-package ivy :ensure t
+  :diminish (ivy-mode . "")
+  :hook (after-init . ivy-mode)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  ;;number of result lines to display
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-wrap t)
+  )  
+#+end_src
+**** Counsel
+[[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
+#+begin_src emacs-lisp
+(use-package counsel :ensure t
+  :ensure t
+  :config
+  (use-package smex :ensure t)
+  :bind
+  ("C-s" . swiper)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ;;this collide
+  ("C-c C-u" . counsel-unicode-char)
+  ("C-c C-i" . counsel-info-lookup-symbol)
+  ("C-x t" . counsel-imenu)
+  ;;for git setup
+  ("C-c g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c L" . counsel-git-log)
+  ("C-c k" . counsel-rg))  
+#+end_src
+
+**** Counsel tramp
+which I use for remote editing.
+#+begin_src emacs-lisp :noweb yes
+;; using consuel-tramp
+(use-package counsel-tramp
+  :after (counsel tramp)
+  :ensure t
+  :init
+  (setq auth-source-save-behavior nil)  ;; don't store the password the package
+  ;; does not load immediately, if you have previous opened plinkw file in
+  ;; recentf, you may have error on buffer-switching, simply call counsel-tramp
+  ;; to load plinkw method in
+  :bind ("C-c s" . counsel-tramp)
+  ;; Here is the config to make trump work on windows; forget ssh, emacs will
+  ;; find /c/windows/system32/openssh first, the git ssh won't work either. For
+  ;; plink to work, you have to run pink in terminal first to add it to the
+  ;; REGISTRY, otherwise it will spit whole bunch of thing tramp will not
+  ;; understand.
+  :config
+  <<TRAMP>>
+  )
+  
+#+end_src
+
+On windows, I use Plink for remote editing.
+#+begin_src emacs-lisp :tangle no :noweb-ref TRAMP
+  (when (and (eq system-type 'windows-nt)  (executable-find "plink"))
+    (add-to-list 'tramp-methods
+		 `("plinkw"
+                   (tramp-login-program "plink")
+                   (tramp-login-args (("-l" "%u") ("-P" "%p") ("-t")
+				      ("%h") ("\"")
+				      (,(format
+                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
+                                         tramp-terminal-type
+                                         "$")) ;; This prompt will be
+				      ("/bin/sh") ("\"")))
+                   (tramp-remote-shell       "/bin/sh")
+                   (tramp-remote-shell-login ("-l"))
+                   (tramp-remote-shell-args  ("-c"))
+                   (tramp-default-port       22)))
+    )  
+#+end_src
+
+
+*** Spell check
+the excellent fly-spell to correct my common typing mistakes.
+#+begin_src emacs-lisp
+(use-package flyspell
+  :if (or (executable-find "ispell") (executable-find "hunspell") (executable-find "aspell"))
+  :defer t
+  :hook ((prog-mode . flyspell-prog-mode)
+	 (text-mode . flyspell-mode) ;;for markdown, org, nxml
+	 ;;also disable it for specific mode
+	 (change-log-mode . (turn-off-flyspell)))
+  :init
+  ;;for flyspell to work, you need to set LANG first
+  ;; on windows, getenv has strange behavior, getenv-internal seems to work correctly.
+  ;; (when (not (getenv-internal "LANG" initial-environment))
+  (setenv "LANG" "en_US")
+  :custom  (ispell-program-name (or (executable-find "hunspell")
+				    (executable-find "aspell")
+				    (executable-find "ispell")))
+  ;;:config
+  ;;TODO flyspell language-tool
+  )  
+#+end_src
+
+Flyspell correct
+#+begin_src emacs-lisp
+;; correcting word and save it to personal dictionary
+(use-package flyspell-correct
+  :ensure t
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-c ;" . flyspell-correct-wrapper)))
+#+end_src
+Using our [[*IVY][IVY]] framework for correction prompts.
+#+begin_src emacs-lisp
+(use-package flyspell-correct-ivy
+  ;;switch to use ivy interface
+  ;;TODO there is a face bug on popup interface
+  ;;NOTE: use M-o to access ivy menus
+  :ensure t
+  :after (ivy flyspell-correct))    
+#+end_src
 
 
 ** Appearance Settings
@@ -316,7 +436,6 @@ I created a small package to manage my fixed width font(with ligature), proporti
 				   "Iosevka Aile")))  
 #+end_src
 
-
 ** Programming Setup
 *** Display line numbers
 #+begin_src emacs-lisp
@@ -348,4 +467,17 @@ pdftools _disabled_
   :custom
   (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
   
+#+end_src
+
+*** Enable LLM with ellama
+#+begin_src emacs-lisp
+(when (executable-find "ollama")
+  (use-package ellama :ensure t
+    :init
+    ;; setup key bindings
+    (setopt ellama-keymap-prefix "C-c e")
+    ;; we only use the default model "zephyr:latest"
+    ;; TODO : adding new models
+    ;; language you want ellama to translate to
+    (setopt ellama-language "French")))
 #+end_src
