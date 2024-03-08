@@ -775,17 +775,18 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
   ("C-c C-u" . counsel-unicode-char)
   ("C-c C-i" . counsel-info-lookup-symbol)
   ("C-x t" . counsel-imenu)
+  ("C-c y" . counsel-yank-pop)
   ;;for git setup
   ("C-c g" . counsel-git)
   ("C-c j" . counsel-git-grep)
   ("C-c L" . counsel-git-log)
-  ("C-c k" . counsel-rg))  
+  ("C-c k" . counsel-rg))
 #+end_src
 
 *** Counsel tramp
 which I use for remote editing.
 #+begin_src emacs-lisp :noweb yes
-;; using consuel-tramp
+;; using counsel-tramp
 (use-package counsel-tramp
   :after (counsel tramp)
   :ensure t
