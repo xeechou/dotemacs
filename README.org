@@ -955,22 +955,26 @@ I created a small package to manage my fixed width font(with ligature), proporti
 *** Projectile
 #+begin_src emacs-lisp
 
-(use-package projectile
-  :ensure t
-  :diminish projectile-mode
-  :init
-  (projectile-mode +1)
-  :bind (:map projectile-mode-map
-	      ("C-c p" . projectile-command-map))
-  :custom
-  (projectile-enable-caching t))
+  (use-package projectile
+    :ensure t
+    :diminish projectile-mode
+    :init
+    (projectile-mode +1)
+    :bind (:map projectile-mode-map
+                ("C-c p" . projectile-command-map))
+    :custom
+    (projectile-enable-caching t))
+
+  (use-package projectile-ripgrep :ensure t :pin melpa :after projectile)
 #+end_src
 *** Color-rg for refactoring and code search.
 
 #+begin_src emacs-lisp
-(use-package color-rg
-  :vc (:fetcher github :repo "manateelazycat/color-rg")
-  :custom (color-rg-search-no-ignore-file nil))
+  (use-package color-rg
+    :vc (:fetcher github :repo "manateelazycat/color-rg")
+    :config (when (eq system-type 'windows-nt)
+              (setq color-rg-command-prefix "powershell"))
+    :custom (color-rg-search-no-ignore-file nil))
 #+end_src
 
 ** Editing packages
