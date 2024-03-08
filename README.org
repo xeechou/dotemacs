@@ -893,17 +893,11 @@ I have tried a few themes, not satisfied with most of them. Either the contrast 
 	  (border-mode-line-inactive unspecified))))  
 #+end_src
 
-I use [[https://github.com/guidoschmidt/circadian.el][circadian.el]] to switch between light and dark theme. 
-#+begin_src emacs-lisp
-(use-package circadian
-  :ensure t
-  :config
-  (setq circadian-themes
-	'(("8:00" . modus-operandi-tinted)
-	  ("17:30" . modus-vivendi-tinted)))
-  (circadian-setup))
+Now I setup my desired theme here
+#+begin_src emacs-lisp :tangle no :noweb-ref THEME
+  (setq appr-dark-theme-name 'modus-vivendi-tinted)
+  (setq appr-light-theme-name 'modus-operandi-tinted)
 #+end_src
-The package uses ~run-at-time~ to schedule theme change. It disable all your ~custom-enabled-themes~ and then load your desired theme. It also offer ~circadian-before-load-theme-hook~ and ~circadian-after-load-theme-hook~.
 
 ** Ligature and font settings
 [[https://github.com/mickeynp/ligature.el][ligature]] is a typographical method to combine two or more glyphs or letters  to form a single glyph.
@@ -919,24 +913,27 @@ The package uses ~run-at-time~ to schedule theme change. It disable all your ~cu
 #+end_src
 
 I created a small package to manage my fixed width font(with ligature), proportional font, CJK font and emoji font.
-#+begin_src emacs-lisp
-(use-package appr
-  :load-path "lisp"
-  :hook (after-init . appr)
-  :custom
-  (appr-default-font-size 13)
-  (appr-cjk-font-list     '("WenQuanYi Micro Hei"
-			    "WenQuanYi Zen Hei"
-			    "Microsoft YaHei"
-			    "Microsoft JhengHei"))
-  (appr-emoji-font-list '("Noto Color Emoji"
-			  "Noto Emoji"
-			  "Segoe UI Emoji"
-			  "Symbola"
-			  "Apple Color Emoji"))
+#+begin_src emacs-lisp :noweb yes
+  (use-package appr
+    :load-path "lisp"
+    :hook (after-init . appr)
+    :init
+    <<THEME>>
+    :custom
+    (appr-default-font-size 13)
+    (appr-cjk-font-list     '("WenQuanYi Micro Hei"
+                              "WenQuanYi Zen Hei"
+                              "Microsoft YaHei"
+                              "Microsoft JhengHei"))
+    (appr-emoji-font-list '("Noto Color Emoji"
+                            "Noto Emoji"
+                            "Segoe UI Emoji"
+                            "Symbola"
+                            "Apple Color Emoji"))
 
-  (appr-variable-pitch-font-list '("Fira Sans"
-				   "Iosevka Aile")))  
+    (appr-variable-pitch-font-list '("Fira Sans"
+                                     "Iosevka Aile"))
+    )  
 #+end_src
 
 * Programming Setup
