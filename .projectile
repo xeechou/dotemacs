@@ -1,0 +1,10 @@
+#ignore files
+-.cache/
+-.git/
+-*.elc
+-eln-cache/
+-org-roam.db
+-multisession/
+-tree-sitter/
+-README.elc
+

@@ -954,19 +954,21 @@ I created a small package to manage my fixed width font(with ligature), proporti
   :hook (magit-credential . ssh-agency-ensure))
 #+end_src
 *** Projectile
+There is not thing special here, we just add a key-map and use ~alien~ indexing method (git) across all platform.
 #+begin_src emacs-lisp
 
-  (use-package projectile
-    :ensure t
-    :diminish projectile-mode
-    :init
-    (projectile-mode +1)
-    :bind (:map projectile-mode-map
-                ("C-c p" . projectile-command-map))
-    :custom
-    (projectile-enable-caching t))
+    (use-package projectile
+      :ensure t
+      :diminish projectile-mode
+      :init
+      (projectile-mode +1)
+      :bind (:map projectile-mode-map
+                  ("C-c p" . projectile-command-map))
+      :custom
+      (projectile-enable-caching t)
+      (projectile-indexing-method 'alien))
 
-  (use-package projectile-ripgrep :ensure t :pin melpa :after projectile)
+    (use-package projectile-ripgrep :ensure t :pin melpa :after projectile)
 #+end_src
 *** Color-rg for refactoring and code search.
 

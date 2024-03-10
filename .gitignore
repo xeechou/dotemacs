@@ -38,6 +38,8 @@ server/
 multisession/
 tree-sitter/
 
+org-persist/
+
 #magit
 transient/*
 
