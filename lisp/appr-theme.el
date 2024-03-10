@@ -64,6 +64,7 @@
     (if (and (>= hour ltime) (<= hour dtime))
 	appr-light-theme-name appr-dark-theme-name)))
 
+;;;###autoload
 (defun appr-apply-theme ()
   ;;apply theme based on time
   (let ((theme (appr-theme-based-on-time)))

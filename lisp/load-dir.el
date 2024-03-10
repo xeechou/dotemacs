@@ -16,15 +16,8 @@
       (let* ((file (car files))
 	     (abs-file (concat expanded-dir "/" file)))
 
-	(if (string-match "\.elc?$" file) ;;it is a lisp file
-	    ;; don't load file if elc exists
-	    (prog2
-	      (if (file-exists-p (concat abs-file "c"))
-		  ())
-	      (load-file abs-file)
-	      )
-	  )
-	)
+	(when (string-match "\.el$" file)
+	  (load-file abs-file)))
       (setq files (cdr files)))
     )
   )

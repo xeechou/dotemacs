@@ -1,16 +1,15 @@
 ;;make set-custom-variable elsewhere
-(customize-save-variable 'custom-file (expand-file-name "custom.el" user-emacs-directory))
-;; (unless (file-exists-p custom-file)
-;;   (write-region "(custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  )" nil custom-file))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(unless (file-exists-p custom-file)
+  (write-region "(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )" nil custom-file))
 
 
-(display-time)
-;; 1) this setting avoids subdirectory do not starts with letter or digit
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (let ((default-directory "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
@@ -19,10 +18,8 @@
 (when (fboundp 'native-compiled-async)
   (setq comp-deferred-compilation t
 	comp-deferred-compilation-black-list '("/mu4e.*\\.el$")))
-;;(setq warning-minimum-level :error)
-(setq visible-bell 1)
-;; disable org-roam warning
-(setq org-roam-v2-ack t)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;; MELPA ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -37,7 +34,7 @@
 ;;install use-package if we don't have, but package refresh-content gonna take
 ;;really long time
 (unless (package-installed-p 'use-package)
-  ;; (package-refresh-contents)
+  (package-refresh-contents)
   (package-install 'use-package)
   (package-install 'diminish))
 
@@ -73,18 +70,27 @@
     (add-to-list 'exec-path-from-shell-variables var))
   (exec-path-from-shell-initialize))
 
-;;;;;;;;;;;; common functions ;;;;;;;;;;
-;;set org_dir
-(defun my/concat-path (&rest parts)
-  (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
-(defun my/merge-list-to-list (dst-list src-list)
-  (dolist (item src-list) (add-to-list dst-list item)))
-
 ;;;;;;;;;;;; load user config ;;;;;;;;;;
 ;; we don't need do anything specificly for flyspell-mode so long as
 ;; you installed hunspell, make sure your emacs version is 24+
-(require 'load-dir)
-(load-dir "~/.emacs.d/etc")
+
+(let* ((dotfile-dir (file-name-directory (or (buffer-file-name)
+					     load-file-name)))
+       ;; disabled
+       ;; (etc-dir   (expand-file-name "etc" dotfile-dir))
+       ;; (etc-files (directory-files etc-dir t "\\.org$"))
+       (config-org  (expand-file-name "README.org" dotfile-dir))
+       (config-el   (expand-file-name "README.el"  dotfile-dir)))
+  (require 'org)
+  (require 'ob-tangle)
+  ;;tangle and load if newer than compiled
+  (if (or (not (file-exists-p config-el))
+          (file-newer-than-file-p config-org config-el))
+      (org-babel-load-file config-org t)
+    (load-file config-el)))
+
+;; (require 'load-dir)
+;; (load-dir (expand-file-name "etc" user-emacs-directory))
 
 (require 'load-env-paths)
 (when (eq system-type 'windows-nt) ;;use it only for windows now

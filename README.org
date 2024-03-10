@@ -1,0 +1,1600 @@
+#+TITLE: My Vanilla yet powerful Emacs environment
+#+AUTHOR: Xichen Zhou
+#+OPTIONS: toc:1
+
+* Introduction
+For years I have been perfecting my Emacs configuration, it is now the
+essential part of my digital life. This is my personal configuration but
+you may also find it useful to your needs. Feel free to grab some of my
+config snippets to work for you.
+
+Here is a list of incomplete features you get from this config set:
+- Clean configuration with [[https://github.com/jwiegley/use-package][use-package]]
+- Many programming language support: C/C++, Python, typescript, golang, glsl and many others.
+- Some of my collected code snippets for different languages.
+- Code auto-complete support via eglot and [[https://company-mode.github.io/][Company-mode]].
+- Completion framework using [[https://github.com/abo-abo/swiper][Ivy]].
+- keybinding look-up with [[https://github.com/justbur/emacs-which-key][which-key]].
+- FlySpell support via Hunspell.
+- minimal LLM support through [[https://github.com/s-kostyaev/ellama][Ellama]].
+- many others.
+
+** Run-time requirement for some packages.
+Some of the packages requires not only Emacs-Lisp code but also other
+binaries to work. Here is the list of binaries required for all the
+features.
+
+- Clang installation for LSP back-end.
+- Compiler or Interpreter for the targeting programming languages.
+- SQLite3 for org-roam.
+- Latex installation for =org-latex-preview=
+- [[https://github.com/BurntSushi/ripgrep][ripgrep]] for refactoring
+  support.
+- Hunspell installation for flyspell.
+- Ollama for ellama package.
+
+Note that none of those are hard requirements, you will simply lose some
+features if you don't have them.
+
+*** Binaries for Windows
+On Linux, those run-time requires can be easily satisfied with package managers
+like =apt-get= or =dnf install=. On windows, it's another story, for this purpose,
+I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for those dependencies on Windows.
+
+
+* My personal function defines
+All my functions are defined with prefix ~my/~.
+
+** File operations
+#+begin_src emacs-lisp emacs-lisp
+  (defun my/concat-path (&rest parts)
+    (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
+
+  (defun my/merge-list-to-list (dst-list src-list)
+    (dolist (item src-list) (add-to-list dst-list item)))
+
+  (defun my/filename ()
+    "Copy the filename of the current buffer."
+    (interactive)
+    (kill-new (buffer-name (window-buffer (minibuffer-selected-window)))))
+
+  (defun my/full-path ()
+    "Copy the full path of the current buffer."
+    (interactive)
+    (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+#+end_src
+** Reload buffer for ~.dir-locals.el~
+
+Sometimes you need to modify ~.dir-locals.el~ while editing. Following two functions helps you reload current buffer with modified ~.dir-locals.el~
+#+begin_src emacs-lisp
+  (defun my/reload-dir-locals-for-current-buffer ()
+    "reload dir locals for the current buffer"
+    (interactive)
+    (let ((enable-local-variables :all))
+      (hack-dir-local-variables-non-file-buffer)))
+
+  (defun my/reload-dir-locals-for-all-buffer-in-this-directory ()
+    "For every buffer with the same `default-directory` as the
+  current buffer's, reload dir-locals."
+    (interactive)
+    (let ((dir default-directory))
+      (dolist (buffer (buffer-list))
+        (with-current-buffer buffer
+          (when (equal default-directory dir)
+            (my/reload-dir-locals-for-current-buffer))))))  
+#+end_src
+
+** Proxies functions
+Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have two functions when you need to toggle on/off proxies.
+#+begin_src emacs-lisp
+  (defun my/disable-proxy ()
+    "Disable the proxy used in emacs"
+    (interactive)
+    (setq url-proxy-services
+          `(("http" . nil)
+            ("https" . nil)
+            ("no_proxy" . ,(getenv "no_proxy"))))
+    ;;backup the proxy settings
+    (setenv "http_proxy_backup" (getenv "http_proxy"))
+    (setenv "https_proxy_backup" (getenv "https_proxy"))
+    (setenv "ftp_proxy_backup" (getenv "ftp_proxy"))
+    ;;clean up the proxy settings
+    (setenv "http_proxy" nil)
+    (setenv "https_proxy" nil)
+    (setenv "ftp_proxy" nil)
+    )
+
+  (defun my/enable-proxy ()
+    "Re-enable proxy from environment variables"
+    (interactive)
+    (setenv "http_proxy" (getenv "http_proxy_backup"))
+    (setenv "https_proxy" (getenv "https_proxy_backup"))
+    (setenv "ftp_proxy" (getenv "ftp_proxy_backup"))
+
+    (setq url-proxy-services
+          `(("http" . ,(getenv "http_proxy"))
+            ("https" . ,(getenv "https_proxy"))
+            ("ftp_proxy" . ,(getenv "ftp_proxy"))
+            ("no_proxy" . ,(getenv "no_proxy"))))
+    )
+#+end_src
+
+** Generate UUIDs
+#+begin_src emacs-lisp
+(use-package uuidgen
+  :ensure t
+  :pin melpa
+  :init
+  (defun my/insert-uuid ()
+    "insert UUID at the point"
+    (interactive)
+    (insert (uuidgen-4)))
+  )
+#+end_src
+
+* Global settings
+menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
+
+#+begin_src emacs-lisp
+  (display-time)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq visible-bell 1)
+  ;;enabled global modes
+  (save-place-mode 1)
+  (global-auto-revert-mode t)
+  (column-number-mode 1)
+  (delete-selection-mode 1)
+  ;;default to text mode
+  (setq-default major-mode 'text-mode)
+  ;;displaying line numbers
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+#+end_src
+
+** Setup the default encoding environment
+#+begin_src emacs-lisp
+  (prefer-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)  
+#+end_src
+
+** Backup files
+copied from emacswiki
+#+begin_src emacs-lisp
+(setq
+   backup-by-copying t      ; don't clobber symlinks
+   backup-directory-alist
+    '(("." . "~/.saves/"))    ; don't litter my fs tree
+   delete-old-versions t
+   kept-new-versions 6
+   kept-old-versions 2
+   version-control t)       ; use versioned backups
+#+end_src
+
+* Org mode settings
+** Convenience functions
+#+begin_src emacs-lisp
+(require 'org-funcs)
+(defun my/org-dir-set (dir)
+  (and dir (not (string= dir "")) (file-exists-p dir)))
+(defun my/org-file (path)
+  (my/concat-path org-directory path))
+#+end_src
+** Org-mode
+#+begin_src emacs-lisp :noweb yes
+  (use-package org
+    :ensure t
+    :mode (("\\.org$" . org-mode))
+    :commands org-capture
+    :custom
+    (org-log-done  'time)
+    (org-clock-persist 'history)
+    (org-adapt-indentation nil)
+    (org-image-actual-width 300) ;;set to 300px
+    ;;setup the column, this max length for the first level we can go, maybe we
+    ;;can somehow calculate it?
+    (org-tags-column -54)
+  
+    ;;faces
+    (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
+
+    :hook
+    ((org-after-todo-statistics . org-funcs-summary-todo)
+     (org-checkbox-statistics . org-funcs-checkbox-todo)
+     (org-mode . org-funcs-define-faces))
+    ;; I am not sure this global key setting is good or not, capture stuff
+    ;; globally is great
+    :bind (:map global-map
+                ("\C-ca"   . org-agenda)
+                ("\C-cc"   . org-capture)
+                :map org-mode-map
+                ("M-<left>"  . org-metaleft)
+                ("M-<right>" . org-metaright)
+                ("M-<up>"    . org-metaup)
+                ("M-<down>"  . org-metadown))
+    :init
+    <<ORG_DIRECTORY>>
+
+    ;; enable images
+    (setq org-startup-with-inline-images t)
+
+    ;;activate babel languages
+    :config
+    ;;note files
+    <<ORG_NOTE_AGENDA>>
+    ;;latex setup
+    <<ORG_LATEX>>
+
+    (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+    (org-clock-persistence-insinuate)
+    ;; I just use PEND to define stuck projects.
+    (setq org-stuck-projects
+          '("/-DONE-CANC" ("DOIN" "TODO") nil ""))
+    ;;capture templates
+
+    (setq org-capture-templates
+          `(
+            <<ORG_CAPTURE>>            
+            ))
+    (org-funcs-load-babel-compiler))
+#+end_src
+*** Org directory setup
+org-directory has to have trailing "/"  
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_DIRECTORY
+  (setq org-directory (if (my/org-dir-set (getenv "ORG_DIR"))
+                          (getenv "ORG_DIR")
+                        "~/org/")) 
+#+end_src
+
+*** Agenda setup
+I divide my agenda files to the following:
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_NOTE_AGENDA
+  (setq org-default-notes-file
+        (my/concat-path org-directory "notes.org"))
+
+  (setq org-agenda-files
+          (list (my/concat-path org-directory "reading.org")
+                (my/concat-path org-directory "writing.org")
+                (my/concat-path org-directory "coding.org")
+                (my/concat-path org-directory "social.org")
+                (my/concat-path org-directory "thoughts.org")
+                (my/concat-path org-directory "goals-habits.org")
+                (my/concat-path org-directory "miscs.org")))
+#+end_src
+
+Show unplanned tasks in global TODO list.
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_NOTE_AGENDA
+    (setq org-agenda-skip-scheduled-if-done t)
+    (setq org-agenda-skip-deadline-if-done t)
+    (setq org-agenda-todo-ignore-deadlines t)
+    (setq org-agenda-todo-ignore-scheduled t)
+    (setq org-deadline-warning-days 7)
+#+end_src
+
+log the agenda states into drawer, instead of insert inside org files.
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_NOTE_AGENDA
+    (setq org-log-into-drawer t)    
+#+end_src
+
+It will prevent from inserting a state directly under headings.
+- State "DONE"       from "DOIN"       [2024-02-26 Mon 08:50]
+Instead it will be inside a ~:LOGBOOK:~
+
+*** Capture templates
+Put int ~misc.org~
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
+  ;; misc tasks, moving coding or writing later?
+  ("m" "Miscs" entry
+               (file+headline ,(my/org-file "miscs.org") "Tasks")
+               "* TODO %?\n%i\n  %a" :prepend t)
+#+end_src
+
+Capture some ideas in ~thoughts.org~
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
+  ;; my ideas
+  ("s" "Thoughts" entry
+   (file+headline ,(my/org-file "thoughts.org") "Ideas")
+   "* %?\n %i\n \n\n"
+   :prepend t)
+#+end_src
+
+Something to read.
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
+  ;; Learning items
+  ("r" "Reading" entry
+   (file+headline ,(my/org-file "reading.org") "Articles")
+   "** TODO %?\n%i\n %^L\n \n"
+   :prepend t) ;;why the linebreak didn't work?
+#+end_src
+
+Reviews.
+#+begin_src  emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
+  ("p" "Review+Planning" entry
+   (file+headline ,(my/org-file "goals-habits.org") "Review+TODOs+Plan+Journal")
+   "**** On %t\n***** Planned:\n\n %i \n "
+   :prepend t)
+#+end_src
+
+*** Latex setup in org
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_LATEX
+  
+  (setq org-preview-latex-default-process 'dvipng)
+  (setq org-preview-latex-image-directory
+        (my/concat-path temporary-file-directory
+                       "ltximg/"))
+  ;;set latex preview scale
+  (setq org-format-latex-options (plist-put
+                                  org-format-latex-options :scale 2.0))  
+#+end_src
+
+On archlinux, you need to install
+- texlive-basic
+- texlive-bin
+- texlive-latex
+- texlive-lateextra
+- texlive-latexrecommanded
+- texlive-pictures,
+- texlive-plangeneric
+
+
+** Org journal
+#+begin_src emacs-lisp :noweb yes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; journal
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-journal
+  :ensure t :pin melpa :after org :defer t
+  :init
+  (defun my/journal-dir () (my/org-file "journals/"))
+  (defun my/org-journal-find-location ()
+    ;; Open today's journal, but specify a non-nil prefix argument in order to
+    ;; inhibit inserting the heading; org-capture will insert the heading.
+    (org-journal-new-entry t)
+    (unless (eq org-journal-file-type 'daily)
+      (org-narrow-to-subtree))
+    (goto-char (point-max)))
+
+  (with-eval-after-load 'org
+    (add-to-list 'org-capture-templates
+		 '("j" "Journal entry" plain (function org-journal-find-location)
+                   "\n** %?"
+                   :jump-to-captured t
+		   :immediate-finish t
+		   :prepend t)))
+  :custom
+  (org-journal-file-type 'daily)
+  (org-journal-dir (my/org-file "journals/"))
+  (org-journal-time-format "")
+  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-file-header "#+title: %A, %d %B %Y\n\n* Review:\n \n* Planning:\n")
+  (org-journal-enable-agenda-integration t)
+
+  :bind-keymap
+  ("C-c n j" . org-journal-mode-map)
+  :bind (:map org-journal-mode-map
+	      ("C-f" . org-journal-next-entry)
+	      ("C-b" . org-journal-previous-entry)
+	      ("C-s" . org-journal-search))
+  )
+
+#+end_src
+** Org mode appearance setup
+
+#+begin_src emacs-lisp
+
+(use-package mixed-pitch
+  :ensure t
+  :hook
+  (org-mode . mixed-pitch-mode)
+  :custom
+  (mixed-pitch-variable-pitch-cursor 'box))
+
+(use-package org-modern
+  :ensure t
+  :after org
+  :hook
+  (org-mode . org-modern-mode)
+  (org-agenda-finalize . org-modern-agenda)
+  :custom
+  (org-startup-indented t)
+  (org-hide-emphasis-markers t)
+  (line-spaceing 0.3)
+
+  (org-fontify-done-headline nil)
+  :config
+  ;; (let* ((base-font-color     (face-foreground 'default nil 'default))
+  ;;        (headline           `(:inherit default :weight bold
+  ;; 					:foreground ,base-font-color)))
+  ;;   (custom-theme-set-faces
+  ;;    'user
+  ;;    `(org-level-8 ((t (,@headline))))
+  ;;    `(org-level-7 ((t (,@headline))))
+  ;;    `(org-level-6 ((t (,@headline))))
+  ;;    `(org-level-5 ((t (,@headline))))
+  ;;    `(org-level-4 ((t (,@headline :background unspecified :height 1.1))))
+  ;;    `(org-level-3 ((t (,@headline :background unspecified :height 1.25))))
+  ;;    `(org-level-2 ((t (,@headline :background unspecified :height 1.5))))
+  ;;    `(org-level-1 ((t (,@headline :background unspecified :height 2.0))))
+  ;;    `(org-document-title ((t (,@headline :underline nil))))
+  ;;    )
+  ;;   )
+
+  (custom-theme-set-faces
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+  )
+
+#+end_src
+** Org Roam
+Setting the correct org-roam connector based on version. Emacs-29, which uses emacs builtin sqlite library, prior to that, it uses sqlite utilities from OS.
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_SQLITE
+  (if (version< emacs-version "29.0")
+      (setq org-roam-database-connector 'sqlite)
+    (setq org-roam-database-connector 'sqlite-builtin))  
+#+end_src
+
+#+begin_src emacs-lisp :noweb yes
+  (use-package org-roam
+    :ensure t
+    :after org
+    :init
+    <<ROAM_SQLITE>>
+    ;; disable org-roam warning
+    (setq org-roam-v2-ack t)
+    (defun my/roam-dir () (my/org-file "pages/"))
+    <<ROAM_VISIT>>
+
+    :custom
+    (org-roam-directory (my/org-file "pages/"))
+    (org-roam-completion-everywhere t)
+    (org-roam-db-update-on-save t)
+    ;;template for v2
+    (org-roam-capture-templates
+     '(
+       <<ROAM_CAPTURES>>
+       ))
+    ;; displaying tags along with title for org roam
+    (org-roam-node-display-template
+     (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
+    :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
+            ("C-c n f" . org-roam-node-find)
+            ("C-c n c" . org-roam-capture)
+            ("C-c n i" . org-roam-node-insert)
+            ("C-c n g" . org-roam-ui-mode)
+            :map org-roam-mode-map
+            ;;NOTE alternatively, use C-u RET to visit in other window
+            ("RET" . my/roam-visit))
+    :config
+    ;;start db sync automatically, also you are able to refresh back link buffer,
+    ;;alternatively you hook org-roam-db-auto-sync-mode to org-roam-mode
+    (org-roam-db-autosync-enable)
+    ;; configure org-roam-buffer
+    <<ROAM_BUFFER>>
+    )
+#+end_src
+*** Roam templates
+Mostly I only use default template
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_CAPTURES
+       ("d" "default" plain "%?"
+        :if-new (file+head "${slug}.org"
+                           "#+title: ${title}\n#+filetags: %^{org-roam-tags}\n#+created: %u\n")
+        :unnarrowed t
+        :jump-to-captured t)  
+#+end_src
+
+Optionally, create a note from clipboard.
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_CAPTURES
+       ("l" "clipboard" plain (function org-roam--capture-get-point)
+        "%c"
+        :file-name "${slug}"
+        :head "#+title: ${title}\n#+created: %u\n#+last_modified: %U\n\
+  ,#+ROAM_TAGS: %?\n"
+        :unnarrowed t
+        :prepend t
+        :jump-to-captured t)  
+#+end_src
+*** Roam buffer
+visiting roam pages using different other window. It's most case what you want.
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_VISIT
+  (defun my/roam-visit () (interactive) (org-roam-node-visit
+                                         (org-roam-node-at-point) 'other-window))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_BUFFER
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (display-buffer-in-previous-window)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer)))
+#+end_src
+
+** Org roam UI
+#+begin_src emacs-lisp
+(use-package org-roam-ui
+  :ensure t
+  :diminish org-roam-ui-mode
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme nil
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+#+end_src
+** Org utilities
+*** Clipboard
+#+begin_src emacs-lisp
+
+(use-package org-cliplink
+  :ensure t
+  :bind (:map org-mode-map
+	      ("C-c C-p i" . org-cliplink)
+	      ("C-c C-p l" . org-store-link)))
+#+end_src
+*** Org download
+#+begin_src emacs-lisp
+;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-download
+  :ensure t :after org
+  :init
+  (defun my/org-dir-is-fixed (currdir)
+    (let ((org-dir     (file-truename org-directory))     ;;get abs path
+	  (roam-dir    (file-truename (my/roam-dir)))     ;;get abs path
+	  (journal-dir (file-truename (my/journal-dir)))) ;;get abs path
+      (or (string= currdir org-dir)
+	  (string= currdir roam-dir)
+	  (string= currdir journal-dir))))
+  :hook
+  ;;this hook will run at-startup because of org-clock, and we do not have a
+  ;;(buffer-file-name) then, so we need to error check it
+  (org-mode . (lambda ()
+		(when (buffer-file-name)
+		  (let ((currdir (file-name-directory (buffer-file-name))))
+		    ;;set org-download-iamge-dir to imgs/ if is
+		    ;;agenda/roam/journal, otherwise it is temporary, make it nil
+		    (set (make-local-variable 'org-download-image-dir)
+			 (if (my/org-dir-is-fixed currdir)
+			     (my/concat-path currdir "imgs/")
+			   nil))))))
+  :bind (:map org-mode-map
+	      ("C-c d s" . org-download-screenshot)
+	      ("C-c d y" . org-download-yank)
+	      ("C-c d c" . org-download-clipboard)))
+
+#+end_src
+*** Org-ref
+using the IVY framework 
+#+begin_src emacs-lisp
+(use-package ivy-bibtex
+  :ensure t
+  :after org
+  :init
+  (setq bibtex-completion-bibliography `,(my/org-file "bib/references.bib")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-ref
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-ref
+  :ensure t
+  :after org
+  :init
+  (require 'org-ref-arxiv)
+  (require 'org-ref-scopus)
+  (require 'org-ref-wos)
+  (require 'org-ref-ivy)
+  (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+	org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+	org-ref-insert-label-function 'org-ref-insert-label-link
+	org-ref-insert-ref-function 'org-ref-insert-ref-link
+	org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
+  ;; setup auto generating bibtex keys
+  (require 'bibtex)
+  (setq bibtex-autokey-year-length 4
+	bibtex-autokey-name-year-separator "-"
+	bibtex-autokey-year-title-separator "-"
+	bibtex-autokey-titleword-separator "-"
+	bibtex-autokey-titlewords 2
+	bibtex-autokey-titlewords-stretch 1
+	bibtex-autokey-titleword-length 5)
+  ;; export to pdf with bibtex
+  ;;this is when you don't have latexmk
+  (setq org-latex-pdf-process
+	(if (executable-find "latexmk")
+	    ;;when you have latexmk
+	    (list "latexmk -shell-escape -bibtex -f -pdf %f")
+	  ;;when you don't have latexmk
+	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
+	    "bibtex %b" ;;using bibtex here, or you can use biber
+	    "pdflatex -interaction nonstopmode -output-directory %o %f"
+	    "pdflatex -interaction nonstopmode -output-directory %o %f")))
+
+  :bind (:map org-mode-map
+	      ("C-c [" . org-ref-insert-link-hydra/body)
+	      ("C-c ]" . org-ref-insert-link))
+  )
+
+#+end_src
+** Org Contrib
+#+begin_src emacs-lisp
+(use-package org-contrib
+  :ensure t
+  :after org
+  :init
+  (require 'ox-groff))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; disabled-config
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; My synchronizer
+;; (use-package org-msync :load-path "lisp/"
+;;   :hook ((org-mode . org-msync-after-save-hook)
+;; 	 (auto-save . org-msync-auto-save-hook))
+;;   :custom
+;;   (org-msync-local-dir org-directory)
+;;   (org-msync-remote-dir "~/Documents/org-remote/")
+;;   )
+#+end_src
+
+* Editing/Keybindings
+** Line operations 
+Define a backward kill a line:
+#+begin_src emacs-lisp
+  (defun my/backward-kill-line (arg)
+    "Kill ARG line backwards"
+    (interactive "p")
+    (kill-line (- 1 arg)))
+  (define-key prog-mode-map (kbd "C-c u") 'my/backward-kill-line)
+#+end_src
+
+Copy a line:
+#+begin_src emacs-lisp
+(defun my/copy-line ()
+  "copy current line, from the first character that is not \t or
+  ' ', to the last of that line, this feature is from vim.
+  Case to use this feature:
+  - repeat similar lines in the code.
+  "
+  (interactive)
+  (save-excursion
+    (back-to-indentation)
+    (let* ((beg (point))
+	   (end (line-end-position))
+	   (mystr (buffer-substring beg end)))
+      (kill-ring-save beg end)
+      (message "%s" mystr)))
+  ;;This is silly, find a way to print out last-kill.
+  )
+
+(define-key prog-mode-map (kbd "C-c C-k") 'my/copy-line)
+#+end_src
+
+move line up and down:
+#+begin_src emacs-lisp
+(defmacro save-column (&rest body)
+  `(let ((column (current-column)))
+     (unwind-protect
+         (progn ,@body)
+       (move-to-column column))))
+(put 'save-column 'lisp-indent-function 0)
+
+(defun my/move-line-up ()
+  (interactive)
+  (save-column
+    (transpose-lines 1)
+    (forward-line -2)))
+
+(defun my/move-line-down ()
+  (interactive)
+  (save-column
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1)))
+
+(define-key prog-mode-map (kbd "M-<up>") 'my/move-line-up)
+(define-key prog-mode-map (kbd "M-<down>") 'my/move-line-down)  
+#+end_src
+
+** Moving in the mark ring
+backward-forward package helps us jump back-forward in the mark ring.
+#+begin_src emacs-lisp
+  (use-package backward-forward
+    :ensure t
+    :demand
+    :config
+    (backward-forward-mode t)
+    :bind (:map backward-forward-mode-map
+                ("<C-left>" . nil)
+                ("<C-right>" . nil)
+                ("C-c C-<left>" . backward-forward-previous-location)
+                ("C-c C-<right>" . backward-forward-next-location)
+                ("<mouse-8>" . backward-forward-previous-location)
+                ("<mouse-9>" . backward-forward-next-location)))
+#+end_src
+
+** Window operations
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x <up>") 'windmove-up)
+  (global-set-key (kbd "C-x <down>") 'windmove-down)
+  (global-set-key (kbd "C-x <left>") 'windmove-left)
+  (global-set-key (kbd "C-x <right>") 'windmove-right)
+#+end_src
+
+winner mode has two default keybinding
+- "C-c left" : for ~winner-undo~
+- "C-c right" : for ~winner-redo~
+#+begin_src emacs-lisp
+(use-package winner
+  :defer t
+  :diminish winner-mode
+  :hook ((prog-mode text-mode) . winner-mode))
+#+end_src
+
+** Rectangle editing
+#+begin_src emacs-lisp
+  (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)  
+#+end_src
+** IVY
+I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my editing need. Ivy is a multi-package setup. It contains ivy itself:
+#+begin_src emacs-lisp
+(use-package ivy :ensure t
+  :diminish (ivy-mode . "")
+  :hook (after-init . ivy-mode)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  ;;number of result lines to display
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-wrap t)
+  )  
+#+end_src
+*** Counsel
+[[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
+#+begin_src emacs-lisp
+(use-package counsel :ensure t
+  :ensure t
+  :config
+  (use-package smex :ensure t)
+  :bind
+  ("C-s" . swiper)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ;;this collide
+  ("C-c C-u" . counsel-unicode-char)
+  ("C-c C-i" . counsel-info-lookup-symbol)
+  ("C-x t" . counsel-imenu)
+  ("C-c y" . counsel-yank-pop)
+  ;;for git setup
+  ("C-c g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c L" . counsel-git-log)
+  ("C-c k" . counsel-rg))
+#+end_src
+
+*** Counsel tramp
+which I use for remote editing.
+#+begin_src emacs-lisp :noweb yes
+;; using counsel-tramp
+(use-package counsel-tramp
+  :after (counsel tramp)
+  :ensure t
+  :init
+  (setq auth-source-save-behavior nil)  ;; don't store the password the package
+  ;; does not load immediately, if you have previous opened plinkw file in
+  ;; recentf, you may have error on buffer-switching, simply call counsel-tramp
+  ;; to load plinkw method in
+  :bind ("C-c s" . counsel-tramp)
+  ;; Here is the config to make trump work on windows; forget ssh, emacs will
+  ;; find /c/windows/system32/openssh first, the git ssh won't work either. For
+  ;; plink to work, you have to run pink in terminal first to add it to the
+  ;; REGISTRY, otherwise it will spit whole bunch of thing tramp will not
+  ;; understand.
+  :config
+  <<TRAMP>>
+  )
+  
+#+end_src
+
+On windows, I use Plink for remote editing.
+#+begin_src emacs-lisp :tangle no :noweb-ref TRAMP
+  (when (and (eq system-type 'windows-nt)  (executable-find "plink"))
+    (add-to-list 'tramp-methods
+		 `("plinkw"
+                   (tramp-login-program "plink")
+                   (tramp-login-args (("-l" "%u") ("-P" "%p") ("-t")
+				      ("%h") ("\"")
+				      (,(format
+                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
+                                         tramp-terminal-type
+                                         "$")) ;; This prompt will be
+				      ("/bin/sh") ("\"")))
+                   (tramp-remote-shell       "/bin/sh")
+                   (tramp-remote-shell-login ("-l"))
+                   (tramp-remote-shell-args  ("-c"))
+                   (tramp-default-port       22)))
+    )  
+#+end_src
+
+And also enable the ~.dir-locals.el~ on remote machine.
+#+begin_src emacs-lisp
+(setq enable-remote-dir-locals t)
+#+end_src
+
+** Spell check
+the excellent fly-spell to correct my common typing mistakes.
+#+begin_src emacs-lisp
+(use-package flyspell
+  :if (or (executable-find "ispell") (executable-find "hunspell") (executable-find "aspell"))
+  :defer t
+  :hook ((prog-mode . flyspell-prog-mode)
+	 (text-mode . flyspell-mode) ;;for markdown, org, nxml
+	 ;;also disable it for specific mode
+	 (change-log-mode . (turn-off-flyspell)))
+  :init
+  ;;for flyspell to work, you need to set LANG first
+  ;; on windows, getenv has strange behavior, getenv-internal seems to work correctly.
+  ;; (when (not (getenv-internal "LANG" initial-environment))
+  (setenv "LANG" "en_US")
+  :custom  (ispell-program-name (or (executable-find "hunspell")
+				    (executable-find "aspell")
+				    (executable-find "ispell")))
+  ;;:config
+  ;;TODO flyspell language-tool
+  )  
+#+end_src
+
+Flyspell correct
+#+begin_src emacs-lisp
+;; correcting word and save it to personal dictionary
+(use-package flyspell-correct
+  :ensure t
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-c ;" . flyspell-correct-wrapper)))
+#+end_src
+Using our [[*IVY][IVY]] framework for correction prompts.
+#+begin_src emacs-lisp
+(use-package flyspell-correct-ivy
+  ;;switch to use ivy interface
+  ;;TODO there is a face bug on popup interface
+  ;;NOTE: use M-o to access ivy menus
+  :ensure t
+  :after (ivy flyspell-correct))    
+#+end_src
+
+* Appearance Settings
+** Themes
+I have tried a few themes, not satisfied with most of them. Either the contrast is too high, or they are plain ugly. Among them, I like these themes.
+- [[https://github.com/nashamri/spacemacs-theme][spacemacs-theme]] : a well designed theme can be used for long time.
+- [[https://github.com/waymondo/apropospriate-theme][apropospriate-theme]] : low contrast yet colorful.
+- [[https://github.com/protesilaos/modus-themes][modus-themes]]: *current choice*. I like the tinted version of the theme, however I have to disable defer loading to make it work.
+
+#+begin_src emacs-lisp
+(use-package modus-themes
+  ;; TODO have to disable defer to get circadian to work
+  :ensure t
+  :init
+  (setq modus-themes-mixed-fonts t)
+  (setq modus-themes-common-palette-overrides
+	`(
+	  ;; From the section "Make the mode line borderless"
+	  (border-mode-line-active unspecified)
+	  (border-mode-line-inactive unspecified))))  
+#+end_src
+
+Now I setup my desired theme here
+#+begin_src emacs-lisp :tangle no :noweb-ref THEME
+  (setq appr-dark-theme-name 'modus-vivendi-tinted)
+  (setq appr-light-theme-name 'modus-operandi-tinted)
+  (setq appr-dark-theme-hour 17)
+  (setq appr-light-theme-hour 8)
+#+end_src
+
+My setup uses ~run-with-timer~ every hour to check the if it's time to change the theme, so it may not change the theme at desired time. *NOTE*: Originally I was using [[https://github.com/guidoschmidt/circadian.el][circadian.el]] but unfortunately that package has misuse of ~run-at-time~ that leads to heavy CPU spikes. See the [[https://github.com/guidoschmidt/circadian.el/issues/28][issue]] for details. I would need to fix that bug if want to switch back to circadian.
+
+** Ligature and font settings
+[[https://github.com/mickeynp/ligature.el][ligature]] is a typographical method to combine two or more glyphs or letters  to form a single glyph.
+
+#+begin_src emacs-lisp
+(use-package ligature
+  :vc (:fetcher github :repo "mickeynp/ligature.el")
+  :if (string-match "HARFBUZZ" system-configuration-features)
+  :hook ((prog-mode text-mode) . ligature-mode)
+  :config
+  ;; Enable "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www")))  
+#+end_src
+
+I created a small package to manage my fixed width font(with ligature), proportional font, CJK font and emoji font.
+#+begin_src emacs-lisp :noweb yes
+  (use-package appr
+    :load-path "lisp"
+    :hook (after-init . appr)
+    :init
+    <<THEME>>
+    :custom
+    (appr-default-font-size 13)
+    (appr-cjk-font-list     '("WenQuanYi Micro Hei"
+                              "WenQuanYi Zen Hei"
+                              "Microsoft YaHei"
+                              "Microsoft JhengHei"))
+    (appr-emoji-font-list '("Noto Color Emoji"
+                            "Noto Emoji"
+                            "Segoe UI Emoji"
+                            "Symbola"
+                            "Apple Color Emoji"))
+
+    (appr-variable-pitch-font-list '("Fira Sans"
+                                     "Iosevka Aile"))
+    )  
+#+end_src
+
+* Programming Setup
+** Project management 
+*** Magit for managing git repos
+#+begin_src emacs-lisp
+;;sync
+(use-package magit
+  :ensure t
+  :bind ("C-x g" . magit-status))
+
+(use-package ssh-agency
+  :vc (:fetcher github :repo "magit/ssh-agency")
+  :hook (magit-credential . ssh-agency-ensure))
+#+end_src
+*** Projectile
+#+begin_src emacs-lisp
+
+  (use-package projectile
+    :ensure t
+    :diminish projectile-mode
+    :init
+    (projectile-mode +1)
+    :bind (:map projectile-mode-map
+                ("C-c p" . projectile-command-map))
+    :custom
+    (projectile-enable-caching t))
+
+  (use-package projectile-ripgrep :ensure t :pin melpa :after projectile)
+#+end_src
+*** Color-rg for refactoring and code search.
+
+#+begin_src emacs-lisp
+  (use-package color-rg
+    :vc (:fetcher github :repo "manateelazycat/color-rg")
+    :config (when (eq system-type 'windows-nt)
+              (setq color-rg-command-prefix "powershell"))
+    :custom (color-rg-search-no-ignore-file nil))
+#+end_src
+
+** Editing packages
+*** [[https://github.com/xeechou/fmo-mode.el][fmo-mode]] for code re-formatting
+#+begin_src emacs-lisp
+(use-package fmo-mode
+  :vc (:fetcher github :repo "xeechou/fmo-mode.el")
+  :custom (fmo-ensure-formatters t)
+  :hook ((prog-mode . fmo-mode)))
+#+end_src
+
+*** Clean up the white spaces
+#+begin_src emacs-lisp
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :diminish whitespace-cleanup-mode
+  :hook ((prog-mode . whitespace-cleanup-mode)))
+#+end_src
+
+*** parenthesis management
+#+begin_src emacs-lisp
+  (use-package elec-pair
+    :diminish electric-pair-mode
+    :hook ((prog-mode text-mod outline-mode) . electric-pair-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package paren
+  :ensure t
+  :diminish show-paren-mode
+  :hook (prog-mode . show-paren-mode)
+  :config (setq show-paren-style 'parenthesis))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+  :ensure t :defer t
+  :hook ((emacs-lisp-mode lisp-interaction-mode) . rainbow-delimiters-mode))  
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package paredit
+  :ensure t :defer t :pin melpa
+  :hook ( (emacs-lisp-mode lisp-interaction-mode) . paredit-mode))  
+#+end_src
+
+*** fic-mode: keyword highlighting
+#+begin_src emacs-lisp
+(use-package fic-mode ;;show FIXME/TODO in comments
+  :vc (:fetcher github :repo "lewang/fic-mode")
+  :diminish fic-mode
+  :hook (prog-mode . fic-mode)
+  :custom (fic-highlighted-words '("FIXME" "TODO" "BUG" "NOTE")))
+#+end_src
+*** Snippets
+#+begin_src emacs-lisp
+;; yasnippet
+(use-package yasnippet-snippets
+  :ensure t
+  :config
+  (yas-reload-all)
+  :hook ((prog-mode outline-mode cmake-mode) . yas-minor-mode))
+#+end_src
+
+*** Column width setup
+#+begin_src emacs-lisp
+;; visual fill column
+(use-package visual-fill-column
+  :ensure t
+  :init
+  (setq-default fill-column 79)
+  :hook
+  (prog-mode . turn-on-auto-fill)
+  (visual-line-mode . visual-fill-column-mode)
+  ((text-mode outline-mode) . visual-line-mode)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+
+;; diminish some builtin packages
+(diminish 'eldoc-mode)
+(diminish 'abbrev-mode)
+#+end_src
+*** Hide show
+
+#+begin_src emacs-lisp
+(use-package hideif
+  :ensure t
+  :diminish hide-ifdef-mode
+  :hook ((c++-mode c++-ts-mode c-mode c-ts-mode)  . hide-ifdef-mode)
+  :config
+  (setq hide-ifdef-read-only t)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package hideshow
+  :hook ((prog-mode . hs-minor-mode)
+	 (nxml-mode . hs-minor-mode))
+  :diminish hs-minor-mode
+  :bind (;; the two map didn't work, polluting global map
+	 ("C-c C-h t" . hs-toggle-hiding)
+	 ("C-c C-h l" . hs-hide-level)
+	 ("C-c C-h a" . hs-hide-leafs)
+	 ("C-c C-h s" . hs-show-block)
+	 )
+  :config
+  (setq hs-isearch-open t)
+  (add-to-list 'hs-special-modes-alist
+	       '(nxml-mode
+		 "<!--\\|<[^/>]*[^/]>"
+		 "-->\\|</[^/>]*[^/]>"
+		 "<!--"
+		 sgml-skip-tag-forward
+		 nil))
+  :preface
+  (defun hs-hide-leafs-recursive (minp maxp)
+    "Hide blocks below point that do not contain further blocks in
+    region (MINP MAXP)."
+    (when (hs-find-block-beginning)
+      (setq minp (1+ (point)))
+      (funcall hs-forward-sexp-func 1)
+      (setq maxp (1- (point))))
+    (unless hs-allow-nesting
+      (hs-discard-overlays minp maxp))
+    (goto-char minp)
+    (let ((leaf t))
+      (while (progn
+	       (forward-comment (buffer-size))
+	       (and (< (point) maxp)
+		    (re-search-forward hs-block-start-regexp maxp t)))
+	(setq pos (match-beginning hs-block-start-mdata-select))
+	(if (hs-hide-leafs-recursive minp maxp)
+	    (save-excursion
+	      (goto-char pos)
+	      (hs-hide-block-at-point t)))
+	(setq leaf nil))
+      (goto-char maxp)
+      leaf))
+  (defun hs-hide-leafs ()
+    "Hide all blocks in the buffer that do not contain subordinate
+    blocks.  The hook `hs-hide-hook' is run; see `run-hooks'."
+    (interactive)
+    (hs-life-goes-on
+     (save-excursion
+       (message "Hiding blocks ...")
+       (save-excursion
+	 (goto-char (point-min))
+	 (hs-hide-leafs-recursive (point-min) (point-max)))
+       (message "Hiding blocks ... done"))
+     (run-hooks 'hs-hide-hook)))
+  )
+#+end_src
+
+** Tree-sitter
+[[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] is a new major mode managements package.
+
+*** Define indentation rules
+here is my custom rule just to disable namespace indentation ~(setq
+treesit--indent-verbose t)~ to see if your rule works ~(treesit-check-indent
+c++-mode)~ to check your rules against ~c++-mode~.
+
+#+begin_src emacs-lisp
+  (when (treesit-available-p)
+    (require 'treesit)
+
+    (defun my/indent-rules ()
+      `(
+        ((n-p-gp "declaration" "declaration_list" "namespace_definition")
+         parent-bol 0)
+        ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
+        ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
+        ((n-p-gp "function_definition" "declaration_list" "namespace_definition")
+         parent-bol 0)
+        ((n-p-gp "template_declaration" "declaration_list" "namespace_definition")
+         parent-bol 0)
+        ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp)))
+      ))
+  #+end_src
+
+The difficult thing is to setup the indentations. See [[https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html][gnu archive]] and this
+[[https://casouri.github.io/note/2023/tree-sitter-starter-guide/index.html#Indentation][blog-post]] is very useful.
+
+*** Treesit auto
+treesit-auto does not work on windows at moment.
+#+begin_src emacs-lisp
+  (use-package treesit-auto
+      :unless (or (eq system-type 'windows-nt)
+                  (not (treesit-available-p)))
+      :ensure t
+      :demand t
+      :custom
+      (c-ts-mode-indent-style #'my/indent-rules)
+      :config
+      (global-treesit-auto-mode)
+      (setq-default treesit-font-lock-level 3)      
+      (setq treesit-auto-install 'prompt))
+#+end_src
+
+** Company mode and LSP setup
+
+#+begin_src emacs-lisp
+(use-package company-c-headers :ensure t)
+;; (setq clang-known-modes '(c++-mode c-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :defer t
+    :hook (((c++-mode c++-ts-mode) . company-mode)
+           ((c-mode c-ts-mode)     . company-mode)
+           ((c++-mode c++-ts-mode c-mode c-ts-mode) .
+            ;;override default company backends because eglot not compatible with company-clang
+            (lambda () (set (make-local-variable 'company-backends)
+                            '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
+           (emacs-lisp-mode . company-mode)
+           ;; company-elisp is removed
+           (emacs-lisp-mode . (lambda () (my/merge-list-to-list
+                                          (make-local-variable 'company-backends)
+                                          (list
+                                           'company-dabbrev-code
+                                           'company-files
+                                           'company-keywords))))
+           (outline-mode    . company-mode) ;;enable for org mode
+           (outline-mode    . (lambda () (my/merge-list-to-list
+                                          (make-local-variable 'company-backends)
+                                          (list'company-dabbrev 'company-emoji))))
+           (text-mode       . company-mode)
+           (text-mode       . (lambda () (my/merge-list-to-list
+                                          (make-local-variable 'company-backends)
+                                          (list 'company-dabbrev 'company-emoji))))
+           (meson-mode . company-mode)
+           ;;cmake
+           (cmake-mode . company-mode)
+           (cmake-mode .  (lambda () (my/merge-list-to-list
+                                      (make-local-variable 'company-backends)
+                                      (list 'company-cmake 'company-dabbrev))))
+           ;;lua
+           (lua-mode . company-mode)
+           (lua-mode . (lambda ()
+                         (add-to-list (make-local-variable 'company-backends)
+                                      'company-lua)))
+           ;; shaders
+           (hlsl-mode . company-mode)
+           (hlsl-mode . (lambda () (my/merge-list-to-list
+                                    (make-local-variable 'company-backends)
+                                    (list 'company-keywords 'company-dabbrev))))
+           (azsl-mode . company-mode)
+           (azsl-mode . (lambda () (my/merge-list-to-list
+                                    (make-local-variable 'company-backends)
+                                    (list 'company-keywords 'company-dabbrev))))
+           (glsl-mode . company-mode)
+           (glsl-mode . (lambda ()
+                          (when (executable-find "glslangValidator")
+                            (add-to-list (make-local-variable 'company-backends)
+                                         'company-glsl))))
+           )
+    :config
+
+    (setq company-minimum-prefix-length 2
+          company-idle-delay 0.1
+          company-async-timeout 10
+          company-backends  '((company-files
+                               company-keywords
+                               company-yasnippet
+                               company-capf)))
+
+    (defun complete-or-indent ()
+      (interactive)
+      (if (company-manual-begin)
+          (company-complete-common)
+        (indent-according-to-mode)))
+    (defun indent-or-complete ()
+      (interactive)
+      (if (looking-at "\\_>")
+          (company-complete-common)
+        (indent-according-to-mode)))
+    )
+
+  (use-package company-emoji
+    :defer t
+    :ensure t
+    :after company)
+
+  (use-package company-glsl
+    :defer t
+    :ensure t
+    :after company)
+#+end_src
+** Eaglet mode
+It's builtin now
+#+begin_src emacs-lisp
+
+;; eglot configuration, switching to eglot after emacs 29
+(use-package eglot
+  :ensure t
+  :hook (((c++-mode c++-ts-mode) . eglot-ensure)
+	 ((c-mode c-ts-mode) . eglot-ensure)
+	 (python-mode . eglot-ensure))
+  :custom
+  (eglot-extend-to-xref t)
+  ;;inlay-hints are annoying
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  :config
+  ;;by default eglot forces company to only use company-capf, I lose a lot of
+  ;;backends in this way
+  (setq eglot-stay-out-of '(company))
+  ;;eldoc's multi-line mini buffer is really annoying, turn it off
+  (setq eldoc-echo-area-use-multiline-p nil)
+  ;;C++ requires clangd, python requires python-language server
+  :bind (:map eglot-mode-map
+	      ;; we just use the default binding here, so comment it out
+	      ;; ("M-." . xref-find-definitions)
+	      ;; ("M-?" . xref-find-references)
+	      ;; ("M-," . xref-go-back)
+	      ("C-c r"  . eglot-rename)
+	      ("C-c h"  . eldoc))
+  )
+#+end_src
+** Debugging
+*** Debugging with dap-mode.
+It is not ready, disable it now.
+#+begin_src emacs-lisp
+
+  (use-package dap-mode :ensure t :defer t
+    :disabled
+    :commands dap-debug
+    :after lsp-mode
+    :config
+    (dap-ui-mode)
+    (dap-ui-controls-mode)
+    (let ((dap-lldb-vscode-path (executable-find "lldb-vscode")))
+      (when dap-lldb-vscode-path
+        (require 'dap-lldb)
+        (setq dap-lldb-debug-program `(, dap-lldb-vscode-path))
+        (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
+        ))
+    )
+#+end_src
+*** [[https://github.com/rurban/rmsbolt][Rmsbolt]] mode
+#+begin_src emacs-lisp
+
+
+(use-package rmsbolt ;;compiler explorer in emacs
+  :ensure t
+  ;; rmsbolt changes keybinding C-c C-c, which is bonded to comment code.
+  ;; :bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))
+  :hook
+  ;;rmsbolt does not support tree-sitter. We have to manually set it, coping from
+  ;;rmsbolt.el
+  (rmsbolt-mode . (lambda ()
+		    (cond ((eq major-mode 'c-ts-mode)
+			   (setq rmsbolt-language-descriptor
+				 (make-rmsbolt-lang :compile-cmd "gcc"
+						    :supports-asm t
+						    :supports-disass t
+						    :demangler "c++filt"
+						    :compile-cmd-function #'rmsbolt--c-compile-cmd
+						    :disass-hidden-funcs
+						    rmsbolt--hidden-func-c)))
+			  ((eq major-mode 'c++-ts-mode)
+			   (setq rmsbolt-language-descriptor
+				 (make-rmsbolt-lang :compile-cmd "g++"
+						    :supports-asm t
+						    :supports-disass t
+						    :demangler "c++filt"
+						    :compile-cmd-function #'rmsbolt--c-compile-cmd
+						    :disass-hidden-funcs rmsbolt--hidden-func-c)))
+			  ) ;;cond
+
+		    ;;TODO adding GLSL/HLSL languages?
+		    )) ;;rmsbolt-mode-hook
+  )
+#+end_src
+
+** Languages
+*** C family
+#+begin_src emacs-lisp
+;; C family
+(use-package cc-mode
+  :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
+	 ("\\.m\\'" . c-mode)
+	 ("\\.mm\\'" . c++-mode)
+	 ("\\.inl\\'" . c++-mode))
+  :preface
+  (defun my/cmode-hook ()
+    ;;default settings
+    (setq c-default-style "linux"
+	  c-basic-offset 8)
+    (c-set-offset 'inextern-lang 0)
+    (c-set-offset 'innamespace 0)
+    (c-set-offset 'inline-open 0)
+    )
+  :config
+  (require 'cc-file-styles)
+  (c-add-style (car cc-file-style-o3de)
+	       (cdr cc-file-style-o3de))
+  (c-add-style (car cc-file-style-sparroh)
+	       (cdr cc-file-style-sparroh))
+  :hook
+  ((c-mode-common . my/cmode-hook)))
+#+end_src
+*** Build Scripts
+#+begin_src emacs-lisp
+;;cmake
+(use-package cmake-mode
+  :ensure t
+  :config
+  :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
+	 ("\\.cmake\\'" . cmake-mode)))
+#+end_src
+
+#+begin_src emacs-lisp
+  ;;mesonbuild
+  (use-package meson-mode
+    :ensure t
+    :defer t
+    :mode (("/meson\\.build\\'" . meson-mode))
+    )
+#+end_src
+
+*** Shader languages
+GLSL
+#+begin_src emacs-lisp
+;; glsl
+(use-package glsl-mode
+  :ensure t
+  :mode (("\\.glsl\\'" . glsl-mode)
+	 ("\\.vert\\'" . glsl-mode)
+	 ("\\.frag\\'" . glsl-mode)
+	 ("\\.geom\\'" . glsl-mode)
+	 ("\\.comp\\'" . glsl-mode)
+	 ("\\.rgen\\'" . glsl-mode)
+	 ("\\.rchit\\'" . glsl-mode)
+	 ("\\.rmiss\\'" . glsl-mode))
+  )
+#+end_src
+
+HLSL
+#+begin_src emacs-lisp
+;; hlsl
+(use-package hlsl-mode
+  :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
+  :mode (("\\.fxh\\'"    . hlsl-mode)
+	 ("\\.hlsl\\'"   . hlsl-mode)
+	 ("\\.vs\\'"     . hlsl-mode)
+	 ("\\.ps\\'"     . hlsl-mode)
+	 ("\\.hs\\'"     . hlsl-mode) ;;hull shader
+	 ("\\.ds\\'"     . hlsl-mode) ;;domain shader
+	 ("\\.cs\\'"     . hlsl-mode) ;;compute shader
+	 ("\\.ms\\'"     . hlsl-mode) ;;mesh shader
+	 ("\\.as\\'"     . hlsl-mode) ;;amplification shader
+	 ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
+	 ))
+#+end_src
+AZSL
+#+begin_src emacs-lisp
+  (use-package azsl-mode
+    :vc (:fetcher github :repo "xeechou/azsl-mode.el")
+    :mode (("\\.azsl\\'"  . azsl-mode)
+           ("\\.azsli\\'" . azsl-mode)))
+
+  (use-package shader-mode
+    :disabled
+    :ensure t
+    :mode (("\\.shader\\'" . hlsl-mode)))
+#+end_src
+*** Go Lang
+#+begin_src emacs-lisp
+  ;; golang
+  (use-package go-mode
+    :ensure t
+    :mode (("\\.go\\'" . go-mode)
+           ("\\.mode\\'" . go-mode))
+    :hook ((go-mode . (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t)))))
+#+end_src
+*** Web programmings
+#+begin_src emacs-lisp
+  ;;javascript
+  (use-package rjsx-mode
+    :ensure t
+    :defer t
+    :mode (("\\.js\\'" . rjsx-mode))
+    :config (setq js-indent-level 2)
+    )
+
+  (use-package web-mode
+    :ensure t
+    :pin melpa
+    :defer t
+    :mode ("\\.html?\\'" . web-mode))
+
+  ;;typescript
+  (use-package typescript-mode
+    :ensure t
+    :mode "\\.ts\\'"
+    :config
+    (setq typescript-indent-level 2)
+    (setq-default indent-tabs-mode nil)
+    )
+
+  (use-package json-mode
+    :ensure t
+    :pin melpa
+    :mode (("\\.json\\'" . json-mode)
+           ;; O3DE passes and assets use json format
+           ("\\.pass\\'"         . json-mode)
+           ("\\.azasset\\'"      . json-mode)
+           ("\\.setreg\\'"       . json-mode)
+           ("\\..setregpatch\\'" . json-mode)
+           ))
+#+end_src
+*** Flutter
+#+begin_src emacs-lisp
+  ;;dart
+  (use-package dart-mode
+    :ensure t
+    :defer t
+    :mode (("\\.dart\\'" . dart-mode))
+    :config
+    (with-eval-after-load 'projectile
+      (projectile-register-project-type 'flutter '("pubspec.yaml")
+                                        :project-file "pubspec.yaml"
+                                        :compile "flutter build"
+                                        :test "flutter test"
+                                        :run "flutter run"
+                                        :src-dir "lib/"))
+    )
+#+end_src
+*** Other languages
+#+begin_src emacs-lisp
+
+  ;;lua
+  (use-package lua-mode :ensure t :mode (("\\.lua\\'" . lua-mode)))
+
+  ;;graphviz dot
+  (use-package graphviz-dot-mode :ensure t
+    :mode (("\\.dot\\'" . graphviz-dot-mode)))
+
+  (use-package rust-mode :ensure t :mode (("\\.rs\\'" . rust-mode)))
+
+  (use-package gdscript-mode :ensure t :mode (("\\.gd\\'" . gdscript-mode)))
+
+  (use-package markdown-mode :ensure t :mode (("\\.md\\'" . markdown-mode)))
+
+  (use-package octave :ensure t :mode (("\\.m\\'" . octave-mode)))
+
+  (use-package yaml-mode :ensure t :mode (("\\.yml\\'" . yaml-mode)))
+#+end_src
+*** Disabled languages
+#+begin_src emacs-lisp
+  (use-package tex :ensure auctex
+    :disabled
+    :custom
+    (TeX-master              nil)
+    (Tex-auto-save           t)
+    (Tex-parse-self          t)
+    (Tex-save-query          nil)
+    (reftex-plug-into-AUCTeX t)
+    :hook
+    ((latex-mode . flyspell-mode)
+     (latex-mode . turn-on-reftex)
+     (LaTeX-mode . turn-on-reftex))
+    )
+
+  (use-package unity
+    :disabled
+    :vc (:fetcher github :repo "elizagamedev/unity.Eli")
+    :hook (after-init . unity-mode))  
+#+end_src
+
+
+* Miscellaneous
+** Common helpers
+
+[[https://github.com/garberw/openwith][openwith]] to open external program for file types.
+#+begin_src emacs-lisp
+(use-package openwith
+  :vc (:fetcher github :repo "garberw/openwith" :rev "master")
+  :init (openwith-mode 1)
+  :config (setq openwith-associations '(("\\.pdf\\'" "sioyek" (file)))))  
+#+end_src
+
+
+#+begin_src emacs-lisp
+(use-package which-key :ensure t
+  :diminish which-key-mode
+  :hook ((prog-mode text-mode outline-mode) . which-key-mode))
+#+end_src
+
+pdftools _disabled_
+#+begin_src emacs-lisp
+;; pdf-tools, only run this on windows
+(use-package pdf-tools
+  :if (eq system-type 'windows-nt)
+  :disabled
+  :defer t
+  :pin manual
+  :magic ("%PDF" . pdf-view-mode)
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  :custom
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+  
+#+end_src
+
+** Enable LLM with ellama
+#+begin_src emacs-lisp
+(when (executable-find "ollama")
+  (use-package ellama :ensure t
+    :init
+    ;; setup key bindings
+    (setopt ellama-keymap-prefix "C-c e")
+    ;; we only use the default model "zephyr:latest"
+    ;; TODO : adding new models
+    ;; language you want ellama to translate to
+    (setopt ellama-language "French")))
+#+end_src

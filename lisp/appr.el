@@ -34,6 +34,7 @@
 (require 'frame)
 (require 'custom)
 (require 'appr-ligature)
+(require 'appr-theme)
 
 (defgroup appr nil
   "Emacs font and theme setting"
@@ -195,7 +196,8 @@ inside FONT-LIST."
 	      (message "Setup up font for current frame")
 	      (when (display-graphic-p)
 		(appr-setup))))
-  (add-hook 'window-setup-hook #'appr-setup))
+  (add-hook 'window-setup-hook #'appr-setup)
+  (run-with-timer 0 3600 #'appr-apply-theme))
 
 (provide 'appr)
 ;;; appr.el ends here
