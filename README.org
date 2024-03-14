@@ -1600,3 +1600,45 @@ pdftools _disabled_
     ;; language you want ellama to translate to
     (setopt ellama-language "French")))
 #+end_src
+
+** News letter
+we configure Emacs with [[https://github.com/skeeto/elfeed][elfeed]] to read the news.
+#+begin_src emacs-lisp
+(use-package elfeed :ensure t
+:config (elfeed-set-max-connections 32))
+#+end_src
+Here are some of the key bindings for elfeed:
+
+- RET :: view selected entry in a buffer
+- b ::  open selected entries in your browser (browse-url)
+- y ::  copy selected entries URL to the clipboard
+- r ::  mark selected entries as read
+- u ::  mark selected entries as unread
+- g :: ~elfeed-update-force~ updating the feeds after _modified_ "elfeed.org"
+- s :: search/filter, however it *also* sort the feed by source.
+- + ::  add a specific tag to selected entries
+- - ::  remove a specific tag from selected entries
+
+We load elfeed-org and elfeed-goodies as well.
+#+begin_src emacs-lisp
+  (use-package elfeed-org
+    :when (file-exists-p (expand-file-name "elfeed.org" org-directory))
+    :ensure t
+    :after elfeed
+    :config
+    (elfeed-org)
+    (setq rmh-elfeed-org-files
+          (list
+           (expand-file-name "elfeed.org" org-directory))))
+#+end_src
+The elfeed goodies sort the feed based alphabetically, and reorder the layout
+#+begin_src emacs-lisp
+  (use-package elfeed-goodies
+    :ensure t
+    :after elfeed
+    :config
+    (elfeed-goodies/setup))
+#+end_src
+
+I would like to open feed buffer using  [[https://github.com/fritzgrabo/elfeed-webkit][elfeed-webkit]] but my Emacs does not support xWidgets.
+
