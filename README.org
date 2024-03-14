@@ -1614,6 +1614,8 @@ Here are some of the key bindings for elfeed:
 - y ::  copy selected entries URL to the clipboard
 - r ::  mark selected entries as read
 - u ::  mark selected entries as unread
+- g :: ~elfeed-update-force~ updating the feeds after _modified_ "elfeed.org"
+- s :: search/filter, however it *also* sort the feed by source.
 - + ::  add a specific tag to selected entries
 - - ::  remove a specific tag from selected entries
 
