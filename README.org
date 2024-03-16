@@ -648,6 +648,17 @@ using the IVY framework
 ;;   (org-msync-remote-dir "~/Documents/org-remote/")
 ;;   )
 #+end_src
+** Deft mode
+#+begin_src emacs-lisp
+    (use-package deft :ensure t :defer t
+      :bind ("<f8>" . deft)
+      :commands (deft)
+      :custom
+      (deft-directory  org-directory)
+      (deft-extensions '("org"))
+      (deft-recursive  t)
+      (deft-use-filename-as-title t))
+#+end_src
 
 * Editing/Keybindings
 ** Line operations 
