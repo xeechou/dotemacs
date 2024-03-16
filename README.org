@@ -651,7 +651,6 @@ using the IVY framework
 ** Deft mode
 #+begin_src emacs-lisp
     (use-package deft :ensure t :defer t
-      :bind ("<f8>" . deft)
       :commands (deft)
       :custom
       (deft-directory  org-directory)
