@@ -335,7 +335,6 @@ On archlinux, you need to install
 - texlive-pictures,
 - texlive-plangeneric
 
-
 ** Org journal
 #+begin_src emacs-lisp :noweb yes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -773,26 +772,27 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
 *** Counsel
 [[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
 #+begin_src emacs-lisp
-(use-package counsel :ensure t
-  :ensure t
-  :config
-  (use-package smex :ensure t)
-  :bind
-  ("C-s" . swiper)
-  ("M-x" . counsel-M-x)
-  ("C-x C-f" . counsel-find-file)
-  ;;this collide
-  ("C-c C-u" . counsel-unicode-char)
-  ("C-c C-i" . counsel-info-lookup-symbol)
-  ("C-x t" . counsel-imenu)
-  ("C-c y" . counsel-yank-pop)
-  ;;for git setup
-  ("C-c g" . counsel-git)
-  ("C-c j" . counsel-git-grep)
-  ("C-c L" . counsel-git-log)
-  ("C-c k" . counsel-rg))
+  (use-package counsel :ensure t
+    :ensure t
+    :config
+    (use-package smex :ensure t)
+    :bind
+    ("C-s" . swiper)
+    ("M-x" . counsel-M-x)
+    ("C-x C-f" . counsel-find-file)
+    ;;this collide
+    ("C-c C-u" . counsel-unicode-char)
+    ("C-c C-i" . counsel-info-lookup-symbol)
+    ("C-x t" . counsel-imenu)
+    ("C-c y" . counsel-yank-pop)
+    ;;for git setup
+    ("C-c g" . counsel-grep)
+    ("C-c j" . counsel-git-grep)
+    ("C-c L" . counsel-git-log)
+    ("C-c r" . counsel-rg)
+    ("C-c o" . counsel-org-goto))
 #+end_src
-
+Note: originally I have "C-c g" binds to ~counsel-git~, it's search files in git. However [[*Projectile][Projectile]] does that perfectly.
 *** Counsel tramp
 which I use for remote editing.
 #+begin_src emacs-lisp :noweb yes
