@@ -1054,16 +1054,16 @@ There is not thing special here, we just add a key-map and use ~alien~ indexing 
 
 *** Column width setup
 #+begin_src emacs-lisp
-;; visual fill column
-(use-package visual-fill-column
-  :ensure t
-  :init
-  (setq-default fill-column 79)
-  :hook
-  (prog-mode . turn-on-auto-fill)
-  (visual-line-mode . visual-fill-column-mode)
-  ((text-mode outline-mode) . visual-line-mode)
-  )
+  ;; visual fill column
+  (use-package visual-fill-column
+    :ensure t
+    :init
+    (setq-default fill-column 79)
+    (setq-default visual-fill-column-width 120)
+    :hook
+    (prog-mode . turn-on-auto-fill)
+    (visual-line-mode . visual-fill-column-mode)
+    ((text-mode outline-mode) . visual-line-mode))
 #+end_src
 
 #+begin_src emacs-lisp
