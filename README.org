@@ -1256,17 +1256,6 @@ treesit-auto does not work on windows at moment.
                                company-keywords
                                company-yasnippet
                                company-capf)))
-
-    (defun complete-or-indent ()
-      (interactive)
-      (if (company-manual-begin)
-          (company-complete-common)
-        (indent-according-to-mode)))
-    (defun indent-or-complete ()
-      (interactive)
-      (if (looking-at "\\_>")
-          (company-complete-common)
-        (indent-according-to-mode)))
     )
 
   (use-package company-emoji
