@@ -280,12 +280,12 @@ It will prevent from inserting a state directly under headings.
 Instead it will be inside a ~:LOGBOOK:~
 
 *** Capture templates
-Put int ~misc.org~
+Capture tasks in ~misc.org~ to sort later
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
   ;; misc tasks, moving coding or writing later?
   ("m" "Miscs" entry
-               (file+headline ,(my/org-file "miscs.org") "Tasks")
-               "* TODO %?\n%i\n  %a" :prepend t)
+               (file+headline ,(my/org-file "miscs.org") "Captures")
+               "** TODO %?\n%i\n  %a" :prepend t)
 #+end_src
 
 Capture some ideas in ~thoughts.org~
