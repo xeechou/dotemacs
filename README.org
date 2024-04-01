@@ -658,7 +658,7 @@ using the IVY framework
       (deft-use-filename-as-title t))
 #+end_src
 
-* Editing/Keybindings
+* Editing
 ** Line operations 
 Define a backward kill a line:
 #+begin_src emacs-lisp
@@ -788,8 +788,8 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
     ;;for git setup
     ("C-c g" . counsel-grep)
     ("C-c j" . counsel-git-grep)
-    ("C-c L" . counsel-git-log)
-    ("C-c r" . counsel-rg)
+    ("C-c l" . counsel-git-log)
+    ("C-c r" . counsel-rg) ;;avoid conflict with eglot "C-c R"
     ("C-c o" . counsel-org-goto))
 #+end_src
 Note: originally I have "C-c g" binds to ~counsel-git~, it's search files in git. However [[*Projectile][Projectile]] does that perfectly.
@@ -882,6 +882,19 @@ Using our [[*IVY][IVY]] framework for correction prompts.
   :ensure t
   :after (ivy flyspell-correct))    
 #+end_src
+
+
+* Keybindings
+I tried to keep my keybindings consistent and avoid conflicts. Right now there are too many packages fight for ~C-c~.
+
+** [[*Counsel][Counsel/Ivy]] keys
+Start the key key map with
+
+** [[*Org mode settings][org-mode]] keys
+
+** [[*Eglot mode][Eglot]] key bindings
+There are currently two keybindings
+
 
 * Appearance Settings
 ** Themes
@@ -1268,7 +1281,7 @@ treesit-auto does not work on windows at moment.
     :ensure t
     :after company)
 #+end_src
-** Eaglet mode
+** Eglot mode
 It's builtin now
 #+begin_src emacs-lisp
 
@@ -1294,8 +1307,8 @@ It's builtin now
 	      ;; ("M-." . xref-find-definitions)
 	      ;; ("M-?" . xref-find-references)
 	      ;; ("M-," . xref-go-back)
-	      ("C-c r"  . eglot-rename)
-	      ("C-c h"  . eldoc))
+	      ("C-c R"  . eglot-rename)
+	      ("C-c H"  . eldoc))
   )
 #+end_src
 ** Debugging
