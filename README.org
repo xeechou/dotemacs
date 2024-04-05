@@ -179,7 +179,7 @@ copied from emacswiki
 (defun my/org-file (path)
   (my/concat-path org-directory path))
 #+end_src
-** Org-mode
+** Org Mode
 #+begin_src emacs-lisp :noweb yes
   (use-package org
     :ensure t
@@ -193,7 +193,7 @@ copied from emacswiki
     ;;setup the column, this max length for the first level we can go, maybe we
     ;;can somehow calculate it?
     (org-tags-column -54)
-  
+
     ;;faces
     (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
 
@@ -203,14 +203,13 @@ copied from emacswiki
      (org-mode . org-funcs-define-faces))
     ;; I am not sure this global key setting is good or not, capture stuff
     ;; globally is great
-    :bind (:map global-map
-                ("\C-ca"   . org-agenda)
-                ("\C-cc"   . org-capture)
-                :map org-mode-map
-                ("M-<left>"  . org-metaleft)
-                ("M-<right>" . org-metaright)
-                ("M-<up>"    . org-metaup)
-                ("M-<down>"  . org-metadown))
+    :bind (("C-c o a"   . org-agenda)
+           ("C-c o c"   . org-capture)
+           :map org-mode-map
+           ("M-<left>"  . org-metaleft)
+           ("M-<right>" . org-metaright)
+           ("M-<up>"    . org-metaup)
+           ("M-<down>"  . org-metadown))
     :init
     <<ORG_DIRECTORY>>
 
@@ -466,11 +465,12 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
     (org-roam-node-display-template
      (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
-    :bind  (("C-c n r" . org-roam-buffer-toggle) ;;toggle-back-links
-            ("C-c n f" . org-roam-node-find)
-            ("C-c n c" . org-roam-capture)
-            ("C-c n i" . org-roam-node-insert)
-            ("C-c n g" . org-roam-ui-mode)
+    :bind  (("C-c o f" . org-roam-node-find)
+            ("C-c o C" . org-roam-capture)
+            ("C-c o i" . org-roam-node-insert)
+            ("C-c o g" . org-roam-ui-mode)
+            :map org-mode-map
+            ("C-c o r" . org-roam-buffer-toggle) ;;toggle-back-links
             :map org-roam-mode-map
             ;;NOTE alternatively, use C-u RET to visit in other window
             ("RET" . my/roam-visit))
@@ -543,6 +543,7 @@ visiting roam pages using different other window. It's most case what you want.
 	      ("C-c C-p i" . org-cliplink)
 	      ("C-c C-p l" . org-store-link)))
 #+end_src
+
 *** Org download
 #+begin_src emacs-lisp
 ;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -569,12 +570,12 @@ visiting roam pages using different other window. It's most case what you want.
 			     (my/concat-path currdir "imgs/")
 			   nil))))))
   :bind (:map org-mode-map
-	      ("C-c d s" . org-download-screenshot)
-	      ("C-c d y" . org-download-yank)
-	      ("C-c d c" . org-download-clipboard)))
+	      ("C-c C-p s" . org-download-screenshot)
+	      ("C-c C-p y" . org-download-yank)
+	      ("C-c C-p c" . org-download-clipboard)))
 
 #+end_src
-*** Org-ref
+*** Org Ref
 using the IVY framework 
 #+begin_src emacs-lisp
 (use-package ivy-bibtex
@@ -647,15 +648,17 @@ using the IVY framework
 ;;   (org-msync-remote-dir "~/Documents/org-remote/")
 ;;   )
 #+end_src
+
 ** Deft mode
 #+begin_src emacs-lisp
-    (use-package deft :ensure t :defer t
-      :commands (deft)
-      :custom
-      (deft-directory  org-directory)
-      (deft-extensions '("org"))
-      (deft-recursive  t)
-      (deft-use-filename-as-title t))
+  (use-package deft :ensure t :defer t
+    :commands (deft)
+    :custom
+    (deft-directory  org-directory)
+    (deft-extensions '("org"))
+    (deft-recursive  t)
+    (deft-use-filename-as-title t)
+    :bind ("C-c o d" . deft))
 #+end_src
 
 * Editing
@@ -790,7 +793,7 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
     ("C-c j" . counsel-git-grep)
     ("C-c l" . counsel-git-log)
     ("C-c r" . counsel-rg) ;;avoid conflict with eglot "C-c R"
-    ("C-c o" . counsel-org-goto))
+   )
 #+end_src
 Note: originally I have "C-c g" binds to ~counsel-git~, it's search files in git. However [[*Projectile][Projectile]] does that perfectly.
 *** Counsel tramp
@@ -888,13 +891,15 @@ Using our [[*IVY][IVY]] framework for correction prompts.
 I tried to keep my keybindings consistent and avoid conflicts. Right now there are too many packages fight for ~C-c~.
 
 ** [[*Counsel][Counsel/Ivy]] keys
-Start the key key map with
+Start the key key map with ~C-c~
 
-** [[*Org mode settings][org-mode]] keys
+** [[*Org mode settings][org mode]] keys
+org mode keys (especially globally bound keys) starts with ~(C-c o)~
 
 ** [[*Eglot mode][Eglot]] key bindings
 There are currently two keybindings
-
+- ~C-c R~ :: ~eglot-rename~
+- ~C-c H~ :: ~eldoc~
 
 * Appearance Settings
 ** Themes
