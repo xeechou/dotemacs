@@ -1617,16 +1617,25 @@ Firstly we need methods to securely store our api keys
     (("C-c o s" . gptel-menu))
     :config
     ;;setup directives
-    (dolist (prompt '(<<GPTEL_DIRECTIVES>>))
-      (add-to-list 'gptel-directives prompt))
+    (setq gptel-directives
+          (delete-dups
+           (append gptel-directives
+                   '(
+                     <<GPTEL_DIRECTIVES>>
+                     ))))
     ;;setup backends
     <<GPTEL_BACKENDS>>
     )
 #+end_src
 *** Directives
-Command line helper
+**** Command line helper
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_DIRECTIVES
-  (cmd-helper . "You are a command line helper. Generate command line that do what requested. Without any additional description or explaination. Generate ONLY the command, I will edit before running")
+  (cliwiz . "You are a command line helper. Generate command line that do what requested. Without any additional description or explaination. Generate ONLY the command, I will edit before running")
+#+end_src
+
+**** Explain the code
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_DIRECTIVES
+  (explain . "Explain what this code does to a novice programmer")
 #+end_src
 
 *** GPTAI key
