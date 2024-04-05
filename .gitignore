@@ -50,6 +50,7 @@ projectile-bookmarks.eld
 ellama-sessions/
 gptel-crowdsourced-prompts.csv
 codeium/
+llm-api.el
 
 # Tangled files
 README.el*
