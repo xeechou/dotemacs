@@ -1521,6 +1521,29 @@ AZSL
                                         :src-dir "lib/"))
     )
 #+end_src
+*** Beancount
+The [[https://github.com/beancount/beancount][beancount]] is a text based double entry ledger system.
+#+begin_src emacs-lisp
+  (use-package beancount
+    :when (executable-find "bean-check")
+    :vc (:fetcher github :repo "beancount/beancount-mode")
+    :defer t
+    :mode (("\\.beancount\\'" . beancount-mode))
+    :config
+    (setq-local electric-indent-chars nil)
+    :hook
+    ((beancount-mode . outline-minor-mode)
+     (beancount-mode . flymake-bean-check-enable))
+    :bind (:map beancount-mode-map
+                ("C-c C-n" . outline-next-visible-heading)
+                ("C-c C-p" . outline-previous-visible-heading))
+    )
+#+end_src
+Notes:
+1. The automatic indentation behavior ~electric-indent-chars~ may be undesired for beancount. Disable it
+2. enable the ~outline-minor-mode~ for managing large text
+TODO: setup the ~beancount--fava-process~
+
 *** Other languages
 #+begin_src emacs-lisp
 
