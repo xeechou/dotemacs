@@ -1542,7 +1542,14 @@ The [[https://github.com/beancount/beancount][beancount]] is a text based double
 Notes:
 1. The automatic indentation behavior ~electric-indent-chars~ may be undesired for beancount. Disable it
 2. enable the ~outline-minor-mode~ for managing large text
-TODO: setup the ~beancount--fava-process~
+
+I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you can follow the same process
+#+begin_src shell :tangle no
+  # this creates a python venv for beancount
+  pipx install beancount
+  #inject fava to beancount venv and adding "fava" executable
+  pipx inject --include-apps beancount fava
+#+end_src
 
 *** Other languages
 #+begin_src emacs-lisp
