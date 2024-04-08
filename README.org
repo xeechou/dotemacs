@@ -148,6 +148,8 @@ menu bar configuration. I disable tool bar and scroll bar for a minimalist look.
   (global-auto-revert-mode t)
   (column-number-mode 1)
   (delete-selection-mode 1)
+  (global-hl-line-mode 1)
+  (diminish hl-line-mode)
   ;;default to text mode
   (setq-default major-mode 'text-mode)
   ;;displaying line numbers
@@ -356,7 +358,7 @@ On archlinux, you need to install
 
   (with-eval-after-load 'org
     (add-to-list 'org-capture-templates
-		 '("j" "Journal entry" plain (function org-journal-find-location)
+		 '("j" "Journal entry" plain (function my/org-journal-find-location)
                    "\n** %?"
                    :jump-to-captured t
 		   :immediate-finish t
