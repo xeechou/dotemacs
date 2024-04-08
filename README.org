@@ -120,6 +120,10 @@ Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have t
             ("ftp_proxy" . ,(getenv "ftp_proxy"))
             ("no_proxy" . ,(getenv "no_proxy"))))
     )
+  ;;get the current proxy
+  (defun my/has-or-get-proxy()
+    (or (getenv "https_proxy")
+        (getenv "http_proxy")))
 #+end_src
 
 ** Generate UUIDs
@@ -1627,6 +1631,8 @@ Firstly we need methods to securely store our api keys
                      ))))
     ;;setup backends
     <<GPTEL_BACKENDS>>
+    ;;setup proxies
+    <<GPTEL_PROXY>>
     )
 #+end_src
 *** Directives
@@ -1665,6 +1671,22 @@ Ollama backend runs locally on your pc
       :host "localhost:11434"
       :stream t
       :models `(,my/llm-ollama-model)))
+#+end_src
+
+*** Setup proxies
+Unfortunately my proxy requires some additional arguments for curl ~-k~ or ~--ssl-no-revoke~. It is not possible to set those arguments for now:
+
+#+begin_src emacs-lisp :tangle no
+  (when (and gptel-use-curl (my/has-or-get-proxy))
+    (setq gptel-proxy (my/has-or-get-proxy))
+    ;;there is no such option at the moment
+    (setq gptel-user-argument "-k"))
+#+end_src
+
+So here is the current solution: Use the ~url.el~
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_PROXY
+  (when (and gptel-use-curl (my/has-or-get-proxy))
+    (setq gptel-use-curl nil))
 #+end_src
 
 ** Ellama
