@@ -1674,20 +1674,35 @@ Ollama backend runs locally on your pc
 #+end_src
 
 *** Setup proxies
-Unfortunately my proxy requires some additional arguments for curl ~-k~ or ~--ssl-no-revoke~. It is not possible to set those arguments for now:
+Unfortunately my proxy requires some additional arguments for curl ~-k~ or ~--ssl-no-revoke~.
 
-#+begin_src emacs-lisp :tangle no
-  (when (and gptel-use-curl (my/has-or-get-proxy))
-    (setq gptel-proxy (my/has-or-get-proxy))
-    ;;there is no such option at the moment
-    (setq gptel-user-argument "-k"))
-#+end_src
-
-So here is the current solution: Use the ~url.el~
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_PROXY
+  ;;initialize the proxy
   (when (and gptel-use-curl (my/has-or-get-proxy))
-    (setq gptel-use-curl nil))
+      (setq gptel-proxy (my/has-or-get-proxy)))
+
+  (defun my/gptel-toggle-proxy  ()
+    "Toggle the gptel proxy based on the environment."
+    (interactive)
+    (when (and gptel-use-curl (my/has-or-get-proxy))
+      (if (string= gptel-proxy "")
+          (setq gptel-proxy (my/has-or-get-proxy))
+        (setq gptel-proxy ""))))
 #+end_src
+
+We add additional backend for when using proxy
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_PROXY
+  ;; openai
+  (when (and (my/has-or-get-proxy) (boundp 'my/llm-openai-key))
+      (gptel-make-openai "ChatGPT-no-ssl-check"
+        :key 'my/llm-openai-key
+        :stream t
+        :models '("gpt-3.5-turbo" "gpt-3.5-turbo-16k" "gpt-4"
+                  "gpt-4-turbo-preview" "gpt-4-32k" "gpt-4-1106-preview"
+                  "gpt-4-0125-preview")
+        :curl-args '("-k")))
+#+end_src
+
 
 ** Ellama
 The ellama package is disabled in favor of getel.
