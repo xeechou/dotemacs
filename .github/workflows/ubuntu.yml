@@ -31,5 +31,5 @@ jobs:
 
       - name: Run Emacs in daemon mode
         run: |                
-          emacs --daemon --script .github/workflows/scripts/ci-init.el
+          emacs --init-directory=$(pwd) --daemon --script .github/workflows/scripts/ci-init.el
           echo "Finished"
