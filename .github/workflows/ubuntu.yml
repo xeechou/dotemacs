@@ -1,0 +1,35 @@
+name: Linux CI
+
+on:
+  push:
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      - name: Setup Emacs
+        # You may pin to the exact commit or the version.
+        # uses: jcs090218/setup-emacs@c2e999a18c9dbb0648b79344f462cbbeb5b1ae16
+        uses: jcs090218/setup-emacs@master
+        with:
+          # The version of Emacs to install, e.g. "24.3", or "snapshot" for a recent development version.
+          version: 29.1
+ 
+      - name: Install Dependencies
+        run: sudo apt install -y cmake clang++ libx11-dev libxi-dev ninja-build  g++ cmake shaderc
+      
+      - name: Run Emacs against our configurations 
+        run: |
+          EMACS_VERSION=$(emacs --version)
+          echo $EMACS_VERSION
+          emacs --no-window-system --batch --script .github\workflows\scripts\ci-init.el
+
+      - name: Run Emacs in daemon mode
+        run: |                
+          emacs --daemon --script .github\workflows\scripts\ci-init.el
+          echo "Finished"
