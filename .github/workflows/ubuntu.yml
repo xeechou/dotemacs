@@ -27,9 +27,9 @@ jobs:
         run: |
           EMACS_VERSION=$(emacs --version)
           echo $EMACS_VERSION
-          emacs --no-window-system --batch --script .github\workflows\scripts\ci-init.el
+          emacs --no-window-system --batch --script .github/workflows/scripts/ci-init.el
 
       - name: Run Emacs in daemon mode
         run: |                
-          emacs --daemon --script .github\workflows\scripts\ci-init.el
+          emacs --daemon --script .github/workflows/scripts/ci-init.el
           echo "Finished"
