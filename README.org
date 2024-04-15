@@ -1218,64 +1218,19 @@ treesit-auto does not work on windows at moment.
       (setq treesit-auto-install 'prompt))
 #+end_src
 
-** Company mode and LSP setup
+** Company mode
 
 #+begin_src emacs-lisp
 (use-package company-c-headers :ensure t)
 ;; (setq clang-known-modes '(c++-mode c-mode))
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (use-package company
     :ensure t
     :defer t
-    :hook (((c++-mode c++-ts-mode) . company-mode)
-           ((c-mode c-ts-mode)     . company-mode)
-           ((c++-mode c++-ts-mode c-mode c-ts-mode) .
-            ;;override default company backends because eglot not compatible with company-clang
-            (lambda () (set (make-local-variable 'company-backends)
-                            '(company-capf company-files company-keywords company-dabbrev company-yasnippet))))
-           (emacs-lisp-mode . company-mode)
-           ;; company-elisp is removed
-           (emacs-lisp-mode . (lambda () (my/merge-list-to-list
-                                          (make-local-variable 'company-backends)
-                                          (list
-                                           'company-dabbrev-code
-                                           'company-files
-                                           'company-keywords))))
-           (outline-mode    . company-mode) ;;enable for org mode
-           (outline-mode    . (lambda () (my/merge-list-to-list
-                                          (make-local-variable 'company-backends)
-                                          (list'company-dabbrev 'company-emoji))))
-           (text-mode       . company-mode)
-           (text-mode       . (lambda () (my/merge-list-to-list
-                                          (make-local-variable 'company-backends)
-                                          (list 'company-dabbrev 'company-emoji))))
-           (meson-mode . company-mode)
-           ;;cmake
-           (cmake-mode . company-mode)
-           (cmake-mode .  (lambda () (my/merge-list-to-list
-                                      (make-local-variable 'company-backends)
-                                      (list 'company-cmake 'company-dabbrev))))
-           ;;lua
-           (lua-mode . company-mode)
-           (lua-mode . (lambda ()
-                         (add-to-list (make-local-variable 'company-backends)
-                                      'company-lua)))
-           ;; shaders
-           (hlsl-mode . company-mode)
-           (hlsl-mode . (lambda () (my/merge-list-to-list
-                                    (make-local-variable 'company-backends)
-                                    (list 'company-keywords 'company-dabbrev))))
-           (azsl-mode . company-mode)
-           (azsl-mode . (lambda () (my/merge-list-to-list
-                                    (make-local-variable 'company-backends)
-                                    (list 'company-keywords 'company-dabbrev))))
-           (glsl-mode . company-mode)
-           (glsl-mode . (lambda ()
-                          (when (executable-find "glslangValidator")
-                            (add-to-list (make-local-variable 'company-backends)
-                                         'company-glsl))))
+    :hook (
+           <<COMPANY_HOOKS>>
            )
     :config
 
@@ -1285,21 +1240,128 @@ treesit-auto does not work on windows at moment.
           company-backends  '((company-files
                                company-keywords
                                company-yasnippet
-                               company-capf)))
-    )
+                               company-capf))))
+#+end_src
+*** C/C++ family
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  ((c++-mode c++-ts-mode) . company-mode)
+  ((c-mode c-ts-mode)     . company-mode)
+  ((c++-mode c++-ts-mode c-mode c-ts-mode) .
+   ;;override default company backends because eglot not compatible with company-clang
+   (lambda () (set (make-local-variable 'company-backends)
+                   '(company-capf
+                     company-files
+                     company-keywords
+                     company-dabbrev
+                     company-yasnippet))))
 
+#+end_src
+
+CMake:
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  (cmake-mode . company-mode)
+  (cmake-mode .  (lambda () (my/merge-list-to-list
+                             (make-local-variable 'company-backends)
+                             (list 'company-cmake 'company-dabbrev))))
+#+end_src
+
+*** Emacs lisp
+company-elisp is remove so we just rely on internal backends
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  (emacs-lisp-mode . company-mode)
+  (emacs-lisp-mode . (lambda () (my/merge-list-to-list
+                                 (make-local-variable 'company-backends)
+                                 (list
+                                  'company-dabbrev-code
+                                  'company-files
+                                  'company-keywords))))
+#+end_src
+
+*** Python
+
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  ((python-mode python-ts-mode) . company-mode)
+#+end_src
+
+NOTE that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
+
+#+begin_src shell-script :tangle no
+  pipx inject python-lsp-server [[your packages here]]
+#+end_src
+
+
+*** Texts
+We add company-emoji to company backends.
+#+begin_src emacs-lisp
   (use-package company-emoji
     :defer t
     :ensure t
     :after company)
+#+end_src
 
+
+Outline mode includes org mode and markdowns
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  (outline-mode    . company-mode) ;;enable for org mode
+  (outline-mode    . (lambda () (my/merge-list-to-list
+                                 (make-local-variable 'company-backends)
+                                 (list'company-dabbrev 'company-emoji))))
+#+end_src
+
+simple text mode:
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  (text-mode       . company-mode)
+  (text-mode       . (lambda () (my/merge-list-to-list
+                                 (make-local-variable 'company-backends)
+                                 (list 'company-dabbrev 'company-emoji))))
+#+end_src
+
+
+*** shaders
+Currently HLSL and AZSL does not have a language server so no [[https://company-mode.github.io/manual/Backends.html#index-company_002dcapf][company-capf]] available. I only use [[https://company-mode.github.io/manual/Backends.html#index-company_002ddabbrev][company-dabbrev]] and [[https://company-mode.github.io/manual/Backends.html#index-company_002dkeywords][company-keywords]].
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  ;; shaders
+  (hlsl-mode . company-mode)
+  (hlsl-mode . (lambda () (my/merge-list-to-list
+                           (make-local-variable 'company-backends)
+                           (list 'company-keywords 'company-dabbrev))))
+  (azsl-mode . company-mode)
+  (azsl-mode . (lambda () (my/merge-list-to-list
+                           (make-local-variable 'company-backends)
+                           (list 'company-keywords 'company-dabbrev))))
+#+end_src
+
+GLSL on the other hand, has a language server ~company-glsl~
+#+begin_src emacs-lisp
   (use-package company-glsl
     :defer t
     :ensure t
     :after company)
 #+end_src
+It depends on ~glslangValidator~ to be available.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  (glsl-mode . company-mode)
+  (glsl-mode . (lambda ()
+                 (when (executable-find "glslangValidator")
+                   (add-to-list (make-local-variable 'company-backends)
+                                'company-glsl))))
+#+end_src
+
+*** Other languages
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+  ;;meson
+  (meson-mode . company-mode)
+
+  ;;lua
+  (lua-mode . company-mode)
+  (lua-mode . (lambda ()
+                (add-to-list (make-local-variable 'company-backends)
+                             'company-lua)))
+#+end_src
+
 ** Eglot mode
-It's builtin now
+
 #+begin_src emacs-lisp
 
 ;; eglot configuration, switching to eglot after emacs 29
@@ -1328,6 +1390,7 @@ It's builtin now
 	      ("C-c H"  . eldoc))
   )
 #+end_src
+
 ** Debugging
 *** Debugging with dap-mode.
 It is not ready, disable it now.
