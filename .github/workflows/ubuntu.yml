@@ -21,7 +21,7 @@ jobs:
           version: 29.1
  
       - name: Install Dependencies
-        run: sudo apt install -y cmake clang++ libx11-dev libxi-dev ninja-build  g++ cmake shaderc
+        run: sudo apt install -y cmake libxi-dev ninja-build  g++ cmake
       
       - name: Run Emacs against our configurations 
         run: |
