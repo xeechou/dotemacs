@@ -1369,7 +1369,7 @@ It depends on ~glslangValidator~ to be available.
   :ensure t
   :hook (((c++-mode c++-ts-mode) . eglot-ensure)
 	 ((c-mode c-ts-mode) . eglot-ensure)
-	 (python-mode . eglot-ensure))
+	 ((python-mode python-ts-mode) . eglot-ensure))
   :custom
   (eglot-extend-to-xref t)
   ;;inlay-hints are annoying
