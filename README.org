@@ -792,20 +792,22 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
     :config
     (use-package smex :ensure t)
     :bind
-    ("C-s" . swiper)
-    ("M-x" . counsel-M-x)
-    ("C-x C-f" . counsel-find-file)
-    ;;this collide
-    ("C-c C-u" . counsel-unicode-char)
-    ("C-c C-i" . counsel-info-lookup-symbol)
-    ("C-x t" . counsel-imenu)
-    ("C-c y" . counsel-yank-pop)
-    ;;for git setup
-    ("C-c g" . counsel-grep)
-    ("C-c j" . counsel-git-grep)
-    ("C-c l" . counsel-git-log)
-    ("C-c r" . counsel-rg) ;;avoid conflict with eglot "C-c R"
-   )
+    (("C-s" . swiper)
+     ("M-x" . counsel-M-x)
+     ("C-x C-f" . counsel-find-file)
+     ;;this collide
+     ("C-c C-u" . counsel-unicode-char)
+     ("C-c C-i" . counsel-info-lookup-symbol)
+     ("C-x t" . counsel-imenu)
+     ("C-c y" . counsel-yank-pop)
+     ;;for git setup
+     ("C-c g" . counsel-grep)
+     ("C-c j" . counsel-git-grep)
+     ("C-c l" . counsel-git-log)
+     ("C-c r" . counsel-rg) ;;avoid conflict with eglot "C-c R"
+     ;; for org-mode
+     :map org-mode-map
+     ("C-x t" . counsel-outline)))
 #+end_src
 Note: originally I have "C-c g" binds to ~counsel-git~, it's search files in git. However [[*Projectile][Projectile]] does that perfectly.
 *** Counsel tramp
