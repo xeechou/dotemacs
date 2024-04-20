@@ -1652,6 +1652,12 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
   (use-package octave :ensure t :mode (("\\.m\\'" . octave-mode)))
 
   (use-package yaml-mode :ensure t :mode (("\\.yml\\'" . yaml-mode)))
+
+  ;; built-in
+  (use-package nxml-mode :mode (("\\.xml\\'" . nxml-mode)
+                                ("\\.ofx\\'" . nxml-mode)
+                                ;;quick book
+                                ("\\.qfx\\'" . nxml-mode)))
 #+end_src
 *** Disabled languages
 #+begin_src emacs-lisp
