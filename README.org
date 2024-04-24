@@ -1216,7 +1216,8 @@ treesit-auto does not work on windows at moment.
       (c-ts-mode-indent-style #'my/indent-rules)
       :config
       (global-treesit-auto-mode)
-      (setq-default treesit-font-lock-level 3)      
+      (setq-default treesit-font-lock-level 3)
+      (treesit-auto-add-to-auto-mode-alist 'all)
       (setq treesit-auto-install 'prompt))
 #+end_src
 
