@@ -1580,7 +1580,7 @@ AZSL
            ("\\.azasset\\'"      . json-mode)
            ("\\.setreg\\'"       . json-mode)
            ("\\..setregpatch\\'" . json-mode)
-           ))
+           ("wireplumber\\.conf\\'" . json-mode)))
 #+end_src
 *** Flutter
 #+begin_src emacs-lisp
@@ -1633,8 +1633,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 #+begin_src emacs-lisp
   ;;lua
   (use-package lua-mode :ensure t
-    :mode (("\\.lua\\'" . lua-mode)
-           ("wireplumber\\.conf\\'" . lua-mode))
+    :mode (("\\.lua\\'" . lua-mode))
     :hook
     ((lua-mode . company-mode)
      (lua-mode . (lambda ()
