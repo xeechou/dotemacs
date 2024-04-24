@@ -1355,11 +1355,7 @@ It depends on ~glslangValidator~ to be available.
   ;;meson
   (meson-mode . company-mode)
 
-  ;;lua
-  (lua-mode . company-mode)
-  (lua-mode . (lambda ()
-                (add-to-list (make-local-variable 'company-backends)
-                             'company-lua)))
+
 #+end_src
 
 ** Eglot mode
@@ -1635,9 +1631,15 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
 *** Other languages
 #+begin_src emacs-lisp
-
   ;;lua
-  (use-package lua-mode :ensure t :mode (("\\.lua\\'" . lua-mode)))
+  (use-package lua-mode :ensure t
+    :mode (("\\.lua\\'" . lua-mode)
+           ("wireplumber\\.conf\\'" . lua-mode))
+    :hook
+    ((lua-mode . company-mode)
+     (lua-mode . (lambda ()
+                   (when (executable-find "lua-language-server")
+                     (eglot-ensure))))))
 
   ;;graphviz dot
   (use-package graphviz-dot-mode :ensure t
