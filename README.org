@@ -1216,7 +1216,8 @@ treesit-auto does not work on windows at moment.
       (c-ts-mode-indent-style #'my/indent-rules)
       :config
       (global-treesit-auto-mode)
-      (setq-default treesit-font-lock-level 3)      
+      (setq-default treesit-font-lock-level 3)
+      (treesit-auto-add-to-auto-mode-alist 'all)
       (setq treesit-auto-install 'prompt))
 #+end_src
 
@@ -1355,11 +1356,7 @@ It depends on ~glslangValidator~ to be available.
   ;;meson
   (meson-mode . company-mode)
 
-  ;;lua
-  (lua-mode . company-mode)
-  (lua-mode . (lambda ()
-                (add-to-list (make-local-variable 'company-backends)
-                             'company-lua)))
+
 #+end_src
 
 ** Eglot mode
@@ -1584,7 +1581,7 @@ AZSL
            ("\\.azasset\\'"      . json-mode)
            ("\\.setreg\\'"       . json-mode)
            ("\\..setregpatch\\'" . json-mode)
-           ))
+           ("wireplumber\\.conf\\'" . json-mode)))
 #+end_src
 *** Flutter
 #+begin_src emacs-lisp
@@ -1635,9 +1632,14 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
 *** Other languages
 #+begin_src emacs-lisp
-
   ;;lua
-  (use-package lua-mode :ensure t :mode (("\\.lua\\'" . lua-mode)))
+  (use-package lua-mode :ensure t
+    :mode (("\\.lua\\'" . lua-mode))
+    :hook
+    ((lua-mode . company-mode)
+     (lua-mode . (lambda ()
+                   (when (executable-find "lua-language-server")
+                     (eglot-ensure))))))
 
   ;;graphviz dot
   (use-package graphviz-dot-mode :ensure t
