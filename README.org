@@ -1668,6 +1668,8 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
   (use-package yaml-mode :ensure t :mode (("\\.yml\\'" . yaml-mode)))
 
+  (use-package powershell :ensure t :mode (("\\.ps1\\'" . powershell-mode)))
+
   ;; built-in
   (use-package nxml-mode :mode (("\\.xml\\'" . nxml-mode)
                                 ("\\.ofx\\'" . nxml-mode)
