@@ -1332,53 +1332,13 @@ simple text mode:
                                  (list 'company-dabbrev 'company-emoji))))
 #+end_src
 
-
-*** shaders
-Currently HLSL and AZSL does not have a language server so no [[https://company-mode.github.io/manual/Backends.html#index-company_002dcapf][company-capf]] available. I only use [[https://company-mode.github.io/manual/Backends.html#index-company_002ddabbrev][company-dabbrev]] and [[https://company-mode.github.io/manual/Backends.html#index-company_002dkeywords][company-keywords]].
-#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  ;; shaders
-  (hlsl-mode . company-mode)
-  (hlsl-mode . (lambda () (my/merge-list-to-list
-                           (make-local-variable 'company-backends)
-                           (list 'company-keywords 'company-dabbrev))))
-  (azsl-mode . company-mode)
-  (azsl-mode . (lambda () (my/merge-list-to-list
-                           (make-local-variable 'company-backends)
-                           (list 'company-keywords 'company-dabbrev))))
-#+end_src
-
-GLSL on the other hand, has a language server ~company-glsl~
-#+begin_src emacs-lisp
-  (use-package company-glsl
-    :defer t
-    :ensure t
-    :after company)
-#+end_src
-It depends on ~glslangValidator~ to be available.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  (glsl-mode . company-mode)
-  (glsl-mode . (lambda ()
-                 (when (executable-find "glslangValidator")
-                   (add-to-list (make-local-variable 'company-backends)
-                                'company-glsl))))
-#+end_src
-
-*** Other languages
-#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  ;;meson
-  (meson-mode . company-mode)
-
-
-#+end_src
-
 ** Eglot mode
 
 #+begin_src emacs-lisp
 
 ;; eglot configuration, switching to eglot after emacs 29
 (use-package eglot
-  :ensure t
+  :ensure t :defer t
   :hook (((c++-mode c++-ts-mode) . eglot-ensure)
 	 ((c-mode c-ts-mode) . eglot-ensure)
 	 ((python-mode python-ts-mode) . eglot-ensure))
@@ -1488,12 +1448,11 @@ It is not ready, disable it now.
 #+end_src
 *** Build Scripts
 #+begin_src emacs-lisp
-;;cmake
-(use-package cmake-mode
-  :ensure t
-  :config
-  :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
-	 ("\\.cmake\\'" . cmake-mode)))
+  ;;cmake
+  (use-package cmake-mode
+    :ensure t :defer t
+    :mode (("/CMakeLists\\.txt\\'" . cmake-mode)
+           ("\\.cmake\\'" . cmake-mode)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1502,55 +1461,109 @@ It is not ready, disable it now.
     :ensure t
     :defer t
     :mode (("/meson\\.build\\'" . meson-mode))
+    :hook ((meson-mode . company-mode))
     )
 #+end_src
 
 *** Shader languages
-GLSL
-#+begin_src emacs-lisp
-;; glsl
-(use-package glsl-mode
-  :ensure t
-  :mode (("\\.glsl\\'" . glsl-mode)
-	 ("\\.vert\\'" . glsl-mode)
-	 ("\\.frag\\'" . glsl-mode)
-	 ("\\.geom\\'" . glsl-mode)
-	 ("\\.comp\\'" . glsl-mode)
-	 ("\\.rgen\\'" . glsl-mode)
-	 ("\\.rchit\\'" . glsl-mode)
-	 ("\\.rmiss\\'" . glsl-mode))
-  )
+**** GLSL
+#+begin_src emacs-lisp :noweb yes
+  ;; glsl
+  (use-package glsl-mode
+    :ensure t
+    :defer t
+    :mode (("\\.glsl\\'" . glsl-mode)
+           ("\\.vert\\'" . glsl-mode)
+           ("\\.frag\\'" . glsl-mode)
+           ("\\.geom\\'" . glsl-mode)
+           ("\\.comp\\'" . glsl-mode)
+           ("\\.rgen\\'" . glsl-mode)
+           ("\\.rchit\\'" . glsl-mode)
+           ("\\.rmiss\\'" . glsl-mode))
+    :hook
+    ((glsl-mode . company-mode)
+     (glsl-mode . (lambda ()
+                    <<GLSL_LSP>>)))
+    )
 #+end_src
 
-HLSL
+GLSL has a language server ~company-glsl~
 #+begin_src emacs-lisp
-;; hlsl
-(use-package hlsl-mode
-  :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
-  :mode (("\\.fxh\\'"    . hlsl-mode)
-	 ("\\.hlsl\\'"   . hlsl-mode)
-	 ("\\.vs\\'"     . hlsl-mode)
-	 ("\\.ps\\'"     . hlsl-mode)
-	 ("\\.hs\\'"     . hlsl-mode) ;;hull shader
-	 ("\\.ds\\'"     . hlsl-mode) ;;domain shader
-	 ("\\.cs\\'"     . hlsl-mode) ;;compute shader
-	 ("\\.ms\\'"     . hlsl-mode) ;;mesh shader
-	 ("\\.as\\'"     . hlsl-mode) ;;amplification shader
-	 ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
-	 ))
+  (use-package company-glsl
+    :defer t
+    :ensure t
+    :after company)
 #+end_src
-AZSL
+
+It depends on ~glslangValidator~ to be available.
+#+begin_src emacs-lisp :tangle no :noweb-ref GLSL_LSP
+  (when (executable-find "glslangValidator")
+    (add-to-list (make-local-variable 'company-backends)
+                 'company-glsl))
+#+end_src
+
+**** HLSL
+#+begin_src emacs-lisp :noweb yes
+  ;; hlsl
+  (use-package hlsl-mode
+    :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
+    :defer t
+    :mode (("\\.fxh\\'"    . hlsl-mode)
+           ("\\.hlsl\\'"   . hlsl-mode)
+           ("\\.vs\\'"     . hlsl-mode)
+           ("\\.ps\\'"     . hlsl-mode)
+           ("\\.hs\\'"     . hlsl-mode) ;;hull shader
+           ("\\.ds\\'"     . hlsl-mode) ;;domain shader
+           ("\\.cs\\'"     . hlsl-mode) ;;compute shader
+           ("\\.ms\\'"     . hlsl-mode) ;;mesh shader
+           ("\\.as\\'"     . hlsl-mode) ;;amplification shader
+           ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
+           )
+    :hook ((hlsl-mode . company-mode)
+           ;;TODO there is some bug on windows that :config block always run. I have to put it in hook
+           (hlsl-mode . (lambda ()
+                          <<HLSL_LSP>>
+                          )))
+    )
+#+end_src
+
+setup the slangd as language server if it's available
+#+begin_src emacs-lisp :tangle no :noweb-ref HLSL_LSP
+  (if (executable-find "slangd")
+      ;;available
+      (progn
+        (eglot-ensure)
+        (add-to-list 'eglot-server-programs
+                     `(hlsl-mode . ("slangd")))
+        (add-to-list
+         (make-local-variable 'company-backends) 'company-capf))
+    ;; not available
+    (my/merge-list-to-list
+     (make-local-variable 'company-backends)
+     (list  'company-keywords 'company-dabbrev)))
+#+end_src
+
+**** AZSL
+Currently AZSL does not have a language server so no [[https://company-mode.github.io/manual/Backends.html#index-company_002dcapf][company-capf]] available. I only use [[https://company-mode.github.io/manual/Backends.html#index-company_002ddabbrev][company-dabbrev]] and [[https://company-mode.github.io/manual/Backends.html#index-company_002dkeywords][company-keywords]].
+
 #+begin_src emacs-lisp
   (use-package azsl-mode
     :vc (:fetcher github :repo "xeechou/azsl-mode.el")
+    :defer t
     :mode (("\\.azsl\\'"  . azsl-mode)
-           ("\\.azsli\\'" . azsl-mode)))
+           ("\\.azsli\\'" . azsl-mode))
+    :hook ((azsl-mode . company-mode)))
+#+end_src
 
+**** unity shaders
+
+#+begin_src emacs-lisp
   (use-package shader-mode
     :disabled
     :ensure t
-    :mode (("\\.shader\\'" . hlsl-mode)))
+    :mode (("\\.shader\\'" . hlsl-mode)))  
 #+end_src
+
 *** Go Lang
 #+begin_src emacs-lisp
   ;; golang
