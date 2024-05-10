@@ -1529,7 +1529,8 @@ It depends on ~glslangValidator~ to be available.
 
 setup the slangd as language server if it's available
 #+begin_src emacs-lisp :tangle no :noweb-ref HLSL_LSP
-  (if (executable-find "slangd")
+  (if (and (executable-find "slangd")
+           (eq major-mode 'hlsl-mode)) ;; only enables for hlsl-mode
       ;;available
       (progn
         (eglot-ensure)
