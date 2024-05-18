@@ -1234,10 +1234,10 @@ treesit-auto does not work on windows at moment.
     (setq company-minimum-prefix-length 2
           company-idle-delay 0.1
           company-async-timeout 10
-          company-backends  '((company-files
-                               company-keywords
-                               company-yasnippet
-                               company-capf))))
+          company-backends  '(company-files
+                              company-keywords
+                              company-yasnippet
+                              company-capf)))
 #+end_src
 *** C/C++ family
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
@@ -1258,7 +1258,7 @@ CMake:
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (cmake-mode . company-mode)
   (cmake-mode .  (lambda () (my/merge-list-to-list
-                             (make-local-variable 'company-backends)
+                             'company-backends
                              (list 'company-cmake 'company-dabbrev))))
 #+end_src
 
@@ -1266,12 +1266,6 @@ CMake:
 company-elisp is remove so we just rely on internal backends
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (emacs-lisp-mode . company-mode)
-  (emacs-lisp-mode . (lambda () (my/merge-list-to-list
-                                 (make-local-variable 'company-backends)
-                                 (list
-                                  'company-dabbrev-code
-                                  'company-files
-                                  'company-keywords))))
 #+end_src
 
 *** Python
@@ -1301,7 +1295,7 @@ Outline mode includes org mode and markdowns
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (outline-mode    . company-mode) ;;enable for org mode
   (outline-mode    . (lambda () (my/merge-list-to-list
-                                 (make-local-variable 'company-backends)
+                                 'company-backends
                                  (list'company-dabbrev 'company-emoji))))
 #+end_src
 
@@ -1309,7 +1303,7 @@ simple text mode:
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (text-mode       . company-mode)
   (text-mode       . (lambda () (my/merge-list-to-list
-                                 (make-local-variable 'company-backends)
+                                 'company-backends
                                  (list 'company-dabbrev 'company-emoji))))
 #+end_src
 
@@ -1477,8 +1471,7 @@ GLSL has a language server ~company-glsl~
 It depends on ~glslangValidator~ to be available.
 #+begin_src emacs-lisp :tangle no :noweb-ref GLSL_LSP
   (when (executable-find "glslangValidator")
-    (add-to-list (make-local-variable 'company-backends)
-                 'company-glsl))
+    (add-to-list 'company-backends 'company-glsl))
 #+end_src
 
 **** HLSL
@@ -1515,12 +1508,10 @@ setup the slangd as language server if it's available
         (eglot-ensure)
         (add-to-list 'eglot-server-programs
                      `(hlsl-mode . ("slangd")))
-        (add-to-list
-         (make-local-variable 'company-backends) 'company-capf))
+        (add-to-list 'company-backends 'company-capf))
     ;; not available
-    (my/merge-list-to-list
-     (make-local-variable 'company-backends)
-     (list  'company-keywords 'company-dabbrev)))
+    (my/merge-list-to-list 'company-backends
+     (list 'company-keywords 'company-dabbrev)))
 #+end_src
 
 **** AZSL
