@@ -1537,7 +1537,12 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
 *** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode :ensure t :defer t
-    :mode (("\\.rs\\'" . rust-mode)))
+    :mode (("\\.rs\\'" . rust-mode))
+    :hook ((rust-mode rust-ts-mode) . company-mode)
+    :init
+    (when (executable-find "rust-analyzer")
+      (add-hook 'rust-mode-hook 'eglot-ensure)
+      (add-hook 'rust-ts-mode-hook 'eglot-ensure)))
 #+end_src
 
 *** Go Lang
