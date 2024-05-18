@@ -1,6 +1,7 @@
 #+TITLE: My Vanilla yet powerful Emacs environment
 #+AUTHOR: Xichen Zhou
 #+OPTIONS: toc:1
+#+PROPERTY: header-args :tangle README.el
 
 * Introduction
 For years I have been perfecting my Emacs configuration, it is now the
@@ -46,7 +47,7 @@ I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for t
 All my functions are defined with prefix ~my/~.
 
 ** File operations
-#+begin_src emacs-lisp emacs-lisp
+#+begin_src emacs-lisp
   (defun my/dotfile-dir ()
     (file-name-directory (or (buffer-file-name) load-file-name)))
 
@@ -205,6 +206,7 @@ copied from emacswiki
     ;;setup the column, this max length for the first level we can go, maybe we
     ;;can somehow calculate it?
     (org-tags-column -54)
+    (org-image-actual-width 600)
 
     ;;faces
     (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
@@ -1565,6 +1567,12 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
     :mode (("\\.shader\\'" . hlsl-mode)))  
 #+end_src
 
+*** Rust
+#+begin_src emacs-lisp
+  (use-package rust-mode
+    :ensure t :defer t :mode (("\\.rs\\'" . rust-mode)))
+#+end_src
+
 *** Go Lang
 #+begin_src emacs-lisp
   ;; golang
@@ -1672,7 +1680,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
   (use-package graphviz-dot-mode :ensure t
     :mode (("\\.dot\\'" . graphviz-dot-mode)))
 
-  (use-package rust-mode :ensure t :mode (("\\.rs\\'" . rust-mode)))
+
 
   (use-package gdscript-mode :ensure t :mode (("\\.gd\\'" . gdscript-mode)))
 
