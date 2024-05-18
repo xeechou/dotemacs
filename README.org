@@ -1,6 +1,7 @@
 #+TITLE: My Vanilla yet powerful Emacs environment
 #+AUTHOR: Xichen Zhou
 #+OPTIONS: toc:1
+#+PROPERTY: header-args :tangle README.el
 
 * Introduction
 For years I have been perfecting my Emacs configuration, it is now the
@@ -46,7 +47,7 @@ I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for t
 All my functions are defined with prefix ~my/~.
 
 ** File operations
-#+begin_src emacs-lisp emacs-lisp
+#+begin_src emacs-lisp
   (defun my/dotfile-dir ()
     (file-name-directory (or (buffer-file-name) load-file-name)))
 
@@ -128,15 +129,13 @@ Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have t
 
 ** Generate UUIDs
 #+begin_src emacs-lisp
-(use-package uuidgen
-  :ensure t
-  :pin melpa
-  :init
-  (defun my/insert-uuid ()
-    "insert UUID at the point"
-    (interactive)
-    (insert (uuidgen-4)))
-  )
+  (use-package uuidgen :ensure t :defer t :pin melpa
+    :init
+    (defun my/insert-uuid ()
+      "insert UUID at the point"
+      (interactive)
+      (insert (uuidgen-4)))
+    )
 #+end_src
 
 * Global settings
@@ -193,8 +192,7 @@ copied from emacswiki
 #+end_src
 ** Org Mode
 #+begin_src emacs-lisp :noweb yes
-  (use-package org
-    :ensure t
+  (use-package org :ensure t :defer t
     :mode (("\\.org$" . org-mode))
     :commands org-capture
     :custom
@@ -205,6 +203,7 @@ copied from emacswiki
     ;;setup the column, this max length for the first level we can go, maybe we
     ;;can somehow calculate it?
     (org-tags-column -54)
+    (org-image-actual-width 600)
 
     ;;faces
     (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
@@ -352,7 +351,7 @@ On archlinux, you need to install
 ;; journal
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package org-journal
-  :ensure t :pin melpa :after org :defer t
+  :ensure t :pin melpa :after org
   :init
   (defun my/journal-dir () (my/org-file "journals/"))
   (defun my/org-journal-find-location ()
@@ -391,16 +390,13 @@ On archlinux, you need to install
 
 #+begin_src emacs-lisp
 
-  (use-package mixed-pitch
-    :ensure t
+  (use-package mixed-pitch :ensure t :defer t
     :hook
     (org-mode . mixed-pitch-mode)
     :custom
     (mixed-pitch-variable-pitch-cursor 'box))
 
-  (use-package org-modern
-    :ensure t
-    :after org
+  (use-package org-modern :ensure t :after org
     :hook
     (org-mode . org-modern-mode)
     (org-agenda-finalize . org-modern-agenda)
@@ -457,9 +453,7 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
 #+end_src
 
 #+begin_src emacs-lisp :noweb yes
-  (use-package org-roam
-    :ensure t
-    :after org
+  (use-package org-roam :ensure t :after org
     :init
     <<ROAM_SQLITE>>
     ;; disable org-roam warning
@@ -537,131 +531,121 @@ visiting roam pages using different other window. It's most case what you want.
 
 ** Org roam UI
 #+begin_src emacs-lisp
-(use-package org-roam-ui
-  :ensure t
-  :diminish org-roam-ui-mode
-  :after org-roam
-  :config
-  (setq org-roam-ui-sync-theme nil
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
+  (use-package org-roam-ui :ensure t :after org-roam
+    :diminish org-roam-ui-mode
+    :config
+    (setq org-roam-ui-sync-theme nil
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 
 #+end_src
 ** Org utilities
 *** Clipboard
 #+begin_src emacs-lisp
 
-(use-package org-cliplink
-  :ensure t
-  :bind (:map org-mode-map
-	      ("C-c C-p i" . org-cliplink)
-	      ("C-c C-p l" . org-store-link)))
+  (use-package org-cliplink :ensure t :after org
+    :bind (:map org-mode-map
+                ("C-c C-p i" . org-cliplink)
+                ("C-c C-p l" . org-store-link)))
 #+end_src
 
 *** Org download
 #+begin_src emacs-lisp
-;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package org-download
-  :ensure t :after org
-  :init
-  (defun my/org-dir-is-fixed (currdir)
-    (let ((org-dir     (file-truename org-directory))     ;;get abs path
-	  (roam-dir    (file-truename (my/roam-dir)))     ;;get abs path
-	  (journal-dir (file-truename (my/journal-dir)))) ;;get abs path
-      (or (string= currdir org-dir)
-	  (string= currdir roam-dir)
-	  (string= currdir journal-dir))))
-  :hook
-  ;;this hook will run at-startup because of org-clock, and we do not have a
-  ;;(buffer-file-name) then, so we need to error check it
-  (org-mode . (lambda ()
-		(when (buffer-file-name)
-		  (let ((currdir (file-name-directory (buffer-file-name))))
-		    ;;set org-download-iamge-dir to imgs/ if is
-		    ;;agenda/roam/journal, otherwise it is temporary, make it nil
-		    (set (make-local-variable 'org-download-image-dir)
-			 (if (my/org-dir-is-fixed currdir)
-			     (my/concat-path currdir "imgs/")
-			   nil))))))
-  :bind (:map org-mode-map
-	      ("C-c C-p s" . org-download-screenshot)
-	      ("C-c C-p y" . org-download-yank)
-	      ("C-c C-p c" . org-download-clipboard)))
+  ;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (use-package org-download :ensure t :after org
+    :init
+    (defun my/org-dir-is-fixed (currdir)
+      (let ((org-dir     (file-truename org-directory))     ;;get abs path
+            (roam-dir    (file-truename (my/roam-dir)))     ;;get abs path
+            (journal-dir (file-truename (my/journal-dir)))) ;;get abs path
+        (or (string= currdir org-dir)
+            (string= currdir roam-dir)
+            (string= currdir journal-dir))))
+    :hook
+    ;;this hook will run at-startup because of org-clock, and we do not have a
+    ;;(buffer-file-name) then, so we need to error check it
+    (org-mode . (lambda ()
+                  (when (buffer-file-name)
+                    (let ((currdir (file-name-directory (buffer-file-name))))
+                      ;;set org-download-iamge-dir to imgs/ if is
+                      ;;agenda/roam/journal, otherwise it is temporary, make it nil
+                      (set (make-local-variable 'org-download-image-dir)
+                           (if (my/org-dir-is-fixed currdir)
+                               (my/concat-path currdir "imgs/")
+                             nil))))))
+    :bind (:map org-mode-map
+                ("C-c C-p s" . org-download-screenshot)
+                ("C-c C-p y" . org-download-yank)
+                ("C-c C-p c" . org-download-clipboard)))
 
 #+end_src
 *** Org Ref
 using the IVY framework 
 #+begin_src emacs-lisp
-(use-package ivy-bibtex
-  :ensure t
-  :after org
-  :init
-  (setq bibtex-completion-bibliography `,(my/org-file "bib/references.bib")))
+  (use-package ivy-bibtex :ensure t :after org
+    :init
+    (setq bibtex-completion-bibliography `,(my/org-file "bib/references.bib")))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org-ref
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package org-ref
-  :ensure t
-  :after org
-  :init
-  (require 'org-ref-arxiv)
-  (require 'org-ref-scopus)
-  (require 'org-ref-wos)
-  (require 'org-ref-ivy)
-  (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
-	org-ref-insert-cite-function 'org-ref-cite-insert-ivy
-	org-ref-insert-label-function 'org-ref-insert-label-link
-	org-ref-insert-ref-function 'org-ref-insert-ref-link
-	org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
-  ;; setup auto generating bibtex keys
-  (require 'bibtex)
-  (setq bibtex-autokey-year-length 4
-	bibtex-autokey-name-year-separator "-"
-	bibtex-autokey-year-title-separator "-"
-	bibtex-autokey-titleword-separator "-"
-	bibtex-autokey-titlewords 2
-	bibtex-autokey-titlewords-stretch 1
-	bibtex-autokey-titleword-length 5)
-  ;; export to pdf with bibtex
-  ;;this is when you don't have latexmk
-  (setq org-latex-pdf-process
-	(if (executable-find "latexmk")
-	    ;;when you have latexmk
-	    (list "latexmk -shell-escape -bibtex -f -pdf %f")
-	  ;;when you don't have latexmk
-	  '("pdflatex -interaction nonstopmode -output-directory %o %f"
-	    "bibtex %b" ;;using bibtex here, or you can use biber
-	    "pdflatex -interaction nonstopmode -output-directory %o %f"
-	    "pdflatex -interaction nonstopmode -output-directory %o %f")))
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; org-ref
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (use-package org-ref :ensure t :after org
+    :init
+    (require 'org-ref-arxiv)
+    (require 'org-ref-scopus)
+    (require 'org-ref-wos)
+    (require 'org-ref-ivy)
+    (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+          org-ref-insert-cite-function 'org-ref-cite-insert-ivy
+          org-ref-insert-label-function 'org-ref-insert-label-link
+          org-ref-insert-ref-function 'org-ref-insert-ref-link
+          org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body)))
+    ;; setup auto generating bibtex keys
+    (require 'bibtex)
+    (setq bibtex-autokey-year-length 4
+          bibtex-autokey-name-year-separator "-"
+          bibtex-autokey-year-title-separator "-"
+          bibtex-autokey-titleword-separator "-"
+          bibtex-autokey-titlewords 2
+          bibtex-autokey-titlewords-stretch 1
+          bibtex-autokey-titleword-length 5)
+    ;; export to pdf with bibtex
+    ;;this is when you don't have latexmk
+    (setq org-latex-pdf-process
+          (if (executable-find "latexmk")
+              ;;when you have latexmk
+              (list "latexmk -shell-escape -bibtex -f -pdf %f")
+            ;;when you don't have latexmk
+            '("pdflatex -interaction nonstopmode -output-directory %o %f"
+              "bibtex %b" ;;using bibtex here, or you can use biber
+              "pdflatex -interaction nonstopmode -output-directory %o %f"
+              "pdflatex -interaction nonstopmode -output-directory %o %f")))
 
-  :bind (:map org-mode-map
-	      ("C-c [" . org-ref-insert-link-hydra/body)
-	      ("C-c ]" . org-ref-insert-link))
-  )
+    :bind (:map org-mode-map
+                ("C-c [" . org-ref-insert-link-hydra/body)
+                ("C-c ]" . org-ref-insert-link))
+    )
 
 #+end_src
 ** Org Contrib
 #+begin_src emacs-lisp
-(use-package org-contrib
-  :ensure t
-  :after org
-  :init
-  (require 'ox-groff))
+  (use-package org-contrib :ensure t :after org
+    :init
+    (require 'ox-groff))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; disabled-config
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; disabled-config
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; My synchronizer
-;; (use-package org-msync :load-path "lisp/"
-;;   :hook ((org-mode . org-msync-after-save-hook)
-;; 	 (auto-save . org-msync-auto-save-hook))
-;;   :custom
-;;   (org-msync-local-dir org-directory)
-;;   (org-msync-remote-dir "~/Documents/org-remote/")
-;;   )
+  ;; My synchronizer
+  ;; (use-package org-msync :load-path "lisp/"
+  ;;   :hook ((org-mode . org-msync-after-save-hook)
+  ;; 	 (auto-save . org-msync-auto-save-hook))
+  ;;   :custom
+  ;;   (org-msync-local-dir org-directory)
+  ;;   (org-msync-remote-dir "~/Documents/org-remote/")
+  ;;   )
 #+end_src
 
 ** Deft mode
@@ -680,7 +664,7 @@ using the IVY framework
 The [[https://titan-c.gitlab.io/org-cv/][Org CV]] package helps manages the curriculum-vitae easily. The other custom option is following [[https://www.aidanscannell.com/post/org-mode-resume/][Aidan Scannell's post]].
 
 #+begin_src emacs-lisp
-  (use-package ox-moderncv
+  (use-package ox-moderncv ;;TODO this is an exception to defer?
     :vc (:fetcher github :repo "Titan-C/org-cv")
     :init (require 'ox-moderncv))
 #+end_src
@@ -748,8 +732,7 @@ move line up and down:
 ** Moving in the mark ring
 backward-forward package helps us jump back-forward in the mark ring.
 #+begin_src emacs-lisp
-  (use-package backward-forward
-    :ensure t
+  (use-package backward-forward :ensure t
     :demand
     :config
     (backward-forward-mode t)
@@ -774,8 +757,7 @@ winner mode has two default keybinding
 - "C-c left" : for ~winner-undo~
 - "C-c right" : for ~winner-redo~
 #+begin_src emacs-lisp
-(use-package winner
-  :defer t
+(use-package winner :defer t :ensure t
   :diminish winner-mode
   :hook ((prog-mode text-mode) . winner-mode))
 #+end_src
@@ -800,8 +782,7 @@ I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my edit
 *** Counsel
 [[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
 #+begin_src emacs-lisp
-  (use-package counsel :ensure t
-    :ensure t
+  (use-package counsel :ensure t :after ivy
     :config
     (use-package smex :ensure t)
     :bind
@@ -875,32 +856,32 @@ And also enable the ~.dir-locals.el~ on remote machine.
 ** Spell check
 the excellent fly-spell to correct my common typing mistakes.
 #+begin_src emacs-lisp
-(use-package flyspell
-  :if (or (executable-find "ispell") (executable-find "hunspell") (executable-find "aspell"))
-  :defer t
-  :hook ((prog-mode . flyspell-prog-mode)
-	 (text-mode . flyspell-mode) ;;for markdown, org, nxml
-	 ;;also disable it for specific mode
-	 (change-log-mode . (turn-off-flyspell)))
-  :init
-  ;;for flyspell to work, you need to set LANG first
-  ;; on windows, getenv has strange behavior, getenv-internal seems to work correctly.
-  ;; (when (not (getenv-internal "LANG" initial-environment))
-  (setenv "LANG" "en_US")
-  :custom  (ispell-program-name (or (executable-find "hunspell")
-				    (executable-find "aspell")
-				    (executable-find "ispell")))
-  ;;:config
-  ;;TODO flyspell language-tool
-  )  
+  (use-package flyspell
+    :if (or (executable-find "ispell")
+            (executable-find "hunspell")
+            (executable-find "aspell"))
+    :defer t
+    :hook ((prog-mode . flyspell-prog-mode)
+           (text-mode . flyspell-mode) ;;for markdown, org, nxml
+           ;;also disable it for specific mode
+           (change-log-mode . (turn-off-flyspell)))
+    :init
+    ;;for flyspell to work, you need to set LANG first
+    ;; on windows, getenv has strange behavior, getenv-internal seems to work correctly.
+    ;; (when (not (getenv-internal "LANG" initial-environment))
+    (setenv "LANG" "en_US")
+    :custom  (ispell-program-name (or (executable-find "hunspell")
+                                      (executable-find "aspell")
+                                      (executable-find "ispell")))
+    ;;:config
+    ;;TODO flyspell language-tool
+    )  
 #+end_src
 
 Flyspell correct
 #+begin_src emacs-lisp
 ;; correcting word and save it to personal dictionary
-(use-package flyspell-correct
-  :ensure t
-  :after flyspell
+(use-package flyspell-correct :ensure t :after flyspell
   :bind (:map flyspell-mode-map ("C-c ;" . flyspell-correct-wrapper)))
 #+end_src
 Using our [[*IVY][IVY]] framework for correction prompts.
@@ -936,16 +917,16 @@ I have tried a few themes, not satisfied with most of them. Either the contrast 
 - [[https://github.com/protesilaos/modus-themes][modus-themes]]: *current choice*. I like the tinted version of the theme, however I have to disable defer loading to make it work.
 
 #+begin_src emacs-lisp
-(use-package modus-themes
-  ;; TODO have to disable defer to get circadian to work
-  :ensure t
-  :init
-  (setq modus-themes-mixed-fonts t)
-  (setq modus-themes-common-palette-overrides
-	`(
-	  ;; From the section "Make the mode line borderless"
-	  (border-mode-line-active unspecified)
-	  (border-mode-line-inactive unspecified))))  
+  (use-package modus-themes
+    ;; TODO have to disable defer to get circadian to work
+    :ensure t
+    :init
+    (setq modus-themes-mixed-fonts t)
+    (setq modus-themes-common-palette-overrides
+          `(
+            ;; From the section "Make the mode line borderless"
+            (border-mode-line-active unspecified)
+            (border-mode-line-inactive unspecified))))  
 #+end_src
 
 Now I setup my desired theme here
@@ -962,13 +943,14 @@ My setup uses ~run-with-timer~ every hour to check the if it's time to change th
 [[https://github.com/mickeynp/ligature.el][ligature]] is a typographical method to combine two or more glyphs or letters  to form a single glyph.
 
 #+begin_src emacs-lisp
-(use-package ligature
-  :vc (:fetcher github :repo "mickeynp/ligature.el")
-  :if (string-match "HARFBUZZ" system-configuration-features)
-  :hook ((prog-mode text-mode) . ligature-mode)
-  :config
-  ;; Enable "www" ligature in every possible major mode
-  (ligature-set-ligatures 't '("www")))  
+  (use-package ligature
+    :defer t
+    :vc (:fetcher github :repo "mickeynp/ligature.el")
+    :if (string-match "HARFBUZZ" system-configuration-features)
+    :hook ((prog-mode text-mode) . ligature-mode)
+    :config
+    ;; Enable "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www")))  
 #+end_src
 
 I created a small package to manage my fixed width font(with ligature), proportional font, CJK font and emoji font.
@@ -1224,11 +1206,10 @@ treesit-auto does not work on windows at moment.
       :unless (or (eq system-type 'windows-nt)
                   (not (treesit-available-p)))
       :ensure t
-      :demand t
       :custom
       (c-ts-mode-indent-style #'my/indent-rules)
+      :hook ((after-init . treesit-auto-mode))
       :config
-      (global-treesit-auto-mode)
       (setq-default treesit-font-lock-level 3)
       (treesit-auto-add-to-auto-mode-alist 'all)
       (setq treesit-auto-install 'prompt))
@@ -1237,8 +1218,8 @@ treesit-auto does not work on windows at moment.
 ** Company mode
 
 #+begin_src emacs-lisp
-(use-package company-c-headers :ensure t)
-;; (setq clang-known-modes '(c++-mode c-mode))
+  (use-package company-c-headers :ensure t :defer t)
+  ;; (setq clang-known-modes '(c++-mode c-mode))
 #+end_src
 
 #+begin_src emacs-lisp :noweb yes
@@ -1385,38 +1366,36 @@ It is not ready, disable it now.
 #+end_src
 *** [[https://github.com/rurban/rmsbolt][Rmsbolt]] mode
 #+begin_src emacs-lisp
+   ;;compiler explorer in emacs
+  (use-package rmsbolt   :ensure t :defer t
+    ;; rmsbolt changes keybinding C-c C-c, which is bonded to comment code.
+    ;; :bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))
+    :hook
+    ;;rmsbolt does not support tree-sitter. We have to manually set it, coping from
+    ;;rmsbolt.el
+    (rmsbolt-mode . (lambda ()
+                      (cond ((eq major-mode 'c-ts-mode)
+                             (setq rmsbolt-language-descriptor
+                                   (make-rmsbolt-lang :compile-cmd "gcc"
+                                                      :supports-asm t
+                                                      :supports-disass t
+                                                      :demangler "c++filt"
+                                                      :compile-cmd-function #'rmsbolt--c-compile-cmd
+                                                      :disass-hidden-funcs
+                                                      rmsbolt--hidden-func-c)))
+                            ((eq major-mode 'c++-ts-mode)
+                             (setq rmsbolt-language-descriptor
+                                   (make-rmsbolt-lang :compile-cmd "g++"
+                                                      :supports-asm t
+                                                      :supports-disass t
+                                                      :demangler "c++filt"
+                                                      :compile-cmd-function #'rmsbolt--c-compile-cmd
+                                                      :disass-hidden-funcs rmsbolt--hidden-func-c)))
+                            ) ;;cond
 
-
-(use-package rmsbolt ;;compiler explorer in emacs
-  :ensure t
-  ;; rmsbolt changes keybinding C-c C-c, which is bonded to comment code.
-  ;; :bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))
-  :hook
-  ;;rmsbolt does not support tree-sitter. We have to manually set it, coping from
-  ;;rmsbolt.el
-  (rmsbolt-mode . (lambda ()
-		    (cond ((eq major-mode 'c-ts-mode)
-			   (setq rmsbolt-language-descriptor
-				 (make-rmsbolt-lang :compile-cmd "gcc"
-						    :supports-asm t
-						    :supports-disass t
-						    :demangler "c++filt"
-						    :compile-cmd-function #'rmsbolt--c-compile-cmd
-						    :disass-hidden-funcs
-						    rmsbolt--hidden-func-c)))
-			  ((eq major-mode 'c++-ts-mode)
-			   (setq rmsbolt-language-descriptor
-				 (make-rmsbolt-lang :compile-cmd "g++"
-						    :supports-asm t
-						    :supports-disass t
-						    :demangler "c++filt"
-						    :compile-cmd-function #'rmsbolt--c-compile-cmd
-						    :disass-hidden-funcs rmsbolt--hidden-func-c)))
-			  ) ;;cond
-
-		    ;;TODO adding GLSL/HLSL languages?
-		    )) ;;rmsbolt-mode-hook
-  )
+                      ;;TODO adding GLSL/HLSL languages?
+                      )) ;;rmsbolt-mode-hook
+    )
 #+end_src
 
 ** Languages
@@ -1561,15 +1540,19 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
 #+begin_src emacs-lisp
   (use-package shader-mode
     :disabled
-    :ensure t
     :mode (("\\.shader\\'" . hlsl-mode)))  
+#+end_src
+
+*** Rust
+#+begin_src emacs-lisp
+  (use-package rust-mode :ensure t :defer t
+    :mode (("\\.rs\\'" . rust-mode)))
 #+end_src
 
 *** Go Lang
 #+begin_src emacs-lisp
   ;; golang
-  (use-package go-mode
-    :ensure t
+  (use-package go-mode :ensure t :defer t
     :mode (("\\.go\\'" . go-mode)
            ("\\.mode\\'" . go-mode))
     :hook ((go-mode . (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t)))))
@@ -1586,14 +1569,15 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
 
   (use-package web-mode
     :ensure t
+    :defer t    
     :pin melpa
-    :defer t
     :mode ("\\.html?\\'" . web-mode))
 
   ;;typescript
   (use-package typescript-mode
     :ensure t
-    :mode "\\.ts\\'"
+    :defer t
+    :mode (("\\.ts\\'" . typescript-mode))
     :config
     (setq typescript-indent-level 2)
     (setq-default indent-tabs-mode nil)
@@ -1601,6 +1585,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
 
   (use-package json-mode
     :ensure t
+    :defer t
     :pin melpa
     :mode (("\\.json\\'" . json-mode)
            ;; O3DE passes and assets use json format
@@ -1660,7 +1645,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 *** Other languages
 #+begin_src emacs-lisp
   ;;lua
-  (use-package lua-mode :ensure t
+  (use-package lua-mode :ensure t :defer t
     :mode (("\\.lua\\'" . lua-mode))
     :hook
     ((lua-mode . company-mode)
@@ -1669,30 +1654,37 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
                      (eglot-ensure))))))
 
   ;;graphviz dot
-  (use-package graphviz-dot-mode :ensure t
+  (use-package graphviz-dot-mode :ensure t :defer t
     :mode (("\\.dot\\'" . graphviz-dot-mode)))
 
-  (use-package rust-mode :ensure t :mode (("\\.rs\\'" . rust-mode)))
 
-  (use-package gdscript-mode :ensure t :mode (("\\.gd\\'" . gdscript-mode)))
 
-  (use-package markdown-mode :ensure t :mode (("\\.md\\'" . markdown-mode)))
+  (use-package gdscript-mode :ensure t :defer t
+    :mode (("\\.gd\\'" . gdscript-mode)))
 
-  (use-package octave :ensure t :mode (("\\.m\\'" . octave-mode)))
+  (use-package markdown-mode :ensure t :defer t
+    :mode (("\\.md\\'" . markdown-mode)))
 
-  (use-package yaml-mode :ensure t :mode (("\\.yml\\'" . yaml-mode)))
+  (use-package octave :ensure t :defer t
+    :mode (("\\.m\\'" . octave-mode)))
 
-  (use-package powershell :ensure t :mode (("\\.ps1\\'" . powershell-mode)))
+  (use-package yaml-mode :ensure t :defer t
+    :mode (("\\.yml\\'" . yaml-mode)))
+
+  (use-package powershell :ensure t :defer t
+    :mode (("\\.ps1\\'" . powershell-mode)))
 
   ;; built-in
-  (use-package nxml-mode :mode (("\\.xml\\'" . nxml-mode)
-                                ("\\.ofx\\'" . nxml-mode)
-                                ;;quick book
-                                ("\\.qfx\\'" . nxml-mode)))
+  (use-package nxml-mode
+    :defer t
+    :mode (("\\.xml\\'" . nxml-mode)
+           ("\\.ofx\\'" . nxml-mode)
+           ;;quick book
+           ("\\.qfx\\'" . nxml-mode)))
 #+end_src
 *** Disabled languages
 #+begin_src emacs-lisp
-  (use-package tex :ensure auctex
+  (use-package tex :ensure auctex :defer t
     :disabled
     :custom
     (TeX-master              nil)
@@ -1708,6 +1700,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
   (use-package unity
     :disabled
+    :defer t
     :vc (:fetcher github :repo "elizagamedev/unity.Eli")
     :hook (after-init . unity-mode))  
 #+end_src
@@ -1813,7 +1806,7 @@ We add additional backend for when using proxy
 The ellama package is disabled in favor of getel.
 #+begin_src emacs-lisp
   (when (executable-find "ollama")
-    (use-package ellama :ensure t
+    (use-package ellama :ensure t :defer t
       :disabled
       :init
       ;; setup key bindings
@@ -1864,8 +1857,8 @@ pdftools _disabled_
 ** News letter
 we configure Emacs with [[https://github.com/skeeto/elfeed][elfeed]] to read the news.
 #+begin_src emacs-lisp
-(use-package elfeed :ensure t
-:config (elfeed-set-max-connections 32))
+  (use-package elfeed :ensure t :defer t
+    :config (elfeed-set-max-connections 32))
 #+end_src
 Here are some of the key bindings for elfeed:
 
