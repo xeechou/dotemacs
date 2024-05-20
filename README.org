@@ -57,6 +57,11 @@ All my functions are defined with prefix ~my/~.
   (defun my/merge-list-to-list (dst-list src-list)
     (dolist (item src-list) (add-to-list dst-list item)))
 
+  (defun my/merge-list-buffer-local (dst-list src-list)
+    ;;not that dst-list need to be quoted
+    (make-variable-buffer-local dst-list)
+    (my/merge-list-to-list dst-list src-list))
+
   (defun my/filename ()
     "Copy the filename of the current buffer."
     (interactive)
@@ -1226,6 +1231,7 @@ treesit-auto does not work on windows at moment.
   (use-package company
     :ensure t
     :defer t
+    ;;one-liner setups for languages
     :hook (
            <<COMPANY_HOOKS>>
            )
@@ -1239,50 +1245,35 @@ treesit-auto does not work on windows at moment.
                               company-yasnippet
                               company-capf)))
 #+end_src
-*** C/C++ family
-#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  ((c++-mode c++-ts-mode) . company-mode)
-  ((c-mode c-ts-mode)     . company-mode)
-  ((c++-mode c++-ts-mode c-mode c-ts-mode) .
-   ;;override default company backends because eglot not compatible with company-clang
-   (lambda () (set (make-local-variable 'company-backends)
-                   '(company-capf
-                     company-files
-                     company-keywords
-                     company-dabbrev
-                     company-yasnippet))))
 
-#+end_src
-
-CMake:
+*** Built-in company hooks
+CMake we just add company-dabbrev and company-cmake.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (cmake-mode . company-mode)
-  (cmake-mode .  (lambda () (my/merge-list-to-list
+  (cmake-mode .  (lambda () (my/merge-list-buffer-local
                              'company-backends
                              (list 'company-cmake 'company-dabbrev))))
 #+end_src
 
-*** Emacs lisp
-company-elisp is remove so we just rely on internal backends
+- company-elisp ::  is remove so we just rely on internal backends.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (emacs-lisp-mode . company-mode)
 #+end_src
 
-*** Python
+- Python :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
 
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   ((python-mode python-ts-mode) . company-mode)
 #+end_src
 
-NOTE that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
+*NOTE* that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
 
 #+begin_src shell-script :tangle no
   pipx inject python-lsp-server [[your packages here]]
 #+end_src
 
 
-*** Texts
-We add company-emoji to company backends.
+- TEXT :: We add company-emoji to company backends.
 #+begin_src emacs-lisp
   (use-package company-emoji
     :defer t
@@ -1290,21 +1281,20 @@ We add company-emoji to company backends.
     :after company)
 #+end_src
 
-
 Outline mode includes org mode and markdowns
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  (outline-mode    . company-mode) ;;enable for org mode
-  (outline-mode    . (lambda () (my/merge-list-to-list
-                                 'company-backends
-                                 (list'company-dabbrev 'company-emoji))))
+  (outline-mode . company-mode) ;;enable for org mode
+  (outline-mode . (lambda () (my/merge-list-buffer-local
+                              'company-backends
+                              (list'company-dabbrev 'company-emoji))))
 #+end_src
 
 simple text mode:
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  (text-mode       . company-mode)
-  (text-mode       . (lambda () (my/merge-list-to-list
-                                 'company-backends
-                                 (list 'company-dabbrev 'company-emoji))))
+  (text-mode . company-mode)
+  (text-mode . (lambda () (my/merge-list-buffer-local
+                           'company-backends
+                           (list 'company-dabbrev 'company-emoji))))
 #+end_src
 
 ** Eglot mode
@@ -1395,29 +1385,40 @@ It is not ready, disable it now.
 ** Languages
 *** C family
 #+begin_src emacs-lisp
-;; C family
-(use-package cc-mode
-  :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
-	 ("\\.m\\'" . c-mode)
-	 ("\\.mm\\'" . c++-mode)
-	 ("\\.inl\\'" . c++-mode))
-  :preface
-  (defun my/cmode-hook ()
-    ;;default settings
-    (setq c-default-style "linux"
-	  c-basic-offset 8)
-    (c-set-offset 'inextern-lang 0)
-    (c-set-offset 'innamespace 0)
-    (c-set-offset 'inline-open 0)
-    )
-  :config
-  (require 'cc-file-styles)
-  (c-add-style (car cc-file-style-o3de)
-	       (cdr cc-file-style-o3de))
-  (c-add-style (car cc-file-style-sparroh)
-	       (cdr cc-file-style-sparroh))
-  :hook
-  ((c-mode-common . my/cmode-hook)))
+  ;; C family
+  (use-package cc-mode
+    :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
+           ("\\.m\\'" . c-mode)
+           ("\\.mm\\'" . c++-mode)
+           ("\\.inl\\'" . c++-mode))
+    :preface
+    (defun my/cmode-hook ()
+      ;;default settings
+      (setq c-default-style "linux"
+            c-basic-offset 8)
+      (c-set-offset 'inextern-lang 0)
+      (c-set-offset 'innamespace 0)
+      (c-set-offset 'inline-open 0))
+
+    (defun my/cmode-company-hook ()
+      ;;override default company backends because eglot not compatible with
+      ;;company-clang
+      (set (make-local-variable 'company-backends)
+           '(company-capf
+             company-files
+             company-keywords
+             company-dabbrev
+             company-yasnippet)))
+    :config
+    (require 'cc-file-styles)
+    (c-add-style (car cc-file-style-o3de)
+                 (cdr cc-file-style-o3de))
+    (c-add-style (car cc-file-style-sparroh)
+                 (cdr cc-file-style-sparroh))
+    :hook
+    ((c-mode-common . my/cmode-hook)
+     ((c++-mode c++-ts-mode c-mode c-ts-mode) . company-mode)
+     ((c++-mode c++-ts-mode c-mode c-ts-mode) . my/cmode-company-hook)))
 #+end_src
 *** Build Scripts
 #+begin_src emacs-lisp
@@ -1445,6 +1446,10 @@ It is not ready, disable it now.
   (use-package glsl-mode
     :ensure t
     :defer t
+    :init
+    (defun my/glsl-mode-hook ()
+      <<GLSL_LSP>>
+        )
     :mode (("\\.glsl\\'" . glsl-mode)
            ("\\.vert\\'" . glsl-mode)
            ("\\.frag\\'" . glsl-mode)
@@ -1455,9 +1460,7 @@ It is not ready, disable it now.
            ("\\.rmiss\\'" . glsl-mode))
     :hook
     ((glsl-mode . company-mode)
-     (glsl-mode . (lambda ()
-                    <<GLSL_LSP>>)))
-    )
+     (glsl-mode . my/glsl-mode-hook)))
 #+end_src
 
 GLSL has a language server ~company-glsl~
@@ -1471,6 +1474,7 @@ GLSL has a language server ~company-glsl~
 It depends on ~glslangValidator~ to be available.
 #+begin_src emacs-lisp :tangle no :noweb-ref GLSL_LSP
   (when (executable-find "glslangValidator")
+    (make-variable-buffer-local 'company-backends)
     (add-to-list 'company-backends 'company-glsl))
 #+end_src
 
@@ -1491,12 +1495,14 @@ It depends on ~glslangValidator~ to be available.
            ("\\.as\\'"     . hlsl-mode) ;;amplification shader
            ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
            )
+    :init
+    (defun my/hlsl-mode-hook ()
+      <<HLSL_LSP>>
+      )
     :hook ((hlsl-mode . company-mode)
-           ;;TODO there is some bug on windows that :config block always run. I have to put it in hook
-           (hlsl-mode . (lambda ()
-                          <<HLSL_LSP>>
-                          )))
-    )
+           ;;TODO there is some bug on windows that :config block always run. I
+           ;;have to put it in hook
+           (hlsl-mode . my/hlsl-mode-hook)))
 #+end_src
 
 setup the slangd as language server if it's available
@@ -1510,8 +1516,8 @@ setup the slangd as language server if it's available
                      `(hlsl-mode . ("slangd")))
         (add-to-list 'company-backends 'company-capf))
     ;; not available
-    (my/merge-list-to-list 'company-backends
-     (list 'company-keywords 'company-dabbrev)))
+    (my/merge-list-buffer-local 'company-backends
+                           (list 'company-keywords 'company-dabbrev)))
 #+end_src
 
 **** AZSL
@@ -1537,7 +1543,12 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
 *** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode :ensure t :defer t
-    :mode (("\\.rs\\'" . rust-mode)))
+    :mode (("\\.rs\\'" . rust-mode))
+    :hook ((rust-mode rust-ts-mode) . company-mode)
+    :init
+    (when (executable-find "rust-analyzer")
+      (add-hook 'rust-mode-hook 'eglot-ensure)
+      (add-hook 'rust-ts-mode-hook 'eglot-ensure)))
 #+end_src
 
 *** Go Lang
