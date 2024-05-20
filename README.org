@@ -1390,6 +1390,10 @@ Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it 
 #+end_src
 
 **** TODO However for unknown reason. The [[https://github.com/emacsmirror/rmsbolt/blob/master/rmsbolt.el#L230][rmsbolt-line-mapping]] not working well on windows. We should probably disable this.
+**** TODO add shader languages like HLSL
+#+begin_src shell
+dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of demangler
+#+end_src
 
 ** Languages
 *** C family
