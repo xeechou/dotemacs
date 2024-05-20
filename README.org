@@ -1364,7 +1364,7 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
     (rmsbolt-mode . my/cc-ts-rmsbolt-hook))
 #+end_src
 
-Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linux and windows
+Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linux and windows.
 #+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
   ;; cond
   ((or (eq major-mode 'c-ts-mode)
@@ -1389,7 +1389,7 @@ Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it 
                             :disass-hidden-funcs rmsbolt--hidden-func-c)))  
 #+end_src
 
-
+**** TODO However for unknown reason. The [[https://github.com/emacsmirror/rmsbolt/blob/master/rmsbolt.el#L230][rmsbolt-line-mapping]] not working well on windows. We should probably disable this.
 
 ** Languages
 *** C family
