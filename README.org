@@ -57,6 +57,11 @@ All my functions are defined with prefix ~my/~.
   (defun my/merge-list-to-list (dst-list src-list)
     (dolist (item src-list) (add-to-list dst-list item)))
 
+  (defun my/merge-list-buffer-local (dst-list src-list)
+    ;;not that dst-list need to be quoted
+    (make-variable-buffer-local dst-list)
+    (my/merge-list-to-list dst-list src-list))
+
   (defun my/filename ()
     "Copy the filename of the current buffer."
     (interactive)
@@ -1257,7 +1262,7 @@ treesit-auto does not work on windows at moment.
 CMake:
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (cmake-mode . company-mode)
-  (cmake-mode .  (lambda () (my/merge-list-to-list
+  (cmake-mode .  (lambda () (my/merge-list-buffer-local
                              'company-backends
                              (list 'company-cmake 'company-dabbrev))))
 #+end_src
@@ -1294,7 +1299,7 @@ We add company-emoji to company backends.
 Outline mode includes org mode and markdowns
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (outline-mode    . company-mode) ;;enable for org mode
-  (outline-mode    . (lambda () (my/merge-list-to-list
+  (outline-mode    . (lambda () (my/merge-list-buffer-local
                                  'company-backends
                                  (list'company-dabbrev 'company-emoji))))
 #+end_src
@@ -1302,7 +1307,7 @@ Outline mode includes org mode and markdowns
 simple text mode:
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (text-mode       . company-mode)
-  (text-mode       . (lambda () (my/merge-list-to-list
+  (text-mode       . (lambda () (my/merge-list-buffer-local
                                  'company-backends
                                  (list 'company-dabbrev 'company-emoji))))
 #+end_src
@@ -1445,6 +1450,10 @@ It is not ready, disable it now.
   (use-package glsl-mode
     :ensure t
     :defer t
+    :init
+    (defun my/glsl-mode-hook ()
+      <<GLSL_LSP>>
+        )
     :mode (("\\.glsl\\'" . glsl-mode)
            ("\\.vert\\'" . glsl-mode)
            ("\\.frag\\'" . glsl-mode)
@@ -1455,9 +1464,7 @@ It is not ready, disable it now.
            ("\\.rmiss\\'" . glsl-mode))
     :hook
     ((glsl-mode . company-mode)
-     (glsl-mode . (lambda ()
-                    <<GLSL_LSP>>)))
-    )
+     (glsl-mode . my/glsl-mode-hook)))
 #+end_src
 
 GLSL has a language server ~company-glsl~
@@ -1471,6 +1478,7 @@ GLSL has a language server ~company-glsl~
 It depends on ~glslangValidator~ to be available.
 #+begin_src emacs-lisp :tangle no :noweb-ref GLSL_LSP
   (when (executable-find "glslangValidator")
+    (make-variable-buffer-local 'company-backends)
     (add-to-list 'company-backends 'company-glsl))
 #+end_src
 
@@ -1491,12 +1499,14 @@ It depends on ~glslangValidator~ to be available.
            ("\\.as\\'"     . hlsl-mode) ;;amplification shader
            ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
            )
+    :init
+    (defun my/hlsl-mode-hook ()
+      <<HLSL_LSP>>
+      )
     :hook ((hlsl-mode . company-mode)
-           ;;TODO there is some bug on windows that :config block always run. I have to put it in hook
-           (hlsl-mode . (lambda ()
-                          <<HLSL_LSP>>
-                          )))
-    )
+           ;;TODO there is some bug on windows that :config block always run. I
+           ;;have to put it in hook
+           (hlsl-mode . my/hlsl-mode-hook)))
 #+end_src
 
 setup the slangd as language server if it's available
@@ -1510,8 +1520,8 @@ setup the slangd as language server if it's available
                      `(hlsl-mode . ("slangd")))
         (add-to-list 'company-backends 'company-capf))
     ;; not available
-    (my/merge-list-to-list 'company-backends
-     (list 'company-keywords 'company-dabbrev)))
+    (my/merge-list-buffer-local 'company-backends
+                           (list 'company-keywords 'company-dabbrev)))
 #+end_src
 
 **** AZSL
