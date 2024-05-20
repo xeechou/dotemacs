@@ -278,11 +278,17 @@ I divide my agenda files to the following:
 
 Show unplanned tasks in global TODO list.
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_NOTE_AGENDA
-    (setq org-agenda-skip-scheduled-if-done t)
-    (setq org-agenda-skip-deadline-if-done t)
-    (setq org-agenda-todo-ignore-deadlines t)
-    (setq org-agenda-todo-ignore-scheduled t)
-    (setq org-deadline-warning-days 7)
+  (setq org-deadline-warning-days 7)
+  ;;ignore what's already done
+  (setq org-agenda-skip-scheduled-if-done t)
+  (setq org-agenda-skip-deadline-if-done t)
+  ;;ignore todo items that has dead lines since they will appear in agenda.
+  (setq org-agenda-todo-ignore-deadlines 'near)
+  (setq org-agenda-todo-ignore-scheduled 'all)
+  ;;avoid duplicates deadlines in agenda
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  ;;this works when you place a schedule, so it will not duplicate
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
 #+end_src
 
 log the agenda states into drawer, instead of insert inside org files.
