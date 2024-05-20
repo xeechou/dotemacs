@@ -1349,38 +1349,47 @@ It is not ready, disable it now.
     )
 #+end_src
 *** [[https://github.com/rurban/rmsbolt][Rmsbolt]] mode
-#+begin_src emacs-lisp
+RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making changes with ~C-c C-c~, which is bonded to ~:bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))~
+
+#+begin_src emacs-lisp :noweb yes
    ;;compiler explorer in emacs
   (use-package rmsbolt   :ensure t :defer t
-    ;; rmsbolt changes keybinding C-c C-c, which is bonded to comment code.
-    ;; :bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))
+    :init
+    (defun my/cc-ts-rmsbolt-hook ()
+      ;;setup languages
+      (cond
+       <<RMSBOLT_LANGS>>
+       ))
     :hook
-    ;;rmsbolt does not support tree-sitter. We have to manually set it, coping from
-    ;;rmsbolt.el
-    (rmsbolt-mode . (lambda ()
-                      (cond ((eq major-mode 'c-ts-mode)
-                             (setq rmsbolt-language-descriptor
-                                   (make-rmsbolt-lang :compile-cmd "gcc"
-                                                      :supports-asm t
-                                                      :supports-disass t
-                                                      :demangler "c++filt"
-                                                      :compile-cmd-function #'rmsbolt--c-compile-cmd
-                                                      :disass-hidden-funcs
-                                                      rmsbolt--hidden-func-c)))
-                            ((eq major-mode 'c++-ts-mode)
-                             (setq rmsbolt-language-descriptor
-                                   (make-rmsbolt-lang :compile-cmd "g++"
-                                                      :supports-asm t
-                                                      :supports-disass t
-                                                      :demangler "c++filt"
-                                                      :compile-cmd-function #'rmsbolt--c-compile-cmd
-                                                      :disass-hidden-funcs rmsbolt--hidden-func-c)))
-                            ) ;;cond
-
-                      ;;TODO adding GLSL/HLSL languages?
-                      )) ;;rmsbolt-mode-hook
-    )
+    (rmsbolt-mode . my/cc-ts-rmsbolt-hook))
 #+end_src
+
+Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linux and windows
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+  ;; cond
+  ((or (eq major-mode 'c-ts-mode)
+       (eq major-mode 'c-mode))
+   (setq rmsbolt-language-descriptor
+         (make-rmsbolt-lang :compile-cmd "clang"
+                            :supports-asm t
+                            :supports-disass t
+                            :demangler "llvm-cxxfilt"
+                            :compile-cmd-function #'rmsbolt--c-compile-cmd
+                            :disass-hidden-funcs
+                            rmsbolt--hidden-func-c)))
+
+  ((or (eq major-mode 'c++-ts-mode)
+       (eq major-mode 'c++-mode))
+   (setq rmsbolt-language-descriptor
+         (make-rmsbolt-lang :compile-cmd "clang++"
+                            :supports-asm t
+                            :supports-disass t
+                            :demangler "llvm-cxxfilt"
+                            :compile-cmd-function #'rmsbolt--c-compile-cmd
+                            :disass-hidden-funcs rmsbolt--hidden-func-c)))  
+#+end_src
+
+
 
 ** Languages
 *** C family
