@@ -1231,6 +1231,7 @@ treesit-auto does not work on windows at moment.
   (use-package company
     :ensure t
     :defer t
+    ;;one-liner setups for languages
     :hook (
            <<COMPANY_HOOKS>>
            )
@@ -1244,22 +1245,9 @@ treesit-auto does not work on windows at moment.
                               company-yasnippet
                               company-capf)))
 #+end_src
-*** C/C++ family
-#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  ((c++-mode c++-ts-mode) . company-mode)
-  ((c-mode c-ts-mode)     . company-mode)
-  ((c++-mode c++-ts-mode c-mode c-ts-mode) .
-   ;;override default company backends because eglot not compatible with company-clang
-   (lambda () (set (make-local-variable 'company-backends)
-                   '(company-capf
-                     company-files
-                     company-keywords
-                     company-dabbrev
-                     company-yasnippet))))
 
-#+end_src
-
-CMake:
+*** Built-in company hooks
+CMake we just add company-dabbrev and company-cmake.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (cmake-mode . company-mode)
   (cmake-mode .  (lambda () (my/merge-list-buffer-local
@@ -1267,27 +1255,25 @@ CMake:
                              (list 'company-cmake 'company-dabbrev))))
 #+end_src
 
-*** Emacs lisp
-company-elisp is remove so we just rely on internal backends
+- company-elisp ::  is remove so we just rely on internal backends.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   (emacs-lisp-mode . company-mode)
 #+end_src
 
-*** Python
+- Python :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
 
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
   ((python-mode python-ts-mode) . company-mode)
 #+end_src
 
-NOTE that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
+*NOTE* that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
 
 #+begin_src shell-script :tangle no
   pipx inject python-lsp-server [[your packages here]]
 #+end_src
 
 
-*** Texts
-We add company-emoji to company backends.
+- TEXT :: We add company-emoji to company backends.
 #+begin_src emacs-lisp
   (use-package company-emoji
     :defer t
@@ -1295,21 +1281,20 @@ We add company-emoji to company backends.
     :after company)
 #+end_src
 
-
 Outline mode includes org mode and markdowns
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  (outline-mode    . company-mode) ;;enable for org mode
-  (outline-mode    . (lambda () (my/merge-list-buffer-local
-                                 'company-backends
-                                 (list'company-dabbrev 'company-emoji))))
+  (outline-mode . company-mode) ;;enable for org mode
+  (outline-mode . (lambda () (my/merge-list-buffer-local
+                              'company-backends
+                              (list'company-dabbrev 'company-emoji))))
 #+end_src
 
 simple text mode:
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  (text-mode       . company-mode)
-  (text-mode       . (lambda () (my/merge-list-buffer-local
-                                 'company-backends
-                                 (list 'company-dabbrev 'company-emoji))))
+  (text-mode . company-mode)
+  (text-mode . (lambda () (my/merge-list-buffer-local
+                           'company-backends
+                           (list 'company-dabbrev 'company-emoji))))
 #+end_src
 
 ** Eglot mode
@@ -1400,29 +1385,40 @@ It is not ready, disable it now.
 ** Languages
 *** C family
 #+begin_src emacs-lisp
-;; C family
-(use-package cc-mode
-  :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
-	 ("\\.m\\'" . c-mode)
-	 ("\\.mm\\'" . c++-mode)
-	 ("\\.inl\\'" . c++-mode))
-  :preface
-  (defun my/cmode-hook ()
-    ;;default settings
-    (setq c-default-style "linux"
-	  c-basic-offset 8)
-    (c-set-offset 'inextern-lang 0)
-    (c-set-offset 'innamespace 0)
-    (c-set-offset 'inline-open 0)
-    )
-  :config
-  (require 'cc-file-styles)
-  (c-add-style (car cc-file-style-o3de)
-	       (cdr cc-file-style-o3de))
-  (c-add-style (car cc-file-style-sparroh)
-	       (cdr cc-file-style-sparroh))
-  :hook
-  ((c-mode-common . my/cmode-hook)))
+  ;; C family
+  (use-package cc-mode
+    :mode (("\\.h\\(h?\\|xx\\|pp\\)\\'" . c++-mode)
+           ("\\.m\\'" . c-mode)
+           ("\\.mm\\'" . c++-mode)
+           ("\\.inl\\'" . c++-mode))
+    :preface
+    (defun my/cmode-hook ()
+      ;;default settings
+      (setq c-default-style "linux"
+            c-basic-offset 8)
+      (c-set-offset 'inextern-lang 0)
+      (c-set-offset 'innamespace 0)
+      (c-set-offset 'inline-open 0))
+
+    (defun my/cmode-company-hook ()
+      ;;override default company backends because eglot not compatible with
+      ;;company-clang
+      (set (make-local-variable 'company-backends)
+           '(company-capf
+             company-files
+             company-keywords
+             company-dabbrev
+             company-yasnippet)))
+    :config
+    (require 'cc-file-styles)
+    (c-add-style (car cc-file-style-o3de)
+                 (cdr cc-file-style-o3de))
+    (c-add-style (car cc-file-style-sparroh)
+                 (cdr cc-file-style-sparroh))
+    :hook
+    ((c-mode-common . my/cmode-hook)
+     ((c++-mode c++-ts-mode c-mode c-ts-mode) . company-mode)
+     ((c++-mode c++-ts-mode c-mode c-ts-mode) . my/cmode-company-hook)))
 #+end_src
 *** Build Scripts
 #+begin_src emacs-lisp
