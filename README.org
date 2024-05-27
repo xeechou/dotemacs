@@ -1030,11 +1030,18 @@ There is not thing special here, we just add a key-map and use ~alien~ indexing 
 
 ** Editing packages
 *** [[https://github.com/xeechou/fmo-mode.el][fmo-mode]] for code re-formatting
+prerequisite : format-all
 #+begin_src emacs-lisp
-(use-package fmo-mode
-  :vc (:fetcher github :repo "xeechou/fmo-mode.el")
-  :custom (fmo-ensure-formatters t)
-  :hook ((prog-mode . fmo-mode)))
+  (use-package format-all :ensure t :pin melpa :defer t)
+  (use-package difflib :ensure t :pin melpa :defer t)
+#+end_src
+
+#+begin_src emacs-lisp
+    (use-package fmo-mode
+      :vc (:fetcher github :repo "xeechou/fmo-mode.el")
+      :custom (fmo-ensure-formatters t)
+      :hook (((c-mode c++-mode c-ts-mode c++-ts-mode) . fmo-mode)
+             ((hlsl-mode glsl-mode azsl-mode ) . fmo-mode)))
 #+end_src
 
 *** Clean up the white spaces
