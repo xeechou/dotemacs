@@ -2,6 +2,9 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (unless (file-exists-p custom-file)
+  ;;write the empty file
+  (with-temp-buffer (write-file custom-file))
+  ;;insert the custom region
   (write-region "(custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
