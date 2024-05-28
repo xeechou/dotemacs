@@ -27,10 +27,9 @@ jobs:
         run: |
           EMACS_VERSION=$(emacs --version)
           echo $EMACS_VERSION
-          echo "current dir $(pwd)"
           emacs --no-window-system --init-directory=$(pwd) --batch --script .github/workflows/scripts/ci-init.el
 
-      - name: Run Emacs in daemon mode
-        run: |                
-          emacs --init-directory=$(pwd) --daemon --script .github/workflows/scripts/ci-init.el
-          echo "Finished"
+      # - name: Run Emacs in daemon mode
+      #   run: |
+      #     emacs --init-directory=$(pwd) --daemon --script .github/workflows/scripts/ci-init.el
+      #     echo "Finished"
