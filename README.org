@@ -148,9 +148,10 @@ menu bar configuration. I disable tool bar and scroll bar for a minimalist look.
 
 #+begin_src emacs-lisp
   (display-time)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq visible-bell 1)
+  (when (display-graphic-p)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (setq visible-bell 1))
   ;;enabled global modes
   (save-place-mode 1)
   (global-auto-revert-mode t)

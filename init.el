@@ -13,8 +13,8 @@
  )" nil custom-file))
 
 
-(add-to-list 'load-path "~/.emacs.d/lisp")
-(let ((default-directory "~/.emacs.d/lisp/"))
+(let ((default-directory (expand-file-name "lisp/" user-emacs-directory)))
+  (add-to-list 'load-path  default-directory)
   (normal-top-level-add-subdirs-to-load-path))
 
 ;; set for using native-compiled emacs
