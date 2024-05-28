@@ -22,3 +22,4 @@ jobs:
       - name: Running Emacs
         run: |
           emacs --no-window-system --batch --script .github\workflows\scripts\ci-init.el
+# Error (use-package): org-roam/:config: Opening directory: No such file or directory, c:/Users/runneradmin/AppData/Roaming/org/pages          
