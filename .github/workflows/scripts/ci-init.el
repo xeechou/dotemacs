@@ -15,4 +15,5 @@
   (message "Calculated root directory is \"%s\"" root-dir)
 
   (message "Loading \"init.el\"")
+  (setq user-emacs-directory root-dir) ;;in this way we setup the correct directory
   (load (expand-file-name "init.el" root-dir)))
