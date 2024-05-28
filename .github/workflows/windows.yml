@@ -1,0 +1,24 @@
+name: CI Windows
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  # Run weekly
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  ci-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Emacs (Windows)
+        run: |
+          choco install emacs
+      - name: Show Emacs version
+        run: |
+          emacs --version
+      - name: Running Emacs
+        run: |
+          emacs --no-window-system --batch --script .github\workflows\scripts\ci-init.el
