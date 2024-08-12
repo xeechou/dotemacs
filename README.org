@@ -187,6 +187,19 @@ copied from emacswiki
    version-control t)       ; use versioned backups
 #+end_src
 
+** Recent files
+#+begin_src emacs-lisp
+(use-package recentf
+  :init
+  (setq
+    recentf-save-file  (expand-file-name "recentf" user-emacs-directory)
+    recentf-max-saved-items 10000
+    recentf-max-menu-items 5000
+    )
+  (recentf-mode 1)
+  (run-at-time nil (* 5 60) 'recentf-save-list))
+#+end_src
+
 * Org mode settings
 ** Convenience functions
 #+begin_src emacs-lisp
