@@ -1,1 +1,5 @@
 llm-api.el filter=git-crypt diff=git-crypt
+
+## LFS files
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+

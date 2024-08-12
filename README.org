@@ -200,6 +200,26 @@ copied from emacswiki
   (run-at-time nil (* 5 60) 'recentf-save-list))
 #+end_src
 
+** [[https://github.com/baudtack/pomodoro.el][pomodoro.el]]
+#+begin_src emacs-lisp
+  (use-package pomodoro :defer t
+    :vc (:fetcher github :repo "baudtack/pomodoro.el")
+    :commands pomodoro-start
+    :custom
+    (pomodoro-work-start-sound (expand-file-name "pomodoro/stop1.mp3" (my/dotfile-dir)))
+    (pomodoro-break-start-sound (expand-file-name "pomodoro/rest.mp3" (my/dotfile-dir)))
+    :config
+    (pomodoro-add-to-mode-line)
+    (cond ((executable-find "mpg123") (setq pomodoro-sound-player "mpg123"))
+          ((executable-find "mpv") (setq pomodoro-sound-player "mpv"))
+          ((executable-find "vlc") (setq pomodoro-sound-player "vlc"))
+          ((executable-find "mplayer") (setq pomodoro-sound-player "mplayer"))
+          ((executable-find "cmus") (setq pomodoro-sound-player "cmus"))
+          ;;if no player found, just skip it
+          (t (setq pomodoro-play-sounds nil))))
+#+end_src
+
+
 * Org mode settings
 ** Convenience functions
 #+begin_src emacs-lisp
