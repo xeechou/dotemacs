@@ -1736,6 +1736,12 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
   (use-package powershell :ensure t :defer t
     :mode (("\\.ps1\\'" . powershell-mode)))
 
+  ;; jenkins
+  (use-package jenkinsfile-mode
+    :defer t
+    :vc (:fetcher github :repo "john2x/jenkinsfile-mode")
+    :mode (("Jenkinsfile\\'" . jenkinsfile-mode)))
+
   ;; built-in
   (use-package nxml-mode
     :defer t
