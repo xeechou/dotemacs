@@ -142,6 +142,10 @@ Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have t
       (insert (uuidgen-4)))
     )
 #+end_src
+** per-device settings
+#+begin_src emacs-lisp
+  (use-package perdev :load-path "lisp")
+#+end_src
 
 * Global settings
 menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
@@ -300,14 +304,8 @@ I divide my agenda files to the following:
   (setq org-default-notes-file
         (my/concat-path org-directory "notes.org"))
 
-  (setq org-agenda-files
-          (list (my/concat-path org-directory "reading.org")
-                (my/concat-path org-directory "writing.org")
-                (my/concat-path org-directory "coding.org")
-                (my/concat-path org-directory "social.org")
-                (my/concat-path org-directory "thoughts.org")
-                (my/concat-path org-directory "goals-habits.org")
-                (my/concat-path org-directory "miscs.org")))
+  (setq org-agenda-files (perdev-get-evaluated-value
+                          'my/org-agenda-files '() org-directory))
 #+end_src
 
 Show unplanned tasks in global TODO list.
@@ -371,14 +369,15 @@ Reviews.
 
 *** Latex setup in org
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_LATEX
-  
+
   (setq org-preview-latex-default-process 'dvipng)
   (setq org-preview-latex-image-directory
         (my/concat-path temporary-file-directory
                        "ltximg/"))
   ;;set latex preview scale
   (setq org-format-latex-options (plist-put
-                                  org-format-latex-options :scale 2.0))  
+                                  org-format-latex-options
+                                  :scale (perdev-get-value 'my/org-latex-scale1 1.0)))
 #+end_src
 
 On archlinux, you need to install
