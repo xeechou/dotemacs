@@ -449,11 +449,12 @@ On archlinux, you need to install
     (org-hide-emphasis-markers t)
     (line-spaceing 0.3)
     ;;dejavu sans miss fonts for displaying 'fold. Use old style
-    (org-modern-star 'replace)
+    (org-modern-star 'fold)
 
-
-    (org-fontify-done-headline nil)
+    (org-fontify-done-headline t)
     :config
+    (set-face-attribute 'org-modern-symbol nil
+                        :family (perdev-get-value 'my/org-modern-symbol-font "Iosevka"))
     ;; (let* ((base-font-color     (face-foreground 'default nil 'default))
     ;;        (headline           `(:inherit default :weight bold
     ;; 					:foreground ,base-font-color)))
