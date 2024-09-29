@@ -1152,18 +1152,9 @@ prerequisite : format-all
 (diminish 'abbrev-mode)
 #+end_src
 *** Hide show
+Hide show works by regex searching. You can customize it with [[http://doc.endlessparentheses.com/Var/hs-special-modes-alist.html][hs-special-modes-alist]]. You define the ~START~, ~END~, ~COMMENT~ and a ~FORWARD-SEXP-FUNC~. Which is a ~forward-sexp~ goes to end of the marching.
 
-#+begin_src emacs-lisp
-(use-package hideif
-  :ensure t
-  :diminish hide-ifdef-mode
-  :hook ((c++-mode c++-ts-mode c-mode c-ts-mode)  . hide-ifdef-mode)
-  :config
-  (setq hide-ifdef-read-only t)
-  )
-#+end_src
-
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
   (use-package hideshow
     :hook ((prog-mode . hs-minor-mode)
            (nxml-mode . hs-minor-mode))
@@ -1176,49 +1167,90 @@ prerequisite : format-all
            )
     :config
     (setq hs-isearch-open t)
-    (add-to-list 'hs-special-modes-alist
-                 '(nxml-mode
-                   "<!--\\|<[^/>]*[^/]>"
-                   "-->\\|</[^/>]*[^/]>"
-                   "<!--"
-                   sgml-skip-tag-forward
-                   nil))
+    <<HS_MODES>>
     :preface
-    (defun hs-hide-leafs-recursive (minp maxp)
-      "Hide blocks below point that do not contain further blocks in
-      region (MINP MAXP)."
-      (when (hs-find-block-beginning)
-        (setq minp (1+ (point)))
-        (funcall hs-forward-sexp-func 1)
-        (setq maxp (1- (point))))
-      (unless hs-allow-nesting
-        (hs-discard-overlays minp maxp))
-      (goto-char minp)
-      (let ((leaf t))
-        (while (progn
-                 (forward-comment (buffer-size))
-                 (and (< (point) maxp)
-                      (re-search-forward hs-block-start-regexp maxp t)))
-          (setq pos (match-beginning hs-block-start-mdata-select))
-          (if (hs-hide-leafs-recursive minp maxp)
-              (save-excursion
-                (goto-char pos)
-                (hs-hide-block-at-point t)))
-          (setq leaf nil))
-        (goto-char maxp)
-        leaf))
-    (defun hs-hide-leafs ()
-      "Hide all blocks in the buffer that do not contain subordinate
-      blocks.  The hook `hs-hide-hook' is run; see `run-hooks'."
-      (interactive)
-      (hs-life-goes-on
+    <<HS_HIDE_LEAVES>>
+    )
+#+end_src
+
+**** Hide Show for XML
+XML is very easy to setup, The ~BEGIN~ and ~END~ are simply the tag brackets, xml also has its own forward 
+
+#+begin_src emacs-lisp :tangle no :noweb-ref HS_MODES
+  (add-to-list 'hs-special-modes-alist
+               '(nxml-mode
+                 "<!--\\|<[^/>]*[^/]>"
+                 "-->\\|</[^/>]*[^/]>"
+                 "<!--"
+                 sgml-skip-tag-forward
+                 nil))
+#+end_src
+
+**** Hide show for CMake Mode
+#+begin_src emacs-lisp :tangle no :noweb-ref HS_MODES
+  (add-to-list 'hs-special-modes-alist
+               '(cmake-mode
+                 ;;match the begining
+                 "^\\([:blank:]*\\)\\(if\\|function\\|macro\\)\\([:blank:]*\\)(.*)"
+                 ;match the end
+                 "^\\([:blank:]*\\)end[A-Za-z]+\\([:blank:]*\\)(.*)"
+                 ;;comment
+                 "#"
+                 ;;TODO need to adjust for hs-forward-sexp
+                 nil
+                 nil))
+#+end_src
+
+**** Hide leaves
+Recursively run hide show on all leaves
+#+begin_src emacs-lisp :tangle no :noweb-ref HS_HIDE_LEAVES
+  (defun hs-hide-leafs-recursive (minp maxp)
+    "Hide blocks below point that do not contain further blocks in
+    region (MINP MAXP)."
+    (when (hs-find-block-beginning)
+      (setq minp (1+ (point)))
+      (funcall hs-forward-sexp-func 1)
+      (setq maxp (1- (point))))
+    (unless hs-allow-nesting
+      (hs-discard-overlays minp maxp))
+    (goto-char minp)
+    (let ((leaf t))
+      (while (progn
+               (forward-comment (buffer-size))
+               (and (< (point) maxp)
+                    (re-search-forward hs-block-start-regexp maxp t)))
+        (setq pos (match-beginning hs-block-start-mdata-select))
+        (if (hs-hide-leafs-recursive minp maxp)
+            (save-excursion
+              (goto-char pos)
+              (hs-hide-block-at-point t)))
+        (setq leaf nil))
+      (goto-char maxp)
+      leaf))
+  
+  (defun hs-hide-leafs ()
+    "Hide all blocks in the buffer that do not contain subordinate
+    blocks.  The hook `hs-hide-hook' is run; see `run-hooks'."
+    (interactive)
+    (hs-life-goes-on
+     (save-excursion
+       (message "Hiding blocks ...")
        (save-excursion
-         (message "Hiding blocks ...")
-         (save-excursion
-           (goto-char (point-min))
-           (hs-hide-leafs-recursive (point-min) (point-max)))
-         (message "Hiding blocks ... done"))
-       (run-hooks 'hs-hide-hook)))
+         (goto-char (point-min))
+         (hs-hide-leafs-recursive (point-min) (point-max)))
+       (message "Hiding blocks ... done"))
+     (run-hooks 'hs-hide-hook)))
+#+end_src
+
+**** Hide ~#ifdef~
+Hide show does not work with ~#ifdef~, the hideif package
+#+begin_src emacs-lisp
+  (use-package hideif
+    :ensure t
+    :diminish hide-ifdef-mode
+    :hook ((c++-mode c++-ts-mode c-mode c-ts-mode)  . hide-ifdef-mode)
+    :config
+    (setq hide-ifdef-read-only t)
     )
 #+end_src
 
