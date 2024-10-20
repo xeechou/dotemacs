@@ -1188,16 +1188,38 @@ XML is very easy to setup, The ~BEGIN~ and ~END~ are simply the tag brackets, xm
 
 **** Hide show for CMake Mode
 #+begin_src emacs-lisp :tangle no :noweb-ref HS_MODES
+  (defun hs-cmake-forward-sexp-once ()
+    "forward cmake s-expression once"
+    (when (looking-at hs-block-start-regexp)
+      (let ((matched-key-beg (match-string-no-properties 1))
+            (matched-key-end "")
+            end-point)
+        ;; now we search for the end regular expression
+        (save-excursion
+          ;; loop until we find the END that matches the START 
+          (while (not (string= matched-key-beg matched-key-end))
+            ;; search forward
+            (re-search-forward hs-block-end-regexp)
+            ;; and updating the point and end match data.
+            (setq matched-key-end (match-string-no-properties 1))
+            (setq end-point (match-beginning 0)))
+          )
+        (goto-char end-point))))
+
+  (defun hs-cmake-forward-sexp (args)
+    "forward cmake s-expression ARGS times"
+    (dotimes (i args)
+      (hs-cmake-forward-sexp-once)))
+
   (add-to-list 'hs-special-modes-alist
                '(cmake-mode
                  ;;match the begining
-                 "^\\([:blank:]*\\)\\(if\\|function\\|macro\\)\\([:blank:]*\\)(.*)"
-                 ;match the end
-                 "^\\([:blank:]*\\)end[A-Za-z]+\\([:blank:]*\\)(.*)"
+                 "^\\([:blank:]*\\)\\(?1:if\\|function\\|macro\\) *(.*)"
+                                          ;match the end
+                 "^\\([:blank:]*\\)end\\(?1:[A-Za-z]+\\) *(.*)"
                  ;;comment
                  "#"
-                 ;;TODO need to adjust for hs-forward-sexp
-                 nil
+                 hs-cmake-forward-sexp
                  nil))
 #+end_src
 
