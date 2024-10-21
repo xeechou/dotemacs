@@ -1402,31 +1402,38 @@ simple text mode:
 
 #+begin_src emacs-lisp
 
-;; eglot configuration, switching to eglot after emacs 29
-(use-package eglot
-  :ensure t :defer t
-  :hook (((c++-mode c++-ts-mode) . eglot-ensure)
-	 ((c-mode c-ts-mode) . eglot-ensure)
-	 ((python-mode python-ts-mode) . eglot-ensure))
-  :custom
-  (eglot-extend-to-xref t)
-  ;;inlay-hints are annoying
-  (eglot-ignored-server-capabilities '(:inlayHintProvider))
-  :config
-  ;;by default eglot forces company to only use company-capf, I lose a lot of
-  ;;backends in this way
-  (setq eglot-stay-out-of '(company))
-  ;;eldoc's multi-line mini buffer is really annoying, turn it off
-  (setq eldoc-echo-area-use-multiline-p nil)
-  ;;C++ requires clangd, python requires python-language server
-  :bind (:map eglot-mode-map
-	      ;; we just use the default binding here, so comment it out
-	      ;; ("M-." . xref-find-definitions)
-	      ;; ("M-?" . xref-find-references)
-	      ;; ("M-," . xref-go-back)
-	      ("C-c R"  . eglot-rename)
-	      ("C-c H"  . eldoc))
-  )
+  ;; eglot configuration, switching to eglot after emacs 29
+  (use-package eglot
+    :ensure t :defer t
+    :hook (((c++-mode c++-ts-mode) . eglot-ensure)
+           ((c-mode c-ts-mode) . eglot-ensure)
+           ((python-mode python-ts-mode) . eglot-ensure))
+    :custom
+    (eglot-extend-to-xref t)
+    ;;inlay-hints are annoying
+    (eglot-ignored-server-capabilities '(:inlayHintProvider))
+    :config
+    ;;by default eglot forces company to only use company-capf, I lose a lot of
+    ;;backends in this way
+    (setq eglot-stay-out-of '(company))
+    ;;eldoc's multi-line mini buffer is really annoying, turn it off
+    (setq eldoc-echo-area-use-multiline-p nil)
+    ;; clangd often mess around with headers, turn this off.
+    (add-to-list 'eglot-server-programs
+                 '((c++-mode c-mode c-ts-mode c++-ts-mode)
+                   . ("clangd"
+                      "-j=4"
+                      "--header-insertion=never"
+                      "--header-insertion-decorators=0")))
+    ;;C++ requires clangd, python requires python-language server
+    :bind (:map eglot-mode-map
+                ;; we just use the default binding here, so comment it out
+                ;; ("M-." . xref-find-definitions)
+                ;; ("M-?" . xref-find-references)
+                ;; ("M-," . xref-go-back)
+                ("C-c R"  . eglot-rename)
+                ("C-c H"  . eldoc))
+    )
 #+end_src
 
 ** Debugging
