@@ -1803,6 +1803,13 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
     :vc (:fetcher github :repo "john2x/jenkinsfile-mode")
     :mode (("Jenkinsfile\\'" . jenkinsfile-mode)))
 
+  ;;universal scene descriptor
+  (use-package usda-mode
+    :defer t
+    :load-path "lisp/"
+    :mode (("\\.usda\\'" . usda-mode)
+           ("\\.usd\\'"  . usda-mode)))
+
   ;; built-in
   (use-package nxml-mode
     :defer t
