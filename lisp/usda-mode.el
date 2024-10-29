@@ -46,6 +46,39 @@
 	  (,usda-assetp-regexp . font-lock-constant-face)
 	  (,usda-comments-regexp . font-lock-comment-face))))
 
+;; code mostly took from https://www.omarpolo.com/post/writing-a-major-mode.html
+(defun usda-indent-line ()
+  "Indent current line."
+  (let (indent
+	boi-p                           ;begin of indent
+	move-eol-p
+	(point (point)))                ;lisps-2 are truly wonderful
+    (save-excursion
+      (back-to-indentation)
+      ;;(car (syntax-ppss)) gives depth we are in parenthesis
+      (setq indent (car (syntax-ppss))
+	    boi-p (= point (point)))
+      ;; don't indent empty lines if they don't have the in it
+      (when (and (eq (char-after) ?\n)
+		 (not boi-p))
+	(setq indent 0))
+      ;; check whether we want to move to the end of line
+      (when boi-p
+	(setq move-eol-p t))
+      ;; decrement the indent if the first character on the line is a
+      ;; closer.
+      (when (or (eq (char-after) ?\))
+		(eq (char-after) ?\})
+		(eq (char-after) ?\]))
+	(setq indent (1- indent)))
+      ;; indent the line
+      (delete-region (line-beginning-position)
+		     (point))
+      (indent-to (* tab-width indent)))
+    (when move-eol-p
+      (move-end-of-line nil))))
+
+
 ;;;###autoload
 (progn
   (add-to-list 'auto-mode-alist '("\\.usda\\'" . usda-mode))
@@ -59,6 +92,9 @@
   (setq-local comment-start "#")
   (setq-local comment-end "")
   (setq-local comment-start-skip "#+[\t ]*")
+  (setq-local indent-line-function #'usda-indent-line)
+  (setq-local indent-tabs-mode nil)
+  (setq-local tab-width 4)
   )
 
 (provide 'usda-mode)
