@@ -42,6 +42,51 @@ On Linux, those run-time requires can be easily satisfied with package managers
 like =apt-get= or =dnf install=. On windows, it's another story, for this purpose,
 I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for those dependencies on Windows.
 
+*** Binaries for MacOS
+On MacOS binaries can be installed using [[https://brew.sh/][Homebrew]]. You can use the following commands to setup
+#+begin_src bash :tangle no
+  # install emacs
+  brew tap d12frosted/emacs-plus
+  #by default install the Emacs29
+  brew install emacs-plus --with-imagemagick --with-native-comp
+
+  # the packages, binuitls may cause troubles on M4
+  brew install ripgrep aspell ninja binutils gnupg pngpaste
+
+  # the fonts
+  brew install --cask font-iosevka font-iosevka-aile font-fira-sans font-fira-code
+  # The texlive
+
+  # finally start emacs service, recommand emacs-plus packages
+  brew services start emacs-plus@29
+#+end_src
+
+*** Settings adjustments for Mac
+*NOTE* that is just my settings. Such as that I mostly switch the ~ctrl~ and ~alt~ on my system to avoid [[http://xahlee.info/emacs/emacs/emacs_pinky.html][Emacs Pinky]].
+
+**** Change modifier keys for magic keyboard on Mac
+Goes to ~Settings > Keyboard > Keyboard Shortcut > Modifier Keys~.
+
+#+CAPTION: Switching command, option and control in Mac
+[[file:imgs/magic-keyboard.png]]
+
+**** Change modifier keys for US ANSI keyboard
+I changed only ~ctrl~ and ~option~ (which maps to alt) on windows.
+
+#+CAPTION: Switching command, option and control in Mac
+[[file:imgs/ansi-keyboard.png]]
+
+**** Adjusting keyboard shortcut
+By default Emacs using ~command+Key~ for some common commands. You can adjust those 
+
+#+CAPTION: change keyboard shortcut
+[[file:imgs/keyboard-shortcut.png]]
+
+**** Show Home directory in Finder
+Enable the settings in ~Finder > Preference > Sidebar > Show Home Folder~
+
+**** Some tricks on Mac
+- open a folder using Finder on iTerm with ~open $(pwd)~
 
 * My personal function defines
 All my functions are defined with prefix ~my/~.
@@ -1006,7 +1051,7 @@ I created a small package to manage my fixed width font(with ligature), proporti
     :init
     <<THEME>>
     :custom
-    (appr-default-font-size 13)
+    (appr-default-font-size (perdev-get-value 'my/default-font-size 13))
     (appr-cjk-font-list     '("WenQuanYi Micro Hei"
                               "WenQuanYi Zen Hei"
                               "Microsoft YaHei"
@@ -1317,7 +1362,12 @@ treesit-auto does not work on windows at moment.
       :hook ((after-init . treesit-auto-mode))
       :config
       (setq-default treesit-font-lock-level 3)
-      (treesit-auto-add-to-auto-mode-alist 'all)
+      ;;Error here if (treesit-auto-add-to-auto-mode-alist 'all) because the
+      ;;extensions for glsl is nil. See
+      ;;https://github.com/renzmann/treesit-auto/blob/main/treesit-auto.el#L161. We
+      ;;end up adding a (nil . glsl-ts-mode) to auto-mode-alist. Which causes the
+      ;;auto-mode to fail to load anything.
+      (treesit-auto-add-to-auto-mode-alist nil)
       (setq treesit-auto-install 'prompt))
 #+end_src
 
