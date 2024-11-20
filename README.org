@@ -20,7 +20,7 @@ Here is a list of incomplete features you get from this config set:
 - minimal LLM support through [[https://github.com/s-kostyaev/ellama][Ellama]].
 - many others.
 
-** Run-time requirement for some packages.
+** Run-time requirement and system setups
 Some of the packages requires not only Emacs-Lisp code but also other
 binaries to work. Here is the list of binaries required for all the
 features.
@@ -50,9 +50,10 @@ On MacOS binaries can be installed using [[https://brew.sh/][Homebrew]]. You can
   #by default install the Emacs29
   brew install emacs-plus --with-imagemagick --with-native-comp
 
-  # the packages, binuitls may cause troubles on M4
-  brew install ripgrep aspell ninja binutils gnupg pngpaste
-
+  # the packages, binuitls may cause troubles on M4 (for windres)
+  brew install ripgrep aspell ninja binutils gnupg
+  #for org-downloads
+  brew install pngpaste
   # the fonts
   brew install --cask font-iosevka font-iosevka-aile font-fira-sans font-fira-code
   # The texlive
@@ -82,11 +83,23 @@ By default Emacs using ~command+Key~ for some common commands. You can adjust th
 #+CAPTION: change keyboard shortcut
 [[file:imgs/keyboard-shortcut.png]]
 
-**** Show Home directory in Finder
-Enable the settings in ~Finder > Preference > Sidebar > Show Home Folder~
+**** Adjusting mouse/trackpad scrolling
+On Mac by default the scrolling direction is the *reverse* direction you would experienced in other systems, they called it *nature scrolling*. Depends on your likeness, I disable this.
+
+#+CAPTION: disabling the nature scrolling 
+[[file:imgs/disable-nature-scroll.png]]
+
+**** Adjusting keybinding for iterm2
+On iterm2. Moving between words are done using ~ctrl+[ f/b~. You can adjust this by going to ~Settings > Profiles > keys > Key mapping~. The easiest way is using nature editing preset and adjust it.
+
+#+CAPTION: change iterm2 keybindings
+[[file:imgs/iterm2-keymapping.png]]
 
 **** Some tricks on Mac
 - open a folder using Finder on iTerm with ~open $(pwd)~
+- Enable the settings in ~Finder > Preference > Sidebar > Show Home Folder~.
+- ~cmd+shift+3~ to capture the fullscreen.
+- ~cmd+shift+4~ to capture a portion of screen
 
 * My personal function defines
 All my functions are defined with prefix ~my/~.
