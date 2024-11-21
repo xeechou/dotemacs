@@ -960,9 +960,9 @@ And also enable the ~.dir-locals.el~ on remote machine.
 the excellent fly-spell to correct my common typing mistakes.
 #+begin_src emacs-lisp
   (use-package flyspell
-    :if (or (executable-find "ispell")
+    :if (or (executable-find "aspell")
             (executable-find "hunspell")
-            (executable-find "aspell"))
+            (executable-find "ispell"))
     :defer t
     :hook ((prog-mode . flyspell-prog-mode)
            (text-mode . flyspell-mode) ;;for markdown, org, nxml
@@ -973,8 +973,9 @@ the excellent fly-spell to correct my common typing mistakes.
     ;; on windows, getenv has strange behavior, getenv-internal seems to work correctly.
     ;; (when (not (getenv-internal "LANG" initial-environment))
     (setenv "LANG" "en_US")
-    :custom  (ispell-program-name (or (executable-find "hunspell")
-                                      (executable-find "aspell")
+    ;; priotize aspell over hunspell For Linux and Mac
+    :custom  (ispell-program-name (or (executable-find "aspell")
+                                      (executable-find "hunspell")
                                       (executable-find "ispell")))
     ;;:config
     ;;TODO flyspell language-tool
