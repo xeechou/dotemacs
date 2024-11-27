@@ -290,11 +290,15 @@ copied from emacswiki
 * Org mode settings
 ** Convenience functions
 #+begin_src emacs-lisp
-(require 'org-funcs)
-(defun my/org-dir-set (dir)
-  (and dir (not (string= dir "")) (file-exists-p dir)))
-(defun my/org-file (path)
-  (my/concat-path org-directory path))
+  (require 'org-funcs)
+  (defun my/org-dir-set (dir)
+    (and dir (not (string= dir "")) (file-exists-p dir)))
+  (defun my/org-file (path)
+    (expand-file-name path (perdev-get-evaluated-value
+                            'my/default-org-dir
+                            org-directory ;;default value
+                            org-directory ;;argument
+                            )))
 #+end_src
 ** Org Mode
 #+begin_src emacs-lisp :noweb yes
@@ -566,11 +570,11 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
     <<ROAM_SQLITE>>
     ;; disable org-roam warning
     (setq org-roam-v2-ack t)
-    (defun my/roam-dir () (my/org-file "pages/"))
+    (defun my/roam-dir () (expand-file-name "pages" org-directory))
     <<ROAM_VISIT>>
 
     :custom
-    (org-roam-directory (my/org-file "pages/"))
+    (org-roam-directory (my/roam-dir))
     (org-roam-completion-everywhere t)
     (org-roam-db-update-on-save t)
     ;;template for v2
