@@ -56,7 +56,12 @@ On MacOS binaries can be installed using [[https://brew.sh/][Homebrew]]. You can
   brew install pngpaste
   # the fonts
   brew install --cask font-iosevka font-iosevka-aile font-fira-sans font-fira-code
-  # The texlive
+
+  # The texlive. For minimal install you can try the basicTex then the additional
+  # packages
+  brew install basictex
+  #dvipng is required for org-latex-preview
+  sudo tlmgr update --self && sudo tlmgr install dvipng wrapfig capt-of
 
   # finally start emacs service, recommand emacs-plus packages
   brew services start emacs-plus@29
