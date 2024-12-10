@@ -106,6 +106,12 @@ On iterm2. Moving between words are done using ~ctrl+[ f/b~. You can adjust this
 - ~cmd+shift+3~ to capture the fullscreen.
 - ~cmd+shift+4~ to capture a portion of screen
 
+**** keybinding remap for Firefox/Chrome
+On Mac, browsers tend to use ~command~ to replace ~ctrl~ for operations. Fortunately you can use ~Settings->Keyboard->Keyboard Shortcut->App Shortcut~ to adjust the settings. Chrome works better than Firefox on Mac.
+
+#+CAPTION: App shortcut settings
+[[file:imgs/mac-app-shortcut.png]]
+
 * My personal function defines
 All my functions are defined with prefix ~my/~.
 
