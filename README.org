@@ -279,8 +279,8 @@ copied from emacswiki
     :vc (:fetcher github :repo "baudtack/pomodoro.el")
     :commands pomodoro-start
     :custom
-    (pomodoro-work-start-sound (expand-file-name "pomodoro/stop1.mp3" (my/dotfile-dir)))
-    (pomodoro-break-start-sound (expand-file-name "pomodoro/rest.mp3" (my/dotfile-dir)))
+    (pomodoro-work-start-sound (expand-file-name "assets/stop1.mp3" (my/dotfile-dir)))
+    (pomodoro-break-start-sound (expand-file-name "assets/rest.mp3" (my/dotfile-dir)))
     :config
     (pomodoro-add-to-mode-line)
     (cond ((executable-find "mpg123") (setq pomodoro-sound-player "mpg123"))
