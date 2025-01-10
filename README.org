@@ -95,7 +95,12 @@ On Mac by default the scrolling direction is the *reverse* direction you would e
 [[file:imgs/disable-nature-scroll.png]]
 
 **** Adjusting keybinding for iterm2
-On iterm2. Moving between words are done using ~ctrl+[ f/b~. You can adjust this by going to ~Settings > Profiles > keys > Key mapping~. The easiest way is using nature editing preset and adjust it.
+On iterm2. I have 3 major keybinding I need:
+- ~alt+f~ :: moving forward a word (through sending Esc+f).
+- ~alt+b~ :: moving back a word (through sending Esc+b).
+- ~alt+backspace~ :: delete back a word (through sending 0x1b 0x08).
+  
+You can adjust this by going to ~Settings > Profiles > keys > Key mapping~. The easiest way is using *nature text editing* preset and adjust it. I also exported my config [[file:assets/nature-text-edit.itermkeymap][here]].
 
 #+CAPTION: change iterm2 keybindings
 [[file:imgs/iterm2-keymapping.png]]
