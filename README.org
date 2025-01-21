@@ -302,60 +302,64 @@ copied from emacswiki
 #+end_src
 ** Org Mode
 #+begin_src emacs-lisp :noweb yes
-  (use-package org :ensure t :defer t
-    :mode (("\\.org$" . org-mode))
-    :commands org-capture
-    :custom
-    (org-log-done  'time)
-    (org-clock-persist 'history)
-    (org-adapt-indentation nil)
-    (org-image-actual-width 300) ;;set to 300px
-    ;;setup the column, this max length for the first level we can go, maybe we
-    ;;can somehow calculate it?
-    (org-tags-column -54)
-    (org-image-actual-width 600)
+(use-package org :ensure t :defer t
+  :mode (("\\.org$" . org-mode))
+  :commands org-capture
+  :custom
+  (org-log-done  'time)
+  (org-clock-persist 'history)
+  (org-adapt-indentation nil)
+  (org-image-actual-width 300) ;;set to 300px
+  ;;setup the column, this max length for the first level we can go, maybe we
+  ;;can somehow calculate it?
+  (org-tags-column -54)
+  (org-image-actual-width 600)
+  ;;getting rid of leading white-space in code indentation
+  (org-edit-src-content-indentation 0)
+  ;; this removes the leading white space when you done editing
+  (org-src-preserve-indentation nil)
 
-    ;;faces
-    (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
+  ;;faces
+  (org-todo-keywords '((sequence "TODO" "DOIN" "|" "DONE" "PEND" "CANC")))
 
-    :hook
-    ((org-after-todo-statistics . org-funcs-summary-todo)
-     (org-checkbox-statistics . org-funcs-checkbox-todo)
-     (org-mode . org-funcs-define-faces))
-    ;; I am not sure this global key setting is good or not, capture stuff
-    ;; globally is great
-    :bind (("C-c o a"   . org-agenda)
-           ("C-c o c"   . org-capture)
-           :map org-mode-map
-           ("M-<left>"  . org-metaleft)
-           ("M-<right>" . org-metaright)
-           ("M-<up>"    . org-metaup)
-           ("M-<down>"  . org-metadown))
-    :init
-    <<ORG_DIRECTORY>>
+  :hook
+  ((org-after-todo-statistics . org-funcs-summary-todo)
+   (org-checkbox-statistics . org-funcs-checkbox-todo)
+   (org-mode . org-funcs-define-faces))
+  ;; I am not sure this global key setting is good or not, capture stuff
+  ;; globally is great
+  :bind (("C-c o a"   . org-agenda)
+         ("C-c o c"   . org-capture)
+         :map org-mode-map
+         ("M-<left>"  . org-metaleft)
+         ("M-<right>" . org-metaright)
+         ("M-<up>"    . org-metaup)
+         ("M-<down>"  . org-metadown))
+  :init
+  <<ORG_DIRECTORY>>
 
-    ;; enable images
-    (setq org-startup-with-inline-images t)
+  ;; enable images
+  (setq org-startup-with-inline-images t)
 
-    ;;activate babel languages
-    :config
-    ;;note files
-    <<ORG_NOTE_AGENDA>>
-    ;;latex setup
-    <<ORG_LATEX>>
+  ;;activate babel languages
+  :config
+  ;;note files
+  <<ORG_NOTE_AGENDA>>
+  ;;latex setup
+  <<ORG_LATEX>>
 
-    (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
-    (org-clock-persistence-insinuate)
-    ;; I just use PEND to define stuck projects.
-    (setq org-stuck-projects
-          '("/-DONE-CANC" ("DOIN" "TODO") nil ""))
-    ;;capture templates
+  (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+  (org-clock-persistence-insinuate)
+  ;; I just use PEND to define stuck projects.
+  (setq org-stuck-projects
+        '("/-DONE-CANC" ("DOIN" "TODO") nil ""))
+  ;;capture templates
 
-    (setq org-capture-templates
-          `(
-            <<ORG_CAPTURE>>            
-            ))
-    (org-funcs-load-babel-compiler))
+  (setq org-capture-templates
+        `(
+          <<ORG_CAPTURE>>            
+          ))
+  (org-funcs-load-babel-compiler))
 #+end_src
 *** Org directory setup
 org-directory has to have trailing "/"  
