@@ -67,44 +67,7 @@ On MacOS binaries can be installed using [[https://brew.sh/][Homebrew]]. You can
   brew services start emacs-plus@29
 #+end_src
 
-*** Settings adjustments for Mac
-*NOTE* that is just my settings. Such as that I mostly switch the ~ctrl~ and ~alt~ on my system to avoid [[http://xahlee.info/emacs/emacs/emacs_pinky.html][Emacs Pinky]].
-
-**** Change modifier keys for magic keyboard on Mac
-Goes to ~Settings > Keyboard > Keyboard Shortcut > Modifier Keys~.
-
-#+CAPTION: Switching command, option and control in Mac
-[[file:imgs/magic-keyboard.png]]
-
-**** Change modifier keys for US ANSI keyboard
-I changed only ~ctrl~ and ~option~ (which maps to alt) on windows.
-
-#+CAPTION: Switching command, option and control in Mac
-[[file:imgs/ansi-keyboard.png]]
-
-**** Adjusting keyboard shortcut
-By default Emacs using ~command+Key~ for some common commands. You can adjust those 
-
-#+CAPTION: change keyboard shortcut
-[[file:imgs/keyboard-shortcut.png]]
-
-**** Adjusting mouse/trackpad scrolling
-On Mac by default the scrolling direction is the *reverse* direction you would experienced in other systems, they called it *nature scrolling*. Depends on your likeness, I disable this.
-
-#+CAPTION: disabling the nature scrolling 
-[[file:imgs/disable-nature-scroll.png]]
-
-**** Adjusting keybinding for iterm2
-On iterm2. Moving between words are done using ~ctrl+[ f/b~. You can adjust this by going to ~Settings > Profiles > keys > Key mapping~. The easiest way is using nature editing preset and adjust it.
-
-#+CAPTION: change iterm2 keybindings
-[[file:imgs/iterm2-keymapping.png]]
-
-**** Some tricks on Mac
-- open a folder using Finder on iTerm with ~open $(pwd)~
-- Enable the settings in ~Finder > Preference > Sidebar > Show Home Folder~.
-- ~cmd+shift+3~ to capture the fullscreen.
-- ~cmd+shift+4~ to capture a portion of screen
+There are also some [[file:macos.org][adjustment settings]] I made for MacOS, it is totally personal, you do not need to apply to your situation.
 
 * My personal function defines
 All my functions are defined with prefix ~my/~.
@@ -273,8 +236,8 @@ copied from emacswiki
     :vc (:fetcher github :repo "baudtack/pomodoro.el")
     :commands pomodoro-start
     :custom
-    (pomodoro-work-start-sound (expand-file-name "pomodoro/stop1.mp3" (my/dotfile-dir)))
-    (pomodoro-break-start-sound (expand-file-name "pomodoro/rest.mp3" (my/dotfile-dir)))
+    (pomodoro-work-start-sound (expand-file-name "assets/stop1.mp3" (my/dotfile-dir)))
+    (pomodoro-break-start-sound (expand-file-name "assets/rest.mp3" (my/dotfile-dir)))
     :config
     (pomodoro-add-to-mode-line)
     (cond ((executable-find "mpg123") (setq pomodoro-sound-player "mpg123"))
