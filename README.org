@@ -1095,11 +1095,10 @@ prerequisite : format-all
 #+end_src
 
 #+begin_src emacs-lisp
-    (use-package fmo-mode
-      :vc (:fetcher github :repo "xeechou/fmo-mode.el")
-      :custom (fmo-ensure-formatters t)
-      :hook (((c-mode c++-mode c-ts-mode c++-ts-mode) . fmo-mode)
-             ((hlsl-mode glsl-mode azsl-mode ) . fmo-mode)))
+(use-package fmo-mode :ensure t :pin melpa
+  :custom (fmo-ensure-formatters t)
+  :hook (((c-mode c++-mode c-ts-mode c++-ts-mode) . fmo-mode)
+         ((hlsl-mode glsl-mode azsl-mode ) . fmo-mode)))
 #+end_src
 
 *** Clean up the white spaces
