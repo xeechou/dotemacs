@@ -24,7 +24,8 @@ On Mac by default the scrolling direction is the *reverse* direction you would e
 #+CAPTION: disabling the nature scrolling 
 [[file:imgs/disable-nature-scroll.png]]
 
-
+** Correcting the alt-tab behavior
+In the *mission control* settings, there is an option "*When switching to an application, switch to a Space with open windows for the application*". It cause undesired behavior when you ~alt-tab~. Uncheck this.
 * Application specifics
 
 ** Adjusting keybinding for iterm2
