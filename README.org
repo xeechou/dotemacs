@@ -631,32 +631,21 @@ visiting roam pages using different other window. It's most case what you want.
 
 *** Org download
 #+begin_src emacs-lisp
-  ;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package org-download :ensure t :after org
-    :init
-    (defun my/org-dir-is-fixed (currdir)
-      (let ((org-dir     (file-truename org-directory))     ;;get abs path
-            (roam-dir    (file-truename (my/roam-dir)))     ;;get abs path
-            (journal-dir (file-truename (my/journal-dir)))) ;;get abs path
-        (or (string= currdir org-dir)
-            (string= currdir roam-dir)
-            (string= currdir journal-dir))))
-    :hook
-    ;;this hook will run at-startup because of org-clock, and we do not have a
-    ;;(buffer-file-name) then, so we need to error check it
-    (org-mode . (lambda ()
-                  (when (buffer-file-name)
-                    (let ((currdir (file-name-directory (buffer-file-name))))
-                      ;;set org-download-iamge-dir to imgs/ if is
-                      ;;agenda/roam/journal, otherwise it is temporary, make it nil
-                      (set (make-local-variable 'org-download-image-dir)
-                           (if (my/org-dir-is-fixed currdir)
-                               (my/concat-path currdir "imgs/")
-                             nil))))))
-    :bind (:map org-mode-map
-                ("C-c C-p s" . org-download-screenshot)
-                ("C-c C-p y" . org-download-yank)
-                ("C-c C-p c" . org-download-clipboard)))
+;; org-download;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package org-download :ensure t :after org
+  :hook
+  ;;this hook will run at-startup because of org-clock, and we do not have a
+  ;;(buffer-file-name) then, so we need to error check it
+  (org-mode . (lambda ()
+                ;;download into the "img dir of current org file directory"
+                (when (buffer-file-name)
+                  (let ((currdir (file-name-directory (buffer-file-name))))
+                    (set (make-local-variable 'org-download-image-dir)
+                         (expand-file-name "imgs/" currdir))))))
+  :bind (:map org-mode-map
+              ("C-c C-p s" . org-download-screenshot)
+              ("C-c C-p y" . org-download-yank)
+              ("C-c C-p c" . org-download-clipboard)))
 
 #+end_src
 *** Org Ref
