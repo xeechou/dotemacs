@@ -46,6 +46,19 @@ By default Emacs using ~command+Key~ for some common commands. You can adjust th
 [[file:imgs/mac-app-shortcut.png]]
 
 
+** Mac OS ~DefaultKeyBinding.dict~
+when you apply the keyboard shortcut above you may find that ~^v~ does not work, this is because the ~Ctrl-V~ is being mapped to Page Down by default, see [[https://github.com/jupyter/notebook/issues/4138#issuecomment-642584355][this issue]]. As a workaround, simply do this
+#+begin_src bash
+mkdir -p ~/Library/KeyBindings/
+echo "{ \n
+   \"^v\" = \"noop:\"; \n
+} \n
+" > ~/Library/KeyBindings/DefaultKeyBinding.dict
+
+#+end_src
+
+
+
 * Some tricks on Mac
 - open a folder using Finder on iTerm with ~open $(pwd)~
 - Enable the settings in ~Finder > Preference > Sidebar > Show Home Folder~.
