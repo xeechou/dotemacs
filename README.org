@@ -45,26 +45,29 @@ I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for t
 *** Binaries for MacOS
 On MacOS binaries can be installed using [[https://brew.sh/][Homebrew]]. You can use the following commands to setup
 #+begin_src bash :tangle no
-  # install emacs
-  brew tap d12frosted/emacs-plus
-  #by default install the Emacs29
-  brew install emacs-plus --with-imagemagick --with-native-comp
+# install emacs
+brew tap d12frosted/emacs-plus
+#by default install the Emacs29
+brew install emacs-plus --with-imagemagick --with-native-comp
 
-  # the packages, binuitls may cause troubles on M4 (for windres)
-  brew install ripgrep aspell ninja binutils gnupg
-  #for org-downloads
-  brew install pngpaste
-  # the fonts
-  brew install --cask font-iosevka font-iosevka-aile font-fira-sans font-fira-code
+# the packages, binuitls may cause troubles on M4 (for windres)
+brew install ripgrep aspell ninja binutils gnupg
+#for org-downloads
+brew install pngpaste
+# the fonts
+brew install --cask font-iosevka font-iosevka-aile font-fira-sans font-fira-code
 
-  # The texlive. For minimal install you can try the basicTex then the additional
-  # packages
-  brew install basictex
-  #dvipng is required for org-latex-preview
-  sudo tlmgr update --self && sudo tlmgr install dvipng wrapfig capt-of
+# The texlive. For minimal install you can try the basicTex then the additional
+# packages
+brew install basictex
+#dvipng is required for org-latex-preview
+sudo tlmgr update --self && sudo tlmgr install dvipng wrapfig capt-of
 
-  # finally start emacs service, recommand emacs-plus packages
-  brew services start emacs-plus@29
+# install vterm for aider
+brew install libvterm
+
+# finally start emacs service, recommand emacs-plus packages
+brew services start emacs-plus@30
 #+end_src
 
 There are also some [[file:macos.org][adjustment settings]] I made for MacOS, it is totally personal, you do not need to apply to your situation.
