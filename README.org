@@ -1331,22 +1331,22 @@ The difficult thing is to setup the indentations. See [[https://lists.gnu.org/ar
 *** Treesit auto
 treesit-auto does not work on windows at moment.
 #+begin_src emacs-lisp
-  (use-package treesit-auto
-      :unless (or (eq system-type 'windows-nt)
-                  (not (treesit-available-p)))
-      :ensure t
-      :custom
-      (c-ts-mode-indent-style #'my/indent-rules)
-      :hook ((after-init . treesit-auto-mode))
-      :config
-      (setq-default treesit-font-lock-level 3)
-      ;;Error here if (treesit-auto-add-to-auto-mode-alist 'all) because the
-      ;;extensions for glsl is nil. See
-      ;;https://github.com/renzmann/treesit-auto/blob/main/treesit-auto.el#L161. We
-      ;;end up adding a (nil . glsl-ts-mode) to auto-mode-alist. Which causes the
-      ;;auto-mode to fail to load anything.
-      (treesit-auto-add-to-auto-mode-alist nil)
-      (setq treesit-auto-install 'prompt))
+(use-package treesit-auto
+    :unless (or (eq system-type 'windows-nt)
+                (not (treesit-available-p)))
+    :ensure t
+    :custom
+    (c-ts-mode-indent-style #'my/indent-rules)
+    :hook ((after-init . treesit-auto-mode))
+    :config
+    (setq-default treesit-font-lock-level 3)
+    ;;Error here if (treesit-auto-add-to-auto-mode-alist 'all) because the
+    ;;extensions for glsl is nil. See
+    ;;https://github.com/renzmann/treesit-auto/blob/main/treesit-auto.el#L161. We
+    ;;end up adding a (nil . glsl-ts-mode) to auto-mode-alist. Which causes the
+    ;;auto-mode to fail to load anything.
+    ;;(treesit-auto-add-to-auto-mode-alist '('c 'cpp 'cmake 'rust))
+    (setq treesit-auto-install 'prompt))
 #+end_src
 
 ** Company mode
