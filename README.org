@@ -1349,7 +1349,16 @@ treesit-auto does not work on windows at moment.
     ;;https://github.com/renzmann/treesit-auto/blob/main/treesit-auto.el#L161. We
     ;;end up adding a (nil . glsl-ts-mode) to auto-mode-alist. Which causes the
     ;;auto-mode to fail to load anything.
-    ;;(treesit-auto-add-to-auto-mode-alist '('c 'cpp 'cmake 'rust))
+
+    ;; to fix this, we need to build a treesit-ready-langs which contains only ones has extensions
+    (setq treesit-ready-langs
+          (seq-map #'treesit-auto-recipe-lang
+                   (seq-filter
+                    (lambda (r) (if (and (treesit-auto-recipe-ext r) ;;has extensions
+                                         (fboundp (treesit-auto-recipe-ts-mode r))) ;;has mode
+                                    r nil))
+                    treesit-auto-recipe-list)))
+    (treesit-auto-add-to-auto-mode-alist treesit-ready-langs)
     (setq treesit-auto-install 'prompt))
 #+end_src
 
