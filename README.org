@@ -77,29 +77,39 @@ All my functions are defined with prefix ~my/~.
 
 ** File operations
 #+begin_src emacs-lisp
-  (defun my/dotfile-dir ()
-    (file-name-directory (or (buffer-file-name) load-file-name)))
+(defun my/dotfile-dir ()
+  (file-name-directory (or (buffer-file-name) load-file-name)))
 
-  (defun my/concat-path (&rest parts)
-    (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
+(defun my/concat-path (&rest parts)
+  (cl-reduce (lambda (a b) (expand-file-name b a)) parts))
 
-  (defun my/merge-list-to-list (dst-list src-list)
-    (dolist (item src-list) (add-to-list dst-list item)))
+(defun my/merge-list-to-list (dst-list src-list)
+  (dolist (item src-list) (add-to-list dst-list item)))
 
-  (defun my/merge-list-buffer-local (dst-list src-list)
-    ;;not that dst-list need to be quoted
-    (make-variable-buffer-local dst-list)
-    (my/merge-list-to-list dst-list src-list))
+(defun my/merge-list-buffer-local (dst-list src-list)
+  ;;not that dst-list need to be quoted
+  (make-variable-buffer-local dst-list)
+  (my/merge-list-to-list dst-list src-list))
 
-  (defun my/filename ()
-    "Copy the filename of the current buffer."
-    (interactive)
-    (kill-new (buffer-name (window-buffer (minibuffer-selected-window)))))
+(defun my/filename ()
+  "Copy the filename of the current buffer."
+  (interactive)
+  (kill-new (buffer-name (window-buffer (minibuffer-selected-window)))))
 
-  (defun my/full-path ()
-    "Copy the full path of the current buffer."
-    (interactive)
-    (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+(defun my/full-path ()
+  "Copy the full path of the current buffer."
+  (interactive)
+  (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+
+(defun my/test-port-open (host port)
+  "Test if a TCP PORT at HOST is open."
+  (condition-case nil
+      (progn
+        (let ((stream (open-network-stream "test-stream" nil host port)))
+          (delete-process stream)
+          t))
+    (error nil)))
+
 #+end_src
 ** Reload buffer for ~.dir-locals.el~
 
