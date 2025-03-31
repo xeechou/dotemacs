@@ -416,15 +416,21 @@ Reviews.
 
 *** Latex setup in org
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_LATEX
+(cond
+ ;; use dvipng when found
+ ((and (executable-find "dvipng") (executable-find "latex")) 
+  (setq org-preview-latex-default-process 'dvipng))
+ ;; see if imagemagick is available
+ ((and (executable-find "convert") (executable-find "pdflatex"))
+  (setq org-preview-latex-default-process 'imagemagick)))
 
-  (setq org-preview-latex-default-process 'dvipng)
-  (setq org-preview-latex-image-directory
-        (my/concat-path temporary-file-directory
-                       "ltximg/"))
-  ;;set latex preview scale
-  (setq org-format-latex-options (plist-put
-                                  org-format-latex-options
-                                  :scale (perdev-get-value 'my/org-latex-scale1 1.0)))
+(setq org-preview-latex-image-directory
+      (my/concat-path temporary-file-directory
+                     "ltximg/"))
+;;set latex preview scale
+(setq org-format-latex-options (plist-put
+                                org-format-latex-options
+                                :scale (perdev-get-value 'my/org-latex-scale1 1.0)))
 #+end_src
 
 On archlinux, you need to install
