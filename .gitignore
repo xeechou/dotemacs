@@ -51,6 +51,7 @@ ellama-sessions/
 gptel-crowdsourced-prompts.csv
 codeium/
 llm-api.el
+.aider*
 
 # Tangled files
 README.el*

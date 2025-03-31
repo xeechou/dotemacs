@@ -1883,6 +1883,75 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 #+end_src
 
 * LLM
+** Register the APIs
+personally I use a device local ~llm-api.el~ to register all my keys.
+#+begin_src emacs-lisp
+(let ((llm-api-file (expand-file-name "llm-api.el" (my/dotfile-dir))))
+  (when (file-exists-p llm-api-file)
+    (load llm-api-file)))
+#+end_src
+
+** [[https://aider.chat/][Aider]]
+Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.chat/#features][features]] is like adding multiple files to aider like ~aider <file1> <file2> ...~ then you can ask it to add new features, tests. Fix bugs, refactoring code, update docs.
+
+#+begin_src emacs-lisp :noweb yes
+(use-package vterm  :if (executable-find "vterm-ctrl") :ensure t  :pin melpa)
+
+(use-package aidermacs
+  :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
+  :pin melpa :ensure t :defer t
+  :bind (("C-c a" . aidermacs-transient-menu))
+  :init
+  (if (executable-find "vterm-ctrl")
+    (setq aidermacs-backend 'vterm))
+  :config
+  <<AIDER_BACKENDS>>
+
+  :custom
+  ;; Disable auto-commits
+  (aidermacs-auto-commits nil)
+  )
+
+#+end_src
+
+*** Backends setup
+- openAI
+#+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
+(when (boundp 'my/llm-openai-key)
+  (setenv "OPENAI_API_KEY" my/llm-openai-key)
+  (setq aidermacs-use-architect-mode t)
+  (setq aidermacs-architect-model "gpt-4o")
+  (setq aidermacs-editor-model "gpt-o1"))
+#+end_src
+- openrouter
+#+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
+(when (boundp 'my/llm-openrouter-key)
+  (setenv "OPENROUTER_API_KEY" my/llm-openrouter-key)
+  ;;setup corresponding models
+  (setq aidermacs-use-architect-mode t)
+  (setq aidermacs-architect-model "openrouter/deepseek/deepseek-r1")
+  (setq aidermacs-editor-model "openrouter/deepseek/deepseek-coder"))
+#+end_src
+- ollama
+#+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
+(defun my/test-port-open (host port)
+  "Test if a network PORT at HOST is open."
+  (condition-case nil
+      (progn
+        (let ((stream (open-network-stream "test-stream" nil host port)))
+          (delete-process stream)
+          t))
+    (error nil)))
+
+(when (and (my/test-port-open "127.0.0.1" 11434)
+	   (boundp 'my/llm-ollama-model))
+  (setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
+  (setq aidermacs-use-architect-mode nil)
+  (setq aidermacs-default-model (concat "ollama_chat/" my/llm-ollama-model))
+  )
+#+end_src
+
+
 ** [[https://github.com/karthink/gptel][GPTel]]
 Firstly we need methods to securely store our api keys
 
@@ -1890,8 +1959,6 @@ Firstly we need methods to securely store our api keys
   (use-package gptel
     :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
     :pin melpa :ensure t :defer t
-    :init
-    (load (expand-file-name "llm-api.el" (my/dotfile-dir)))
     :custom
     (gptel-default-mode 'org-mode)
     :bind
@@ -1977,7 +2044,6 @@ We add additional backend for when using proxy
                   "gpt-4-0125-preview")
         :curl-args '("-k")))
 #+end_src
-
 
 ** Ellama
 The ellama package is disabled in favor of getel.
