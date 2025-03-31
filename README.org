@@ -1925,7 +1925,9 @@ Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.
 #+end_src
 
 *** Backends setup
-- openAI
+The code gets evaluated sequentially, the later models gets the higher priorities.
+
+**** openAI
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
 (when (boundp 'my/llm-openai-key)
   (setenv "OPENAI_API_KEY" my/llm-openai-key)
@@ -1933,7 +1935,7 @@ Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.
   (setq aidermacs-architect-model "gpt-4o")
   (setq aidermacs-editor-model "gpt-o1"))
 #+end_src
-- openrouter
+**** OpenRouter
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
 (when (boundp 'my/llm-openrouter-key)
   (setenv "OPENROUTER_API_KEY" my/llm-openrouter-key)
@@ -1942,17 +1944,9 @@ Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.
   (setq aidermacs-architect-model "openrouter/deepseek/deepseek-r1")
   (setq aidermacs-editor-model "openrouter/deepseek/deepseek-coder"))
 #+end_src
-- ollama
+**** Ollama
+  Enables Ollama when the port is enabled.
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
-(defun my/test-port-open (host port)
-  "Test if a network PORT at HOST is open."
-  (condition-case nil
-      (progn
-        (let ((stream (open-network-stream "test-stream" nil host port)))
-          (delete-process stream)
-          t))
-    (error nil)))
-
 (when (and (my/test-port-open "127.0.0.1" 11434)
 	   (boundp 'my/llm-ollama-model))
   (setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
@@ -2017,7 +2011,7 @@ I prefer the google genimi, set it to default if available
 *** Ollama backend, run locally
 Ollama backend runs locally on your pc
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
-  (when (and (executable-find "ollama")
+  (when (and (my/test-port-open "127.0.0.1" 11434)
              (boundp 'my/llm-ollama-model))
     (gptel-make-ollama "Ollama"
       :host "localhost:11434"
