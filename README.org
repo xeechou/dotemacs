@@ -1959,9 +1959,20 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
   (setenv "OPENROUTER_API_KEY" my/llm-openrouter-key)
   ;;setup corresponding models
   (setq aidermacs-use-architect-mode t)
+  (setq aidermacs-default-model "sonnet")
   (setq aidermacs-architect-model "openrouter/deepseek/deepseek-r1")
   (setq aidermacs-editor-model "openrouter/deepseek/deepseek-coder"))
 #+end_src
+**** Claude
+#+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
+(when (boundp 'my/llm-anthropic-key)
+  (setenv "ANTHROPIC_API_KEY" my/llm-anthropic-key)
+  ;;setup corresponding models
+  (setq aidermacs-use-architect-mode t)
+  (setq aidermacs-architect-model "anthropic/claude-3-5-sonnet-latest")
+  (setq aidermacs-editor-model "anthropic/claude-3-5-sonnet-latest"))
+#+end_src
+
 **** Ollama
   Enables Ollama when the port is enabled.
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
@@ -2023,6 +2034,13 @@ I prefer the google genimi, set it to default if available
           gpt-backend  (gptel-make-gemini "Gemini"
                          :key my/llm-gemini-key
                          :stream t)))
+#+end_src
+*** Claude backend
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
+(when (boundp 'my/llm-anthropic-key)
+  (gptel-make-anthropic "Claude"          ;Any name you want
+    :stream t                             ;Streaming responses
+    :key my/llm-anthropic-key))
 #+end_src
 
 *** Ollama backend, run locally
