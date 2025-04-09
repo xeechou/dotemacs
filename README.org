@@ -577,6 +577,10 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
           ("C-c o C" . org-roam-capture)
           ("C-c o i" . org-roam-node-insert)
           ("C-c o g" . org-roam-ui-mode)
+          ("C-c o T" . org-roam-dailies-capture-today)
+          ("C-c o t" . org-roam-dailies-goto-today)
+          ("C-c o n" . org-roam-dailies-goto-date)
+          ("C-c o y" . org-roam-dailies-goto-yesterday)
           :map org-mode-map
           ("C-c o r" . org-roam-buffer-toggle) ;;toggle-back-links
           :map org-roam-mode-map
