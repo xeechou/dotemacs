@@ -1902,7 +1902,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
     :hook (after-init . unity-mode))  
 #+end_src
 
-* LLM
+* LLMs
 ** Register the APIs
 personally I use a device local ~llm-api.el~ to register all my keys.
 #+begin_src emacs-lisp
@@ -1910,6 +1910,14 @@ personally I use a device local ~llm-api.el~ to register all my keys.
   (when (file-exists-p llm-api-file)
     (load llm-api-file)))
 #+end_src
+
+** Command keymap for LLMs
+
+#+begin_src emacs-lisp
+(define-prefix-command 'my/llm-keymap)
+(global-set-key (kbd "C-c i") 'my/llm-keymap)'
+#+end_src
+
 
 ** [[https://aider.chat/][Aider]]
 Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.chat/#features][features]] is like adding multiple files to aider like ~aider <file1> <file2> ...~ then you can ask it to add new features, tests. Fix bugs, refactoring code, update docs.
@@ -1920,7 +1928,7 @@ Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.
 (use-package aidermacs
   :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
   :pin melpa :ensure t :defer t
-  :bind (("C-c a" . aidermacs-transient-menu))
+  :bind (:map my/llm-keymap ("a" . aidermacs-transient-menu))
   :init
   (if (executable-find "vterm-ctrl")
     (setq aidermacs-backend 'vterm))
@@ -1965,31 +1973,30 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
   )
 #+end_src
 
-
 ** [[https://github.com/karthink/gptel][GPTel]]
 Firstly we need methods to securely store our api keys
 
 #+begin_src emacs-lisp :noweb yes
-  (use-package gptel
-    :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
-    :pin melpa :ensure t :defer t
-    :custom
-    (gptel-default-mode 'org-mode)
-    :bind
-    (("C-c o s" . gptel-menu))
-    :config
-    ;;setup directives
-    (setq gptel-directives
-          (delete-dups
-           (append gptel-directives
-                   '(
-                     <<GPTEL_DIRECTIVES>>
-                     ))))
-    ;;setup backends
-    <<GPTEL_BACKENDS>>
-    ;;setup proxies
-    <<GPTEL_PROXY>>
-    )
+(use-package gptel
+  :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
+  :pin melpa :ensure t :defer t
+  :custom
+  (gptel-default-mode 'org-mode)
+  :bind
+  (:map my/llm-keymap ("g" . gptel-menu))
+  :config
+  ;;setup directives
+  (setq gptel-directives
+        (delete-dups
+         (append gptel-directives
+                 '(
+                   <<GPTEL_DIRECTIVES>>
+                   ))))
+  ;;setup backends
+  <<GPTEL_BACKENDS>>
+  ;;setup proxies
+  <<GPTEL_PROXY>>
+  )
 #+end_src
 *** Directives
 **** Command line helper
