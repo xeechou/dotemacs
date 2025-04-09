@@ -2066,7 +2066,38 @@ We add additional backend for when using proxy
         :curl-args '("-k")))
 #+end_src
 
-** Ellama
+** Copilot
+#+begin_src emacs-lisp
+(use-package copilot :pin melpa :ensure t :defer t
+  ;;:hook (prog-mode . copilot-mode) ;;actually, I may just want to disable it
+  ;;by default.
+  :when (executable-find "npm")
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)
+              ("C-n" . 'copilot-next-completion)
+              ("C-p" . 'copilot-previous-completion)))
+#+end_src
+
+The [[https://github.com/chep/copilot-chat.el][copilot-chat.el]]
+#+begin_src emacs-lisp
+(use-package copilot-chat
+  :pin melpa :ensure t :defer t
+  :when (executable-find "npm")
+  :bind (:map my/llm-keymap
+	 ("t" . copilot-chat-transient)
+	 ("d" . copilot-chat-display))
+  ;; :config
+  ;; (setq copilot-chat-backend 'curl)
+  ;; (setq copilot-chat-gpt-4-model "gpt-4o")
+  ;; (setq copilot-chat-gpt-4-key my/llm-openai-key)
+  ;; (setq copilot-chat-gpt-4-proxy (my/has-or-get-proxy))
+  )
+#+end_src
+
+** Ellama (disabled)
 The ellama package is disabled in favor of getel.
 #+begin_src emacs-lisp
   (when (executable-find "ollama")
