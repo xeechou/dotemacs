@@ -2105,8 +2105,9 @@ The [[https://github.com/chep/copilot-chat.el][copilot-chat.el]]
   :pin melpa :ensure t :defer t
   :when (executable-find "npm")
   :bind (:map my/llm-keymap
-	 ("t" . copilot-chat-transient)
-	 ("d" . copilot-chat-display))
+         ("t" . copilot-chat-transient)
+         ("d" . copilot-chat-display)
+         ("c" . copilot-chat-insert-commit-message))
   ;; :config
   ;; (setq copilot-chat-backend 'curl)
   ;; (setq copilot-chat-gpt-4-model "gpt-4o")
