@@ -442,47 +442,6 @@ On archlinux, you need to install
 - texlive-pictures,
 - texlive-plangeneric
 
-** Org journal
-#+begin_src emacs-lisp :noweb yes
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; journal
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package org-journal
-  :ensure t :pin melpa :after org
-  :init
-  (defun my/journal-dir () (my/org-file "journals/"))
-  (defun my/org-journal-find-location ()
-    ;; Open today's journal, but specify a non-nil prefix argument in order to
-    ;; inhibit inserting the heading; org-capture will insert the heading.
-    (org-journal-new-entry t)
-    (unless (eq org-journal-file-type 'daily)
-      (org-narrow-to-subtree))
-    (goto-char (point-max)))
-
-  (with-eval-after-load 'org
-    (add-to-list 'org-capture-templates
-		 '("j" "Journal entry" plain (function my/org-journal-find-location)
-                   "\n** %?"
-                   :jump-to-captured t
-		   :immediate-finish t
-		   :prepend t)))
-  :custom
-  (org-journal-file-type 'daily)
-  (org-journal-dir (my/org-file "journals/"))
-  (org-journal-time-format "")
-  (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-file-header "#+title: %A, %d %B %Y\n\n* Review:\n \n* Planning:\n")
-  (org-journal-enable-agenda-integration t)
-
-  :bind-keymap
-  ("C-c n j" . org-journal-mode-map)
-  :bind (:map org-journal-mode-map
-	      ("C-f" . org-journal-next-entry)
-	      ("C-b" . org-journal-previous-entry)
-	      ("C-s" . org-journal-search))
-  )
-
-#+end_src
 ** Org mode appearance setup
 
 #+begin_src emacs-lisp
@@ -590,6 +549,16 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
   ;;start db sync automatically, also you are able to refresh back link buffer,
   ;;alternatively you hook org-roam-db-auto-sync-mode to org-roam-mode
   (org-roam-db-autosync-enable)
+
+  ;;excluding org-roam-dailes from roam-database
+  (setq org-roam-db-node-include-function
+        (lambda ()
+          (let ((path (buffer-file-name (buffer-base-buffer)))
+                ;; org-roam-dailies-directory is a relative path
+                (dailies-dir (expand-file-name org-roam-dailies-directory
+                                               org-roam-directory)))
+            (not (file-in-directory-p path dailies-dir)))))
+
   ;; configure org-roam-buffer
   <<ROAM_BUFFER>>
   )
