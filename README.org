@@ -740,6 +740,37 @@ The [[https://titan-c.gitlab.io/org-cv/][Org CV]] package helps manages the curr
     :init (require 'ox-moderncv))
 #+end_src
 
+** Org Jira
+Adding Jira tickets to your Calendar
+#+begin_src emacs-lisp
+(use-package org-jira
+  :when (and (boundp 'my/jira-token)
+	     (boundp 'my/jira-url))
+  :ensure t :after org :pin melpa
+  :commands (org-jira-get-issues)
+  :config
+  (setq org-jira-working-dir (expand-file-name ".org-jira" org-directory))
+  (unless (file-exists-p org-jira-working-dir)
+      (make-directory org-jira-working-dir))
+  ;;jiralib.el is part of the package.
+  (setq jiralib-url my/jira-url)
+  (setq jiralib-token
+    (cons "Authorization"
+          (concat "Bearer " my/jira-token))) ;; this is not a good way to do it, use authinfo
+
+  ;; adding the files to org-agenda-files
+  (setq org-agenda-files
+	(append org-agenda-files (directory-files-recursively org-jira-working-dir "\\.org$")))
+
+  ;; setup the workflow
+  (defconst org-jira-progress-issue-flow
+    '(("open" . "Ready for Development")
+       ("Ready for Development" . "In Progress")
+       ("In Progress" . "Closed")
+       ("Closed" . "Reopened")))
+)
+#+end_src
+
 
 * Editing
 ** Line operations 
