@@ -186,6 +186,16 @@ Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have t
   (use-package perdev :load-path "lisp")
 #+end_src
 
+** Downloading transcript from YouTube
+This tool can be used by LLM
+#+begin_src emacs-lisp
+(use-package ytb-sub-dl
+  :load-path "lisp"
+  :when (executable-find "yt-dlp")
+  :commands (ytb-sub-dl-insert-transcript))
+#+end_src
+
+
 * Global settings
 menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
 
