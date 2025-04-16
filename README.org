@@ -790,6 +790,16 @@ Adding Jira tickets to your Calendar
 #+end_src
 
 
+** [[https://github.com/alphapapa/org-web-tools][org-web-tools]]
+awesome package to convert web package into a org buffer/or entries.
+#+begin_src emacs-lisp
+(use-package org-web-tools :pin melpa :after org :ensure t :defer t
+  :bind
+  (("C-c o wr" . org-web-tools-read-url-as-org)
+   :map org-mode-map
+   ("C-c o wi" . org-web-tools-insert-web-page-as-entry)))
+#+end_src
+
 * Editing
 ** Line operations 
 Define a backward kill a line:
