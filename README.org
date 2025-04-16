@@ -66,6 +66,9 @@ sudo tlmgr update --self && sudo tlmgr install dvipng wrapfig capt-of
 # install vterm for aider
 brew install libvterm
 
+# install pinentry-mac for auth-info
+brew install pinentry-mac
+
 # finally start emacs service, recommand emacs-plus packages
 brew services start emacs-plus@30
 #+end_src
@@ -272,6 +275,15 @@ copied from emacswiki
           (t (setq pomodoro-play-sounds nil))))
 #+end_src
 
+** auth-info
+
+#+begin_src emacs-lisp
+;; also set allow-loopback-entry in gpg-agent.conf and gpgconf --reload gpg-agent
+;;
+;; this means clients like Emacs can get the password in their own way and push to gpg
+;; for this to work with Emacs, set epa-pinentry-mode to 'loopback in Emacs
+(setq epg-pinentry-mode 'loopback)
+#+end_src
 
 * Org mode settings
 ** Convenience functions
