@@ -79,7 +79,7 @@
 (require 'exec-path-from-shell)
 (when (and (not (eq system-type 'windows-nt))
 	   (daemonp))
-  (dolist (var '("XDG_SESSION_TYPE" "XDG_CONFIG_HOME"))
+  (dolist (var '("XDG_SESSION_TYPE" "XDG_CONFIG_HOME" "ORG_JIRA_URL"))
     (add-to-list 'exec-path-from-shell-variables var))
   (exec-path-from-shell-initialize))
 

@@ -756,19 +756,25 @@ The [[https://titan-c.gitlab.io/org-cv/][Org CV]] package helps manages the curr
 Adding Jira tickets to your Calendar
 #+begin_src emacs-lisp
 (use-package org-jira
-  :when (and (boundp 'my/jira-token)
-	     (boundp 'my/jira-url))
+  :when (getenv "ORG_JIRA_URL")
   :ensure t :after org :pin melpa
   :commands (org-jira-get-issues)
+  :bind-keymap ("C-c o j" . org-jira-entry-mode-map)
+  :bind (:map org-jira-entry-mode-map
+	      ("ig" . org-jira-get-issues)
+	      ("ih" . org-jira-get-issues-headonly)
+	      ("iw" . org-jira-progress-issue)
+	      ("in" . org-jira-progress-issue-next))
   :config
   (setq org-jira-working-dir (expand-file-name ".org-jira" org-directory))
   (unless (file-exists-p org-jira-working-dir)
       (make-directory org-jira-working-dir))
   ;;jiralib.el is part of the package.
-  (setq jiralib-url my/jira-url)
+  (setq jiralib-url (getenv "ORG_JIRA_URL"))
   (setq jiralib-token
     (cons "Authorization"
-          (concat "Bearer " my/jira-token))) ;; this is not a good way to do it, use authinfo
+          (concat "Bearer " (auth-source-pick-first-password
+                             :host (getenv "ORG_JIRA_URL")))))
 
   ;; adding the files to org-agenda-files
   (setq org-agenda-files
