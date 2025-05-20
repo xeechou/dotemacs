@@ -1535,27 +1535,70 @@ simple text mode:
     )
 #+end_src
 
-** Debugging
-*** Debugging with dap-mode.
-It is not ready, disable it now.
-#+begin_src emacs-lisp
+** Debugging with [[https://microsoft.github.io/debug-adapter-protocol//specification.html][debug adapter protocol]]
+*** [[https://github.com/svaante/dape][dape]] configs
 
-  (use-package dap-mode :ensure t :defer t
-    :disabled
-    :commands dap-debug
-    :after lsp-mode
-    :config
-    (dap-ui-mode)
-    (dap-ui-controls-mode)
-    (let ((dap-lldb-vscode-path (executable-find "lldb-vscode")))
-      (when dap-lldb-vscode-path
-        (require 'dap-lldb)
-        (setq dap-lldb-debug-program `(, dap-lldb-vscode-path))
-        (setq dap-lldb-debugged-program-function (lambda () (expand-file-name (read-file-name "Select file to debug."))))
-        ))
-    )
+#+begin_src emacs-lisp
+(use-package dape :ensure t ;; available in elpa
+  :preface
+  ;; By default dape shares the same keybinding prefix as `gud'
+  ;; If you do not want to use any prefix, set it to nil.
+  (setq dape-key-prefix "\C-x\C-a")
+
+  :hook
+  ;; Save breakpoints on quit
+  (kill-emacs . dape-breakpoint-save)
+  ;; Load breakpoints on startup
+  (after-init . dape-breakpoint-load)
+
+  :config
+  ;; Turn on global bindings for setting breakpoints with mouse
+  (dape-breakpoint-global-mode)
+
+  ;; Info buffers to the right
+  (setq dape-buffer-window-arrangement 'right)
+
+  ;; Pulse source line (performance hit)
+  ;; (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
+
+  ;; Showing inlay hints
+  (setq dape-inlay-hints t)
+
+  ;; Save buffers on startup, useful for interpreted languages
+  ;; (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
+
+  ;; Kill compile buffer on build success
+  (add-hook 'dape-compile-hook 'kill-buffer)
+
+  ;; Projectile users
+  ;; (setq dape-cwd-function 'projectile-project-root)
+  )
+
+;; Enable repeat mode for more ergonomic `dape' use
+(use-package repeat
+  :config
+  (repeat-mode))
 #+end_src
-*** [[https://github.com/rurban/rmsbolt][Rmsbolt]] mode
+
+*** [[https://github.com/vadimcn/codelldb/blob/master/MANUAL.md][codelldb]] setup
+So far I had the most success with ~codelldb~, however there are couple of issues:
+
+**** I get some problems hitting breakpoints at program start up
+a quick hack is to use ~:stopOnEntry~. You can setup ~dap-command~ on ~.dir-locals.el~
+
+#+begin_src emacs-lisp :tangle no
+(setq (dape-command (codelldb-cc :stopOnEntry t :args ["arg0" "args1"])))  
+#+end_src
+**** you may run into permission issues on Mac
+
+*** [[https://github.com/helix-editor/helix/wiki/Debugger-Configurations#install-debuggers][lldb-dap]] installation
+- On MacOS, you can find the ~lldb-dap~ through ~xcrun -f lldb-dap~, it is usually under:
+#+begin_src :tangle no
+/Applications/Xcode.app/Contents/Developer/usr/bin/lldb-dap  
+#+end_src
+then you can link against it ~ln -s /Application//.../lldb-dap /usr/local/bin/lldb-dap~
+
+** [[https://github.com/rurban/rmsbolt][Rmsbolt]] mode
 RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making changes with ~C-c C-c~, which is bonded to ~:bind (:map rmsbolt-mode-map ("C-c C-c" . rmsbolt-compile))~
 
 #+begin_src emacs-lisp :noweb yes
