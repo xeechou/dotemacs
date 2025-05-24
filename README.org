@@ -328,13 +328,14 @@ copied from emacswiki
   ;; globally is great
   :bind (("C-c o a"   . org-agenda)
          ("C-c o c"   . org-capture)
+         <<ORG_KEYS>>
          :map org-mode-map
          ("M-<left>"  . org-metaleft)
          ("M-<right>" . org-metaright)
          ("M-<up>"    . org-metaup)
          ("M-<down>"  . org-metadown))
   :init
-  <<ORG_DIRECTORY>>
+  <<ORG_SETUP>>
 
   ;; enable images
   (setq org-startup-with-inline-images t)
@@ -361,7 +362,7 @@ copied from emacswiki
 #+end_src
 *** Org directory setup
 org-directory has to have trailing "/"  
-#+begin_src emacs-lisp :tangle no :noweb-ref ORG_DIRECTORY
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_SETUP
   (setq org-directory (if (my/org-dir-set (getenv "ORG_DIR"))
                           (getenv "ORG_DIR")
                         "~/org/")) 
@@ -402,7 +403,7 @@ It will prevent from inserting a state directly under headings.
 Instead it will be inside a ~:LOGBOOK:~
 
 *** Capture templates
-Capture tasks in ~misc.org~ to sort later
+**** Capture tasks in ~misc.org~ to sort later
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
   ;; misc tasks, moving coding or writing later?
   ("m" "Miscs" entry
@@ -410,7 +411,7 @@ Capture tasks in ~misc.org~ to sort later
                "** TODO %?\n%i\n  %a" :prepend t)
 #+end_src
 
-Capture some ideas in ~thoughts.org~
+**** Capture some ideas in ~thoughts.org~
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
   ;; my ideas
   ("s" "Thoughts" entry
@@ -419,7 +420,7 @@ Capture some ideas in ~thoughts.org~
    :prepend t)
 #+end_src
 
-Something to read.
+**** Something to read.
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
   ;; Learning items
   ("r" "Reading" entry
@@ -428,12 +429,32 @@ Something to read.
    :prepend t) ;;why the linebreak didn't work?
 #+end_src
 
-Reviews.
+**** Reviews.
 #+begin_src  emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
   ("p" "Review+Planning" entry
    (file+headline ,(my/org-file "goals-habits.org") "Review+TODOs+Plan+Journal")
    "**** On %t\n***** Planned:\n\n %i \n "
    :prepend t)
+#+end_src
+
+**** Today
+The template
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_CAPTURE
+("t" "Today" entry
+ (file+headline ,(my/org-file "writing.org") "Todays")
+ "** TODO %? \n SCHEDULED: %t\n%i"
+ :prepend t)
+#+end_src
+
+Then we use special key bindings for going todays.
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_SETUP
+(defun my/org-capture-today () (interactive) (org-capture nil "t"))
+(defun my/org-goto-today () (interactive) (org-capture-goto-target "t"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_KEYS
+("C-c o t" . my/org-capture-today)
+("C-c o T" . my/org-goto-today)
 #+end_src
 
 *** Latex setup in org
@@ -558,10 +579,11 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
           ("C-c o C" . org-roam-capture)
           ("C-c o i" . org-roam-node-insert)
           ("C-c o g" . org-roam-ui-mode)
-          ("C-c o T" . org-roam-dailies-capture-today)
-          ("C-c o t" . org-roam-dailies-goto-today)
-          ("C-c o n" . org-roam-dailies-goto-date)
-          ("C-c o y" . org-roam-dailies-goto-yesterday)
+          ;; start using my own capture templates instead of org-roam-dailies
+          ;; ("C-c o T" . org-roam-dailies-capture-today)
+          ;; ("C-c o t" . org-roam-dailies-goto-today)
+          ;; ("C-c o n" . org-roam-dailies-goto-date)
+          ;; ("C-c o y" . org-roam-dailies-goto-yesterday)
           :map org-mode-map
           ("C-c o r" . org-roam-buffer-toggle) ;;toggle-back-links
           :map org-roam-mode-map
