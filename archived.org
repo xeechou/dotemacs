@@ -1,0 +1,143 @@
+#+title: Old Deprecated package configurations
+#+author: Xichen Zhou
+
+
+** IVY
+I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my editing need. Ivy is a multi-package setup. It contains ivy itself:
+#+begin_src emacs-lisp
+(use-package ivy :ensure t
+  :diminish (ivy-mode . "")
+  :hook (after-init . ivy-mode)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  ;;number of result lines to display
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-wrap t)
+  )  
+#+end_src
+*** Counsel
+[[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
+#+begin_src emacs-lisp
+  (use-package counsel :ensure t :after ivy
+    :config
+    (use-package smex :ensure t)
+    :bind
+    (("C-s" . swiper)
+     ("M-x" . counsel-M-x)
+     ("C-x C-f" . counsel-find-file)
+     ;;this collide
+     ("C-c C-u" . counsel-unicode-char)
+     ("C-c C-i" . counsel-info-lookup-symbol)
+     ("C-x t" . counsel-imenu)
+     ("C-c y" . counsel-yank-pop)
+     ;;for git setup
+     ("C-c g" . counsel-grep)
+     ("C-c j" . counsel-git-grep)
+     ("C-c l" . counsel-git-log)
+     ("C-c r" . counsel-rg) ;;avoid conflict with eglot "C-c R"
+     ;; for org-mode
+     :map org-mode-map
+     ("C-x t" . counsel-outline)))
+#+end_src
+Note: originally I have "C-c g" binds to ~counsel-git~, it's search files in git. However [[*Projectile][Projectile]] does that perfectly.
+*** Counsel tramp
+which I use for remote editing.
+#+begin_src emacs-lisp :noweb yes
+;; using counsel-tramp
+(use-package counsel-tramp
+  :after (counsel tramp)
+  :ensure t
+  :init
+  (setq auth-source-save-behavior nil)  ;; don't store the password the package
+  ;; does not load immediately, if you have previous opened plinkw file in
+  ;; recentf, you may have error on buffer-switching, simply call counsel-tramp
+  ;; to load plinkw method in
+  :bind ("C-c s" . counsel-tramp)
+  ;; Here is the config to make trump work on windows; forget ssh, emacs will
+  ;; find /c/windows/system32/openssh first, the git ssh won't work either. For
+  ;; plink to work, you have to run pink in terminal first to add it to the
+  ;; REGISTRY, otherwise it will spit whole bunch of thing tramp will not
+  ;; understand.
+  :config
+  <<TRAMP>>
+  )
+  
+#+end_src
+
+On windows, I use Plink for remote editing.
+#+begin_src emacs-lisp :tangle no :noweb-ref TRAMP
+  (when (and (eq system-type 'windows-nt)  (executable-find "plink"))
+    (add-to-list 'tramp-methods
+		 `("plinkw"
+                   (tramp-login-program "plink")
+                   (tramp-login-args (("-l" "%u") ("-P" "%p") ("-t")
+				      ("%h") ("\"")
+				      (,(format
+                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
+                                         tramp-terminal-type
+                                         "$")) ;; This prompt will be
+				      ("/bin/sh") ("\"")))
+                   (tramp-remote-shell       "/bin/sh")
+                   (tramp-remote-shell-login ("-l"))
+                   (tramp-remote-shell-args  ("-c"))
+                   (tramp-default-port       22)))
+    )  
+#+end_src
+
+And also enable the ~.dir-locals.el~ on remote machine.
+#+begin_src emacs-lisp
+(setq enable-remote-dir-locals t)
+#+end_src
+
+** Deft mode
+disabled in favor of org-ql
+#+begin_src emacs-lisp
+  (use-package deft :disabled :ensure t :defer t
+    :commands (deft)
+    :custom
+    (deft-directory  org-directory)
+    (deft-extensions '("org"))
+    (deft-recursive  t)
+    (deft-use-filename-as-title t)
+    :bind ("C-c o d" . deft))
+#+end_src
+
+** Programming languages
+*** Disabled languages
+#+begin_src emacs-lisp
+  (use-package tex :ensure auctex :defer t
+    :disabled
+    :custom
+    (TeX-master              nil)
+    (Tex-auto-save           t)
+    (Tex-parse-self          t)
+    (Tex-save-query          nil)
+    (reftex-plug-into-AUCTeX t)
+    :hook
+    ((latex-mode . flyspell-mode)
+     (latex-mode . turn-on-reftex)
+     (LaTeX-mode . turn-on-reftex))
+    )
+
+  (use-package unity
+    :disabled
+    :defer t
+    :vc (:fetcher github :repo "elizagamedev/unity.Eli")
+    :hook (after-init . unity-mode))  
+#+end_src
+
+** Ellama (disabled)
+The ellama package is disabled in favor of getel.
+#+begin_src emacs-lisp
+  (when (executable-find "ollama")
+    (use-package ellama :ensure t :defer t
+      :disabled
+      :init
+      ;; setup key bindings
+      (setopt ellama-keymap-prefix "C-c e")
+      ;; we only use the default model "zephyr:latest"
+      ;; TODO : adding new models
+      ;; language you want ellama to translate to
+      (setopt ellama-language "French")))
+#+end_src
+
