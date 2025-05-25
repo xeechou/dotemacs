@@ -919,92 +919,75 @@ winner mode has two default keybinding
 #+begin_src emacs-lisp
   (global-set-key (kbd  "\C-x r i") 'string-insert-rectangle)  
 #+end_src
-** IVY
-I am relying on [[https://github.com/abo-abo/swiper][Ivy framework]] for my editing need. Ivy is a multi-package setup. It contains ivy itself:
+
+** Mini-buffer with Vertico
+*** vertico enhancements
 #+begin_src emacs-lisp
-(use-package ivy :ensure t
-  :diminish (ivy-mode . "")
-  :hook (after-init . ivy-mode)
-  :config
-  (setq ivy-use-virtual-buffers t)
-  ;;number of result lines to display
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-wrap t)
-  )  
-#+end_src
-*** Counsel
-[[https://github.com/abo-abo/swiper/blob/master/counsel.el][counsel]] which is a keybinding setup:
-#+begin_src emacs-lisp
-  (use-package counsel :ensure t :after ivy
-    :config
-    (use-package smex :ensure t)
-    :bind
-    (("C-s" . swiper)
-     ("M-x" . counsel-M-x)
-     ("C-x C-f" . counsel-find-file)
-     ;;this collide
-     ("C-c C-u" . counsel-unicode-char)
-     ("C-c C-i" . counsel-info-lookup-symbol)
-     ("C-x t" . counsel-imenu)
-     ("C-c y" . counsel-yank-pop)
-     ;;for git setup
-     ("C-c g" . counsel-grep)
-     ("C-c j" . counsel-git-grep)
-     ("C-c l" . counsel-git-log)
-     ("C-c r" . counsel-rg) ;;avoid conflict with eglot "C-c R"
-     ;; for org-mode
-     :map org-mode-map
-     ("C-x t" . counsel-outline)))
-#+end_src
-Note: originally I have "C-c g" binds to ~counsel-git~, it's search files in git. However [[*Projectile][Projectile]] does that perfectly.
-*** Counsel tramp
-which I use for remote editing.
-#+begin_src emacs-lisp :noweb yes
-;; using counsel-tramp
-(use-package counsel-tramp
-  :after (counsel tramp)
-  :ensure t
-  :init
-  (setq auth-source-save-behavior nil)  ;; don't store the password the package
-  ;; does not load immediately, if you have previous opened plinkw file in
-  ;; recentf, you may have error on buffer-switching, simply call counsel-tramp
-  ;; to load plinkw method in
-  :bind ("C-c s" . counsel-tramp)
-  ;; Here is the config to make trump work on windows; forget ssh, emacs will
-  ;; find /c/windows/system32/openssh first, the git ssh won't work either. For
-  ;; plink to work, you have to run pink in terminal first to add it to the
-  ;; REGISTRY, otherwise it will spit whole bunch of thing tramp will not
-  ;; understand.
-  :config
-  <<TRAMP>>
+(use-package vertico :ensure t
+  :diminish vertico-mode
+  :custom
+  (vertico-count 20)  ;; limit to a fixed size
+  (vertico-cycle t)
+  :hook
+  (after-init . vertico-mode)
+  :bind (:map vertico-map
+    ;; Use page-up/down to scroll vertico buffer, like ivy does by default.
+    ("<prior>" . 'vertico-scroll-down)
+    ("<next>"  . 'vertico-scroll-up))
   )
-  
+(use-package vertico-directory
+  :after vertico
+  :ensure nil  ;; no need to install, it comes with vertico
+  :bind (:map vertico-map
+    ("DEL" . vertico-directory-delete-char)))  
 #+end_src
 
-On windows, I use Plink for remote editing.
-#+begin_src emacs-lisp :tangle no :noweb-ref TRAMP
-  (when (and (eq system-type 'windows-nt)  (executable-find "plink"))
-    (add-to-list 'tramp-methods
-		 `("plinkw"
-                   (tramp-login-program "plink")
-                   (tramp-login-args (("-l" "%u") ("-P" "%p") ("-t")
-				      ("%h") ("\"")
-				      (,(format
-                                         "env 'TERM=%s' 'PROMPT_COMMAND=' 'PS1=%s'"
-                                         tramp-terminal-type
-                                         "$")) ;; This prompt will be
-				      ("/bin/sh") ("\"")))
-                   (tramp-remote-shell       "/bin/sh")
-                   (tramp-remote-shell-login ("-l"))
-                   (tramp-remote-shell-args  ("-c"))
-                   (tramp-default-port       22)))
-    )  
-#+end_src
-
-And also enable the ~.dir-locals.el~ on remote machine.
+*** marginalia mode provides more contextual information for mini buffer
 #+begin_src emacs-lisp
-(setq enable-remote-dir-locals t)
+(use-package marginalia :ensure t
+  :hook (vertico-mode . marginalia-mode))
 #+end_src
+
+*** Orderless provides fuzzing matching
+#+begin_src emacs-lisp
+(use-package orderless :ensure t
+  :custom
+  ;; Activate orderless completion
+  (completion-styles '(orderless basic))
+  ;; Enable partial completion for file wildcard support
+  (completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
+
+*** Consult provides enhanced commands
+#+begin_src emacs-lisp
+(use-package consult :ensure t
+  :bind
+  (;;most basics
+   ("C-x b"   . consult-buffer)
+   ("C-x C-f" . find-file)
+   ("C-s"     . consult-line)
+   ("M-x"     . execute-extended-command)
+   ("C-x t"   . consult-imenu)
+   ("C-c y"   . consult-yank-pop)
+   ;; for git setup
+   ("C-c g"   . consult-grep)
+   ("C-c j"   . consult-git-grep)
+   ("C-c r"   . consult-ripgrep)
+   ))
+
+#+end_src
+
+*** Embark Allows you perform actions in mini-buffer directly
+#+begin_src emacs-lisp
+(use-package embark :ensure t
+  :bind
+  (("C-."   . embark-act)       ;; Begin the embark process
+   ("C-;"   . embark-dwim)      ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+  :config
+  (use-package embark-consult :ensure t))
+#+end_src
+
 
 ** Spell check
 the excellent fly-spell to correct my common typing mistakes.
