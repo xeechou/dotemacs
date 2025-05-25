@@ -754,18 +754,6 @@ using the IVY framework
   ;;   )
 #+end_src
 
-** Deft mode
-#+begin_src emacs-lisp
-  (use-package deft :ensure t :defer t
-    :commands (deft)
-    :custom
-    (deft-directory  org-directory)
-    (deft-extensions '("org"))
-    (deft-recursive  t)
-    (deft-use-filename-as-title t)
-    :bind ("C-c o d" . deft))
-#+end_src
-
 ** Org CV
 The [[https://titan-c.gitlab.io/org-cv/][Org CV]] package helps manages the curriculum-vitae easily. The other custom option is following [[https://www.aidanscannell.com/post/org-mode-resume/][Aidan Scannell's post]].
 
@@ -811,7 +799,6 @@ Adding Jira tickets to your Calendar
        ("Closed" . "Reopened")))
 )
 #+end_src
-
 
 ** [[https://github.com/alphapapa/org-web-tools][org-web-tools]]
 awesome package to convert web package into a org buffer/or entries.
@@ -1966,28 +1953,6 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
            ;;quick book
            ("\\.qfx\\'" . nxml-mode)))
 #+end_src
-*** Disabled languages
-#+begin_src emacs-lisp
-  (use-package tex :ensure auctex :defer t
-    :disabled
-    :custom
-    (TeX-master              nil)
-    (Tex-auto-save           t)
-    (Tex-parse-self          t)
-    (Tex-save-query          nil)
-    (reftex-plug-into-AUCTeX t)
-    :hook
-    ((latex-mode . flyspell-mode)
-     (latex-mode . turn-on-reftex)
-     (LaTeX-mode . turn-on-reftex))
-    )
-
-  (use-package unity
-    :disabled
-    :defer t
-    :vc (:fetcher github :repo "elizagamedev/unity.Eli")
-    :hook (after-init . unity-mode))  
-#+end_src
 
 * LLMs
 ** Register the APIs
@@ -2202,22 +2167,6 @@ The [[https://github.com/chep/copilot-chat.el][copilot-chat.el]]
   ;; (setq copilot-chat-gpt-4-proxy (my/has-or-get-proxy))
   )
 #+end_src
-
-** Ellama (disabled)
-The ellama package is disabled in favor of getel.
-#+begin_src emacs-lisp
-  (when (executable-find "ollama")
-    (use-package ellama :ensure t :defer t
-      :disabled
-      :init
-      ;; setup key bindings
-      (setopt ellama-keymap-prefix "C-c e")
-      ;; we only use the default model "zephyr:latest"
-      ;; TODO : adding new models
-      ;; language you want ellama to translate to
-      (setopt ellama-language "French")))
-#+end_src
-
 
 * Miscellaneous
 ** Common helpers
