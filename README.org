@@ -330,6 +330,7 @@ copied from emacswiki
          ("C-c o c"   . org-capture)
          <<ORG_KEYS>>
          :map org-mode-map
+         ("C-c o C-w"  . org-refile)
          ("M-<left>"  . org-metaleft)
          ("M-<right>" . org-metaright)
          ("M-<up>"    . org-metaup)
