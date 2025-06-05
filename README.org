@@ -1021,28 +1021,16 @@ the excellent fly-spell to correct my common typing mistakes.
     )  
 #+end_src
 
-Flyspell correct
+Fly-spell correct: [[*Mini-buffer with Vertico][Vertico]] uses default ~completing-read~ interface, use shortcut key ~@s, @a, @p or @k~ to trigger the actions.
 #+begin_src emacs-lisp
 ;; correcting word and save it to personal dictionary
 (use-package flyspell-correct :ensure t :after flyspell
   :bind (:map flyspell-mode-map ("C-c ;" . flyspell-correct-wrapper)))
 #+end_src
-Using our [[*IVY][IVY]] framework for correction prompts.
-#+begin_src emacs-lisp
-(use-package flyspell-correct-ivy
-  ;;switch to use ivy interface
-  ;;TODO there is a face bug on popup interface
-  ;;NOTE: use M-o to access ivy menus
-  :ensure t
-  :after (ivy flyspell-correct))    
-#+end_src
 
 
 * Keybindings
-I tried to keep my keybindings consistent and avoid conflicts. Right now there are too many packages fight for ~C-c~.
-
-** [[*Counsel][Counsel/Ivy]] keys
-Start the key key map with ~C-c~
+I tried to keep my keybindings intent and avoid conflicts. Right now there are too many packages fight for ~C-c~.
 
 ** [[*Org mode settings][org mode]] keys
 org mode keys (especially globally bound keys) starts with ~(C-c o)~
@@ -1052,6 +1040,9 @@ There are currently two keybindings
 - ~C-c R~ :: ~eglot-rename~
 - ~C-c H~ :: ~eldoc~
 
+** AI key-bindings
+AI related tools starts with ~(C-c i)~
+  
 * Appearance Settings
 ** Themes
 I have tried a few themes, not satisfied with most of them. Either the contrast is too high, or they are plain ugly. Among them, I like these themes.
