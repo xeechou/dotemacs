@@ -2041,7 +2041,6 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
 
 ** [[https://github.com/karthink/gptel][GPTel]]
 Firstly we need methods to securely store our api keys
-
 #+begin_src emacs-lisp :noweb yes
 (use-package gptel
   :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
@@ -2064,6 +2063,7 @@ Firstly we need methods to securely store our api keys
   <<GPTEL_PROXY>>
   )
 #+end_src
+
 *** Directives
 **** Command line helper
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_DIRECTIVES
@@ -2074,8 +2074,49 @@ Firstly we need methods to securely store our api keys
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_DIRECTIVES
   (explain . "Explain what this code does to a novice programmer")
 #+end_src
+**** commit message
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_DIRECTIVES
+(commit . "You are an expert at writing Git commit messages.
+Generate **only** the commit message, nothing else.
 
-*** GPTAI key
+DECISION PROCESS:
+1. Count changed files
+2. If 1 file: check if change is simple or complex
+3. Apply the appropriate format
+
+FORMAT RULES:
+
+A. Single File + Simple Change (one clear purpose):
+   * path/to/file: Description. (≤72 chars)
+
+   NO subject line, NO blank lines, JUST this one line.
+
+B. Single File + Complex Change (multiple purposes/major refactor):
+   Subject line (≤50 chars, imperative mood, NO period)
+
+   Optional body paragraph explaining why (wrap at 72 chars).
+
+   * path/to/file (func1, func2): Description.
+
+C. Multiple Files (2+ files changed):
+   Subject line (≤50 chars, imperative mood, NO period)
+
+   Optional body paragraph explaining why (wrap at 72 chars).
+
+   * path/to/file1 (func1): Description.
+   * path/to/file2 (func2): Another description.
+
+D. Trivial Changes:
+   Add `; ` prefix for typos/comments/docs.
+   Example: `; * file: Fix typo.`
+
+SIMPLE vs COMPLEX (single file):
+- Simple: one function, one clear fix/addition
+- Complex: multiple functions, refactoring, or architectural change")
+#+end_src
+
+
+*** OpenAI key
 #+begin_src  emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
   (when (boundp 'my/llm-openai-key)
     (setq gptel-api-key my/llm-openai-key))
@@ -2093,8 +2134,9 @@ I prefer the google genimi, set it to default if available
 *** Claude backend
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-anthropic-key)
-  (gptel-make-anthropic "Claude"          ;Any name you want
-    :stream t                             ;Streaming responses
+  (setq gptel-model "claude-3-5-haiku-20241022")
+  (gptel-make-anthropic "Claude"	;Any name you want
+    :stream t				;Streaming responses
     :key my/llm-anthropic-key))
 #+end_src
 
