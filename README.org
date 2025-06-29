@@ -580,11 +580,7 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
           ("C-c o C" . org-roam-capture)
           ("C-c o i" . org-roam-node-insert)
           ("C-c o g" . org-roam-ui-mode)
-          ;; start using my own capture templates instead of org-roam-dailies
-          ;; ("C-c o T" . org-roam-dailies-capture-today)
-          ;; ("C-c o t" . org-roam-dailies-goto-today)
-          ;; ("C-c o n" . org-roam-dailies-goto-date)
-          ;; ("C-c o y" . org-roam-dailies-goto-yesterday)
+
           :map org-mode-map
           ("C-c o r" . org-roam-buffer-toggle) ;;toggle-back-links
           :map org-roam-mode-map
@@ -596,18 +592,40 @@ Setting the correct org-roam connector based on version. Emacs-29, which uses em
   (org-roam-db-autosync-enable)
 
   ;;excluding org-roam-dailes from roam-database
-  (setq org-roam-db-node-include-function
-        (lambda ()
-          (let ((path (buffer-file-name (buffer-base-buffer)))
-                ;; org-roam-dailies-directory is a relative path
-                (dailies-dir (expand-file-name org-roam-dailies-directory
-                                               org-roam-directory)))
-            (not (file-in-directory-p path dailies-dir)))))
-
   ;; configure org-roam-buffer
-  <<ROAM_BUFFER>>
+  <<ROAM_CONFIG>>
   )
 #+end_src
+
+***  org-roam dailies
+
+#+begin_src emacs-lisp
+(use-package org-roam-dailies
+  :ensure nil ;; Do not enable, it is part of org-roam
+  :init
+  (define-prefix-command 'my/org-roam-dailies-map)  
+  :bind
+  (("C-c o d" . my/org-roam-dailies-map)
+   :map my/org-roam-dailies-map
+  ;; NOTE that Do not confuse org-roam-dailies capture with daily task-captures
+  ("T" . org-roam-dailies-capture-today)
+  ("t" . org-roam-dailies-goto-today)
+  ("n" . org-roam-dailies-goto-date)
+  ("y" . org-roam-dailies-goto-yesterday)))
+#+end_src
+
+***  Also, excluding org-roam-dailies from captures
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_CONFIG
+(setq org-roam-db-node-include-function
+      (lambda ()
+        (let ((path (buffer-file-name (buffer-base-buffer)))
+              ;; org-roam-dailies-directory is a relative path
+              (dailies-dir (expand-file-name org-roam-dailies-directory
+                                             org-roam-directory)))
+          (not (file-in-directory-p path dailies-dir)))))
+#+end_src
+
+
 *** Roam templates
 Mostly I only use default template
 #+begin_src emacs-lisp :tangle no :noweb-ref ROAM_CAPTURES
@@ -636,7 +654,7 @@ visiting roam pages using different other window. It's most case what you want.
                                          (org-roam-node-at-point) 'other-window))
 #+end_src
 
-#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_BUFFER
+#+begin_src emacs-lisp :tangle no :noweb-ref ROAM_CONFIG
   (add-to-list 'display-buffer-alist
                '("\\*org-roam\\*"
                  (display-buffer-in-direction)
