@@ -2022,28 +2022,18 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
 (when (boundp 'my/llm-openai-key)
   (setenv "OPENAI_API_KEY" my/llm-openai-key)
-  (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-architect-model "gpt-4o")
-  (setq aidermacs-editor-model "gpt-o1"))
+  (setq aidermacs-default-chat-mode 'architect)
+  (setq aidermacs-default-model "gpt-4o")
+)
 #+end_src
-**** OpenRouter
+
+**** Claude
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
 (when (boundp 'my/llm-openrouter-key)
   (setenv "OPENROUTER_API_KEY" my/llm-openrouter-key)
   ;;setup corresponding models
-  (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-default-model "sonnet")
-  (setq aidermacs-architect-model "openrouter/deepseek/deepseek-r1")
-  (setq aidermacs-editor-model "openrouter/deepseek/deepseek-coder"))
-#+end_src
-**** Claude
-#+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
-(when (boundp 'my/llm-anthropic-key)
-  (setenv "ANTHROPIC_API_KEY" my/llm-anthropic-key)
-  ;;setup corresponding models
-  (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-architect-model "anthropic/claude-3-5-sonnet-latest")
-  (setq aidermacs-editor-model "anthropic/claude-3-5-sonnet-latest"))
+  (setq aidermacs-default-chat-mode 'architect)
+  (setq aidermacs-default-model "sonnet"))
 #+end_src
 
 **** Ollama
@@ -2052,7 +2042,7 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
 (when (and (my/test-port-open "127.0.0.1" 11434)
 	   (boundp 'my/llm-ollama-model))
   (setenv "OLLAMA_API_BASE" "http://127.0.0.1:11434")
-  (setq aidermacs-use-architect-mode nil)
+  (setq aidermacs-default-caht-mode 'ask)
   (setq aidermacs-default-model (concat "ollama_chat/" my/llm-ollama-model))
   )
 #+end_src
