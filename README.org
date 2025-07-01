@@ -2135,26 +2135,27 @@ SIMPLE vs COMPLEX (single file):
 
 *** OpenAI key
 #+begin_src  emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
-  (when (boundp 'my/llm-openai-key)
-    (setq gptel-api-key my/llm-openai-key))
+(when (boundp 'my/llm-openai-key)
+  (setq gptel-api-key my/llm-openai-key))
 #+end_src
 
 *** Gemini backend
 I prefer the google genimi, set it to default if available
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
-  (when (boundp 'my/llm-gemini-key)
-    (setq gptel-model  "gemini-pro"
-          gpt-backend  (gptel-make-gemini "Gemini"
-                         :key my/llm-gemini-key
-                         :stream t)))
+(when (boundp 'my/llm-gemini-key)
+  (setq gptel-model 'gemini-2.5-pro-exp-03-25
+        gpt-backend  (gptel-make-gemini "Gemini"
+                       :key my/llm-gemini-key
+                       :stream t)))
 #+end_src
 *** Claude backend
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-anthropic-key)
-  (setq gptel-model "claude-3-5-haiku-20241022")
-  (gptel-make-anthropic "Claude"	;Any name you want
-    :stream t				;Streaming responses
-    :key my/llm-anthropic-key))
+  (setq gptel-model 'claude-3-7-sonnet-20250219
+        gptel-backend
+        (gptel-make-anthropic "Claude"
+          :stream t
+          :key my/llm-anthropic-key)))
 #+end_src
 
 *** Ollama backend, run locally
