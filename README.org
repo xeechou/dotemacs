@@ -829,6 +829,21 @@ awesome package to convert web package into a org buffer/or entries.
    ("C-c o wi" . org-web-tools-insert-web-page-as-entry)))
 #+end_src
 
+** [[https://github.com/alphapapa/org-ql][org-ql]] is a much powerful query tool for org mode
+Note that ~org-ql-find~ [[https://github.com/alphapapa/org-ql/issues/284][does not work with ivy]], thus I switched to vertico+consult+embark now.
+
+#+begin_src emacs-lisp
+(use-package org-ql
+  :ensure t :after org :pin melpa
+  :after org)
+#+end_src
+
+*** Key bindings
+#+begin_src emacs-lisp :tangle no :noweb-ref ORG_KEYS
+("C-c o v" . org-ql-view)
+("C-c o s" . org-ql-search)
+#+end_src
+
 * Editing
 ** Line operations 
 Define a backward kill a line:
