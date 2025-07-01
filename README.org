@@ -1954,8 +1954,10 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
     :mode (("\\.ps1\\'" . powershell-mode)))
 
   ;; jenkins
+  ;; Jenkins/Groovy support
+  (use-package groovy-mode :ensure t :defer t)
   (use-package jenkinsfile-mode
-    :defer t
+    :after groovy-mode
     :vc (:fetcher github :repo "john2x/jenkinsfile-mode")
     :mode (("Jenkinsfile\\'" . jenkinsfile-mode)))
 
