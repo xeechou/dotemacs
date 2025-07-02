@@ -1169,6 +1169,15 @@ There is not thing special here, we just add a key-map and use ~alien~ indexing 
     :custom (color-rg-search-no-ignore-file nil))
 #+end_src
 
+** EDiff setup
+#+begin_src emacs-lisp
+(use-package ediff :ensure nil ;;built-in package
+  :custom
+  ;;do not use the multi-frame in graphics mode
+  (ediff-window-setup-function #'ediff-setup-windows-plain)
+  (ediff-split-window-function #'split-window-vertically))
+#+end_src
+
 ** Editing packages
 *** [[https://github.com/xeechou/fmo-mode.el][fmo-mode]] for code re-formatting
 prerequisite : format-all
