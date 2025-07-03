@@ -26,6 +26,15 @@ On Mac by default the scrolling direction is the *reverse* direction you would e
 
 ** Correcting the alt-tab behavior
 In the *mission control* settings, there is an option "*When switching to an application, switch to a Space with open windows for the application*". It cause undesired behavior when you ~alt-tab~. Uncheck this.
+** Adjusting ~Ctrl+Arrow~ keys in mission control
+:PROPERTIES:
+:ID:       138D62AC-B1CA-474A-B7B7-A001F1BDECEA
+:END:
+Ctrl+Arrow keys is used in ~paredit-mode~. We need to move them around.
+
+#+CAPTION: adjusting mission control shortcuts 
+[[file:imgs/Input_bindings/2025-07-03_18-16-51_screenshot.png]]
+
 * Application specifics
 
 ** Adjusting keybinding for iterm2
