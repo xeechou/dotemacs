@@ -203,25 +203,28 @@ This tool can be used by LLM
 menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
 
 #+begin_src emacs-lisp
-  (display-time)
-  (when (or (display-graphic-p) (daemonp))
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (setq visible-bell 1))
-  ;;enabled global modes
-  (save-place-mode 1)
-  (global-auto-revert-mode t)
-  (column-number-mode 1)
-  (delete-selection-mode 1)
+(display-time)
+(when (or (display-graphic-p) (daemonp))
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq visible-bell 1))
+;;enabled global modes
+(save-place-mode 1)
+(global-auto-revert-mode t)
+(column-number-mode 1)
+(delete-selection-mode 1)
 
-  ;;default to text mode
-  (setq-default major-mode 'text-mode)
-  ;;displaying line numbers
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+;;default to text mode
+(setq-default major-mode 'text-mode)
+;;displaying line numbers
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-  ;;highlight current line
-  (add-hook 'prog-mode-hook 'hl-line-mode)
-  (diminish 'hl-line-mode)
+;;highlight current line
+(add-hook 'prog-mode-hook 'hl-line-mode)
+(diminish 'hl-line-mode)
+
+;; NOTE: do not Ignore case when completing file names, cause very annoying bugs in lldb that it cannot resolve the symbols.
+(setq read-file-name-completion-ignore-case nil)
 #+end_src
 
 ** Setup the default encoding environment
