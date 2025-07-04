@@ -59,7 +59,7 @@ brew install --cask font-iosevka font-iosevka-aile font-fira-sans font-fira-code
 
 # The texlive. For minimal install you can try the basicTex then the additional
 # packages
-brew install basictex
+brew install basictex ghostscript imagmagick
 #dvipng is required for org-latex-preview
 sudo tlmgr update --self && sudo tlmgr install dvipng wrapfig capt-of
 
@@ -464,11 +464,33 @@ Then we use special key bindings for going todays.
 *** Latex setup in org
 #+begin_src emacs-lisp :tangle no :noweb-ref ORG_LATEX
 (cond
- ;; use dvipng when found
+ ;; 1: If we have dvipng, use this by default
  ((and (executable-find "dvipng") (executable-find "latex")) 
   (setq org-preview-latex-default-process 'dvipng))
- ;; see if imagemagick is available
- ((and (executable-find "convert") (executable-find "pdflatex"))
+ 
+ ;; 2: see if new magick is available
+ ;;
+ ;; old convert command is considered deprecated, in either case, you need the
+ ;; ghostscript
+ ((and (executable-find "magick") (executable-find "pdflatex") (executable-find "gs"))
+  ;; add new item to associations
+  (prog2
+    (when (not (assoc 'magick org-preview-latex-process-alist))
+      (push '(magick
+              :programs ("latex" "magick")
+              :description "pdf > png"
+              :message "you need to install the programs: latex and imagemagick."
+              :image-input-type "pdf"
+              :image-output-type "png"
+              :image-size-adjust (1.0 . 1.0)
+              :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
+              :image-converter
+              ("magick convert -density %D -trim -antialias %f -quality 100 %O"))
+            org-preview-latex-process-alist))
+      (setq org-preview-latex-default-process 'magick)))
+
+ ;; 3:  see if old convert is available
+ ((and (executable-find "convert") (executable-find "pdflatex") (executable-find "gs"))
   (setq org-preview-latex-default-process 'imagemagick)))
 
 (setq org-preview-latex-image-directory
