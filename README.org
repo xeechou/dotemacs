@@ -1095,7 +1095,7 @@ Do nothing if search string is empty to start with."
     (if isearch-success
 	(isearch-delete-char)
       (while (isearch-fail-pos (isearch-pop-state)))
-    (isearch-update)))
+    (isearch-update))))
 #+end_src
 *** isearch the marked regions
 #+begin_src emacs-lisp
