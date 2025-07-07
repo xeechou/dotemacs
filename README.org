@@ -198,7 +198,6 @@ This tool can be used by LLM
   :commands (ytb-sub-dl-insert-transcript))
 #+end_src
 
-
 * Global settings
 menu bar configuration. I disable tool bar and scroll bar for a minimalist look. Also, disable the bell using ~visbible-bell~ and enable some global modes.
 
@@ -568,6 +567,14 @@ allows you to use fixed pitch (for code) and variable pitch (everything else) *I
 
 ;; optionally you will be able to hide ORIGINAL * or not, leading means to hide the leading stars
 (org-modern-hide-stars nil)
+#+end_src
+
+*** org-modern-indent
+#+begin_src emacs-lisp 
+(use-package org-modern-indent
+  :vc (:fetcher github :repo "jdtsmith/org-modern-indent")
+  :hook (org-modern-mode . org-modern-indent-mode)
+  )
 #+end_src
 
 
