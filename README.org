@@ -2329,6 +2329,10 @@ We add additional backend for when using proxy
 
 ** Copilot
 #+begin_src emacs-lisp
+(define-prefix-command 'my/copilot-map)
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package copilot :pin melpa :ensure t :defer t
   ;;:hook (prog-mode . copilot-mode) ;;actually, I may just want to disable it
   ;;by default.
@@ -2347,16 +2351,40 @@ The [[https://github.com/chep/copilot-chat.el][copilot-chat.el]]
 (use-package copilot-chat
   :pin melpa :ensure t :defer t
   :when (executable-find "npm")
-  :bind (:map my/llm-keymap
-         ("t" . copilot-chat-transient)
-         ("d" . copilot-chat-display)
-         ("c" . copilot-chat-insert-commit-message))
-  ;; :config
-  ;; (setq copilot-chat-backend 'curl)
-  ;; (setq copilot-chat-gpt-4-model "gpt-4o")
-  ;; (setq copilot-chat-gpt-4-key my/llm-openai-key)
-  ;; (setq copilot-chat-gpt-4-proxy (my/has-or-get-proxy))
-  )
+  :bind (:map
+         my/llm-keymap
+         ("c" . my/copilot-map)
+         :map my/copilot-map
+         ;; commit messages
+         ("c" . copilot-chat-insert-commit-message)
+         ("C" . copilot-chat-regenerate-commit-message)
+         ;; prompt
+         ("i" . copilot-chat-goto-input)
+         ("a" . copilot-chat-ask-and-insert) ;;insert-at-point
+         ;;instance management
+         ("p" . copilot-chat-display) ;;display chat buffer
+         ("k" . copilot-chat-kill-instance)
+         ("X" . copilot-chat-reset)
+         ("l" . copilot-chat-load)
+         ("s" . copilot-chat-save)
+         ("m" . copilot-chat-set-model)
+         ;; file/buffers
+         ("f" . copilot-chat-add-file)
+         ("b" . copilot-chat-add-buffers)
+         ("B" . copilot-chat-del-buffers)
+         ;; code operations
+         ("e" . copilot-chat-explain)
+         ("d" . copilot-chat-doc)
+         ("r" . copilot-chat-review)
+         ("x" . copilot-chat-fix)
+         ;; yanks are not very useful actually
+         ;; ("y" . copilot-chat-yank) ;;this is org-only
+         ;; ("y" . copilot-chat-copy-code-at-point)
+         ;; ("s" . copilot-chat-send-to-buffer)
+         ;;resets
+         ("Q" . copilot-chat-quotas)
+         ("R" . copilot-chat-reset-models)
+         ))
 #+end_src
 
 * Miscellaneous
