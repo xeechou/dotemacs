@@ -2261,13 +2261,14 @@ SIMPLE vs COMPLEX (single file):
 #+end_src
 
 
-*** OpenAI key
+*** Backends
+**** OpenAI key
 #+begin_src  emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-openai-key)
   (setq gptel-api-key my/llm-openai-key))
 #+end_src
 
-*** Gemini backend
+**** Gemini backend
 I prefer the google genimi, set it to default if available
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-gemini-key)
@@ -2276,7 +2277,7 @@ I prefer the google genimi, set it to default if available
                        :key my/llm-gemini-key
                        :stream t)))
 #+end_src
-*** Claude backend
+**** Claude backend
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-anthropic-key)
   (setq gptel-model 'claude-3-7-sonnet-20250219
@@ -2286,7 +2287,7 @@ I prefer the google genimi, set it to default if available
           :key my/llm-anthropic-key)))
 #+end_src
 
-*** Ollama backend, run locally
+**** Ollama backend, run locally
 Ollama backend runs locally on your pc
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
   (when (and (my/test-port-open "127.0.0.1" 11434)
@@ -2295,6 +2296,12 @@ Ollama backend runs locally on your pc
       :host "localhost:11434"
       :stream t
       :models `(,my/llm-ollama-model)))
+#+end_src
+**** Copilot chat
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
+(when (boundp 'my/llm-copilot-key)
+  (setq gptel-model 'claude-3.7-sonnet
+      gptel-backend (gptel-make-gh-copilot "Copilot")))
 #+end_src
 
 *** Setup proxies
