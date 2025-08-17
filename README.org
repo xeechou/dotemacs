@@ -1824,6 +1824,21 @@ dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of dem
 #+end_src
 
 *** Shader languages
+**** slang
+#+begin_src emacs-lisp
+(use-package slang-mode
+  :when (executable-find "slangd")
+  :vc (:fetcher github :repo "K1ngst0m/slang-mode")
+  :defer t
+  :mode (("\\.slang\\'" . slang-mode)
+         ("\\.sl\\'" . slang-mode)
+         ("\\.slangh\\'" . slang-mode))
+  :hook (slang-mode . company-mode)
+  :config
+  (require 'slang-lsp)
+  (slang-lsp-initialize))
+#+end_src
+
 **** GLSL
 #+begin_src emacs-lisp :noweb yes
   ;; glsl
