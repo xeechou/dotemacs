@@ -286,6 +286,14 @@ copied from emacswiki
 ;; for this to work with Emacs, set epa-pinentry-mode to 'loopback in Emacs
 (setq epg-pinentry-mode 'loopback)
 #+end_src
+** Devil mode
+[[https://susam.github.io/devil/][Devil Mode]] is a non-intrusive modifier-free editing experience, compared to evil mode or god mode.  With this, I can actually forget about the keyboard mapping problems across windows and Mac.
+#+begin_src emacs-lisp
+(use-package devil :ensure t :diminish
+  :init
+  (global-devil-mode)
+  (devil-set-key (kbd ";")))
+#+end_src
 
 * Org mode settings
 ** Convenience functions
