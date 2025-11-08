@@ -2166,7 +2166,7 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
 
 **** Claude
 #+begin_src emacs-lisp :tangle no :noweb-ref AIDER_BACKENDS
-(defun my/aider-use-claude ()
+(defun my/aider-use-claude-architect ()
   "changing Aider to use Claude based model"
   (interactive)  
   (if (boundp 'my/llm-anthropic-key)
@@ -2176,6 +2176,15 @@ The code gets evaluated sequentially, the later models gets the higher prioritie
            (setq aidermacs-default-model "sonnet")
            (setq aidermacs-editor-model "opus")
            (message "Aider now use claude models"))
+    (message "Anthropic API key not available")))
+
+(defun my/aider-use-claude-code ()
+  "changing Aider to use Claude based model Without architect mode"
+  (interactive)
+  (if (boundp 'my/llm-anthropic-key)
+      (progn (setenv "ANTHROPIC_API_KEY" my/llm-anthropic-key)
+	     (setq aidermacs-default-chat-mode 'code)
+	     (setq aidermacs-default-model "sonnet"))
     (message "Anthropic API key not available")))
 #+end_src
 
