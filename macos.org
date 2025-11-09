@@ -67,10 +67,24 @@ echo "{ \n
 #+end_src
 
 
-
 * Some tricks on Mac
 - open a folder using Finder on iTerm with ~open $(pwd)~
 - Enable the settings in ~Finder > Preference > Sidebar > Show Home Folder~.
 - ~cmd+shift+3~ to capture the fullscreen.
 - ~cmd+shift+4~ to capture a portion of screen
 
+* Other options
+** mapping [[http://xahlee.info/emacs/emacs/emacs_mac_meta_key.html][Emacs Meta keys on Mac]]
+The mac port of Emacs has a few global variables to set to change the meta keys.
+#+begin_src emacs-lisp
+(setq mac-command-modifier 'control)
+;; value can be 'hyper, 'super, 'meta, 'alt, 'control or 'shift
+
+;; make Control key do Control
+(setq mac-control-modifier 'meta)
+#+end_src
+
+This remapping does the similar thing.
+
+*** Issues
+While this will work for Emacs. It doesn't change for any other applications.  MacOS often use different key mapping for common shortcuts, such as: they use ~Command+c~ for copy and ~command+v~ for paste. It would still create inconsistency for key-mappings.
