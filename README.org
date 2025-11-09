@@ -2514,6 +2514,18 @@ The [[https://github.com/chep/copilot-chat.el][copilot-chat.el]]
          ))
 #+end_src
 
+** [[https://github.com/editor-code-assistant/eca-emacs][editor code assistant]]
+ECA is LSP protocol for llms
+#+begin_src emacs-lisp
+(use-package eca :ensure t :pin melpa
+  :config
+  (when (boundp 'my/llm-anthropic-key)
+    (setenv "ANTHROPIC_API_KEY" my/llm-anthropic-key))
+  (when (boundp 'my/llm-openai-key)
+    (setenv "OPENAI_API_KEY" my/llm-openai-key)))
+#+end_src
+
+
 * Miscellaneous
 ** Common helpers
 *** OpenWith
