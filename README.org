@@ -2056,6 +2056,17 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
   pipx inject --include-apps beancount fava
 #+end_src
 
+*** LEAN
+#+begin_src emacs-lisp
+(use-package lean4-mode
+  :commands lean4-mode
+  :vc (:fetcher "https://github.com/leanprover-community/lean4-mode.git"
+       :rev :last-release
+       ;; Or, if you prefer the bleeding edge version of Lean4-Mode:
+       ;; :rev :newest
+       ))
+#+end_src
+
 *** Other languages
 #+begin_src emacs-lisp
   ;;lua
