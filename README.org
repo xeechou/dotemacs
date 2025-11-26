@@ -2058,13 +2058,14 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
 *** LEAN
 #+begin_src emacs-lisp
-(use-package lean4-mode
+(use-package lean4-mode :ensure t :defer t
   :commands lean4-mode
   :vc (:fetcher "https://github.com/leanprover-community/lean4-mode.git"
        :rev :last-release
        ;; Or, if you prefer the bleeding edge version of Lean4-Mode:
        ;; :rev :newest
-       ))
+       )
+  :mode ("\\.lean\\'". lean4-mode))
 #+end_src
 
 *** Other languages
