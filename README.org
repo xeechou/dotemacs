@@ -228,9 +228,17 @@ menu bar configuration. I disable tool bar and scroll bar for a minimalist look.
 
 ** Setup the default encoding environment
 #+begin_src emacs-lisp
-  (prefer-coding-system 'utf-8-unix)
-  (set-default-coding-systems 'utf-8-unix)  
+(setenv "LC_CTYPE" "en_US.UTF-8")
+(setenv "LANG" "en_US.UTF-8")
+
+(set-language-environment "UTF-8")
+(set-locale-environment "en_US.UTF-8")
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8-unix)
 #+end_src
+
+Without proper ~LC_CTYPE~ locales, you will get [[https://stackoverflow.com/questions/60557160/python3-8-fails-with-fatal-python-error-config-get-locale-encoding][config_get_locale_encoding error]] from python lsp servers.
 
 ** Backup files
 copied from emacswiki

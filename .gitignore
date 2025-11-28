@@ -23,6 +23,7 @@ org-roam.db
 eln-cache/
 projects
 tramp
+games/
 
 #dap-mode
 .dap-breakpoints
