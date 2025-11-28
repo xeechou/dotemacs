@@ -1593,18 +1593,6 @@ CMake we just add company-dabbrev and company-cmake.
   (emacs-lisp-mode . company-mode)
 #+end_src
 
-- Python :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
-  ((python-mode python-ts-mode) . company-mode)
-#+end_src
-
-*NOTE* that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
-
-#+begin_src shell-script :tangle no
-  pipx inject python-lsp-server [[your packages here]]
-#+end_src
-
 
 - TEXT :: We add company-emoji to company backends.
 #+begin_src emacs-lisp
@@ -1632,14 +1620,14 @@ simple text mode:
 
 ** Eglot mode
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
 
   ;; eglot configuration, switching to eglot after emacs 29
   (use-package eglot
     :ensure t :defer t
-    :hook (((c++-mode c++-ts-mode) . eglot-ensure)
-           ((c-mode c-ts-mode) . eglot-ensure)
-           ((python-mode python-ts-mode) . eglot-ensure))
+    :hook (
+           <<EGLOT_HOOKS>>
+           )
     :custom
     (eglot-extend-to-xref t)
     ;;inlay-hints are annoying
@@ -1814,9 +1802,54 @@ dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of dem
                  (cdr cc-file-style-sparroh))
     :hook
     ((c-mode-common . my/cmode-hook)
-     ((c++-mode c++-ts-mode c-mode c-ts-mode) . company-mode)
      ((c++-mode c++-ts-mode c-mode c-ts-mode) . my/cmode-company-hook)))
 #+end_src
+**** Setup company and eglot
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+((c++-mode c++-ts-mode c-mode c-ts-mode) . company-mode)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref EGLOT_HOOKS
+((c++-mode c++-ts-mode) . eglot-ensure)
+((c-mode c-ts-mode)     . eglot-ensure)
+#+end_src
+
+*** Python
+**** company mode :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
+#+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
+((python-mode python-ts-mode) . company-mode)
+;;don't forget adding company backends!!
+((python-mode python-ts-mode) . (lambda () (my/merge-list-buffer-local
+                                            'company-backends
+                                            (list 'company-dabbrev 'company-capf))))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref EGLOT_HOOKS
+((python-mode python-ts-mode) . eglot-ensure)
+#+end_src
+
+**** Setup [[https://journal.spencerwnelson.com/entries/emacs_virtualenv_lsp.html][Python virtualenvs]]
+You also need the language servers available for Emacs, Emacs has to know when to find the packages, the best way is to setup per-project virtual environments, or you can setup the global virtual environments
+
+#+begin_src emacs-lisp
+(use-package pyvenv :ensure t)
+#+end_src
+
+In the ~.dir-locals.el~, it can be setup like this
+#+begin_src emacs-lisp :tangle no
+((python-mode . ((eval . (pyvenv-activate "~/.virtualenvs/venv"))
+                )))
+#+end_src
+
+If using global pipx server, this can be done as well.
+
+*NOTE* that for python I use [[https://github.com/pypa/pipx][pipx]] to install ~python-lsp-server~. For the other packages installed with ~pipx~. You need to inject them into ~python-lsp-server~ to have ~company-capf~ working.
+
+#+begin_src shell-script :tangle no
+  pipx inject python-lsp-server [[your packages here]]
+#+end_src
+
+
 *** Build Scripts
 #+begin_src emacs-lisp
   ;;cmake
