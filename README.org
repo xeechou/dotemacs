@@ -2109,6 +2109,8 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
   :mode ("\\.lean\\'". lean4-mode))
 #+end_src
 
+The org-babel is supported, see [[file:lisp/ob-lean4.el][ob-lean4.el]] and ~org-funcs-load-babel-compiler~ at [[file:lisp/org-funcs.el][org-funcs.el]]
+
 *** Other languages
 #+begin_src emacs-lisp
   ;;lua

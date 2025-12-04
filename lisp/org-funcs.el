@@ -13,11 +13,12 @@
 ;;    changed.
 
 (require 'org)
+(require 'ob-lean4)
 
 ;;;###autoload
 (defun org-funcs-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are don, to TODO otherwise"
-  (let (org-log-done org-log-states) ; turn off logging
+  (let (org-log-done org-log-states)	; turn off logging
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 ;; At the courtesy of https://emacs.stackexchange.com/questions/19843/how-to-automatically-adjust-an-org-task-state-with-its-children-checkboxes
@@ -53,6 +54,7 @@
   "load babel compilers"
   (let ((has_python (if (executable-find "python") t nil))
 	(has_c (if (and (executable-find "gcc") (executable-find "g++")) t nil))
+	(has_lean (if (executable-find "lean") t nil))
 	)
     (org-babel-do-load-languages
      'org-babel-load-languages
@@ -60,6 +62,7 @@
        (shell       . t)
        (python      . ,has_python)
        (C           . ,has_c)
+       (lean4        . ,has_lean)
        ))
     ))
 
