@@ -217,6 +217,7 @@ menu bar configuration. I disable tool bar and scroll bar for a minimalist look.
 (setq-default major-mode 'text-mode)
 ;;displaying line numbers
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+(setq display-line-numbers-type 'relative)
 
 ;;highlight current line
 (add-hook 'prog-mode-hook 'hl-line-mode)
