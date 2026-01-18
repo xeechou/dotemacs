@@ -2185,13 +2185,13 @@ personally I use a device local ~llm-api.el~ to register all my keys.
 #+end_src
 
 
-** [[https://aider.chat/][Aider]]
+** [[https://aider.chat/][Aider]] (disabled in favor of eca)
 Aider is a *command line* based *project-wise* AI chat bot, the [[https://aider.chat/#features][features]] is like adding multiple files to aider like ~aider <file1> <file2> ...~ then you can ask it to add new features, tests. Fix bugs, refactoring code, update docs.
 
-#+begin_src emacs-lisp :noweb yes
+#+begin_src emacs-lisp :noweb yes :tangle no
 (use-package vterm  :if (executable-find "vterm-ctrl") :ensure t  :pin melpa)
 
-(use-package aidermacs
+(use-package aidermacs :disabled
   :when (file-exists-p (expand-file-name "llm-api.el" (my/dotfile-dir)))
   :pin melpa :ensure t :defer t
   :bind (:map my/llm-keymap ("a" . aidermacs-transient-menu))
@@ -2452,19 +2452,17 @@ gptel [[https://github.com/karthink/gptel/wiki/Tools-collection][wiki]] has a co
 I prefer the google genimi, set it to default if available
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-gemini-key)
-  (setq gptel-model 'gemini-2.5-pro-exp-03-25
-        gpt-backend  (gptel-make-gemini "Gemini"
-                       :key my/llm-gemini-key
-                       :stream t)))
+  (gptel-make-gemini "Gemini"
+    :key "YOUR_GEMINI_API_KEY"
+    :key my/llm-gemini-key
+    :stream t))
 #+end_src
 **** Claude backend
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-anthropic-key)
-  (setq gptel-model 'claude-3-7-sonnet-20250219
-        gptel-backend
-        (gptel-make-anthropic "Claude"
+  (gptel-make-anthropic "Claude"
           :stream t
-          :key my/llm-anthropic-key)))
+          :key my/llm-anthropic-key))
 #+end_src
 
 **** Ollama backend, run locally
@@ -2480,8 +2478,7 @@ Ollama backend runs locally on your pc
 **** Copilot chat
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-copilot-key)
-  (setq gptel-model 'claude-3.7-sonnet
-      gptel-backend (gptel-make-gh-copilot "Copilot")))
+  (gptel-make-gh-copilot "Copilot"))
 #+end_src
 
 *** Setup proxies
@@ -2512,66 +2509,6 @@ We add additional backend for when using proxy
                   "gpt-4-turbo-preview" "gpt-4-32k" "gpt-4-1106-preview"
                   "gpt-4-0125-preview")
         :curl-args '("-k")))
-#+end_src
-
-** Copilot
-#+begin_src emacs-lisp
-(define-prefix-command 'my/copilot-map)
-#+end_src
-
-#+begin_src emacs-lisp
-(use-package copilot :pin melpa :ensure t :defer t
-  ;;:hook (prog-mode . copilot-mode) ;;actually, I may just want to disable it
-  ;;by default.
-  :when (executable-find "npm")
-  :bind (:map copilot-completion-map
-              ("<tab>" . 'copilot-accept-completion)
-              ("TAB" . 'copilot-accept-completion)
-              ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)
-              ("C-n" . 'copilot-next-completion)
-              ("C-p" . 'copilot-previous-completion)))
-#+end_src
-
-The [[https://github.com/chep/copilot-chat.el][copilot-chat.el]]
-#+begin_src emacs-lisp
-(use-package copilot-chat
-  :pin melpa :ensure t :defer t
-  :when (executable-find "npm")
-  :bind (:map
-         my/llm-keymap
-         ("c" . my/copilot-map)
-         :map my/copilot-map
-         ;; commit messages
-         ("c" . copilot-chat-insert-commit-message)
-         ("C" . copilot-chat-regenerate-commit-message)
-         ;; prompt
-         ("i" . copilot-chat-goto-input)
-         ("a" . copilot-chat-ask-and-insert) ;;insert-at-point
-         ;;instance management
-         ("p" . copilot-chat-display) ;;display chat buffer
-         ("k" . copilot-chat-kill-instance)
-         ("X" . copilot-chat-reset)
-         ("l" . copilot-chat-load)
-         ("s" . copilot-chat-save)
-         ("m" . copilot-chat-set-model)
-         ;; file/buffers
-         ("f" . copilot-chat-add-file)
-         ("b" . copilot-chat-add-buffers)
-         ("B" . copilot-chat-del-buffers)
-         ;; code operations
-         ("e" . copilot-chat-explain)
-         ("d" . copilot-chat-doc)
-         ("r" . copilot-chat-review)
-         ("x" . copilot-chat-fix)
-         ;; yanks are not very useful actually
-         ;; ("y" . copilot-chat-yank) ;;this is org-only
-         ;; ("y" . copilot-chat-copy-code-at-point)
-         ;; ("s" . copilot-chat-send-to-buffer)
-         ;;resets
-         ("Q" . copilot-chat-quotas)
-         ("R" . copilot-chat-reset-models)
-         ))
 #+end_src
 
 ** [[https://github.com/editor-code-assistant/eca-emacs][editor code assistant]]
