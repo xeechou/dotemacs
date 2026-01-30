@@ -2181,7 +2181,7 @@ personally I use a device local ~llm-api.el~ to register all my keys.
 
 #+begin_src emacs-lisp
 (define-prefix-command 'my/llm-keymap)
-(global-set-key (kbd "C-c i") 'my/llm-keymap)'
+(global-set-key (kbd "C-c i") 'my/llm-keymap)
 #+end_src
 
 
