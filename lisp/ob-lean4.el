@@ -99,6 +99,10 @@ This function is called by `org-babel-execute-src-block'."
   "Prepare SESSION according to the header arguments specified in PARAMS."
   (error "Lean4 does not support sessions"))
 
+(defun org-babel-edit-prep:lean4 (babel-info)
+  (setq-local buffer-file-name (->> babel-info caddr (alist-get :tangle)))
+  (lsp))
+
 (defun org-babel-lean4-var-to-lean4 (var)
   "Convert an elisp VAR into a string of Lean4 source code."
   (cond
