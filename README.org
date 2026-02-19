@@ -2112,60 +2112,61 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
 The org-babel is supported, see [[file:lisp/ob-lean4.el][ob-lean4.el]] and ~org-funcs-load-babel-compiler~ at [[file:lisp/org-funcs.el][org-funcs.el]]
 
+
 *** Other languages
 #+begin_src emacs-lisp
-  ;;lua
-  (use-package lua-mode :ensure t :defer t
-    :mode (("\\.lua\\'" . lua-mode))
-    :hook
-    ((lua-mode . company-mode)
-     (lua-mode . (lambda ()
-                   (when (executable-find "lua-language-server")
-                     (eglot-ensure))))))
+;;lua
+(use-package lua-mode :ensure t :defer t
+  :mode (("\\.lua\\'" . lua-mode))
+  :hook
+  ((lua-mode . company-mode)
+   (lua-mode . (lambda ()
+                 (when (executable-find "lua-language-server")
+                   (eglot-ensure))))))
 
-  ;;graphviz dot
-  (use-package graphviz-dot-mode :ensure t :defer t
-    :mode (("\\.dot\\'" . graphviz-dot-mode)))
+;;graphviz dot
+(use-package graphviz-dot-mode :ensure t :defer t
+  :mode (("\\.dot\\'" . graphviz-dot-mode)))
 
 
 
-  (use-package gdscript-mode :ensure t :defer t
-    :mode (("\\.gd\\'" . gdscript-mode)))
+(use-package gdscript-mode :ensure t :defer t
+  :mode (("\\.gd\\'" . gdscript-mode)))
 
-  (use-package markdown-mode :ensure t :defer t
-    :mode (("\\.md\\'" . markdown-mode)))
+(use-package markdown-mode :ensure t :defer t
+  :mode (("\\.md\\'" . markdown-mode)))
 
-  (use-package octave :ensure t :defer t
-    :mode (("\\.m\\'" . octave-mode)))
+(use-package octave :ensure t :defer t
+  :mode (("\\.m\\'" . octave-mode)))
 
-  (use-package yaml-mode :ensure t :defer t
-    :mode (("\\.yml\\'" . yaml-mode)))
+(use-package yaml-mode :ensure t :defer t
+  :mode (("\\.yml\\'" . yaml-mode)))
 
-  (use-package powershell :ensure t :defer t
-    :mode (("\\.ps1\\'" . powershell-mode)))
+(use-package powershell :ensure t :defer t
+  :mode (("\\.ps1\\'" . powershell-mode)))
 
-  ;; jenkins
-  ;; Jenkins/Groovy support
-  (use-package groovy-mode :ensure t :defer t)
-  (use-package jenkinsfile-mode
-    :after groovy-mode
-    :vc (:fetcher github :repo "john2x/jenkinsfile-mode")
-    :mode (("Jenkinsfile\\'" . jenkinsfile-mode)))
+;; jenkins
+;; Jenkins/Groovy support
+(use-package groovy-mode :ensure t :defer t)
+(use-package jenkinsfile-mode
+  :after groovy-mode
+  :vc (:fetcher github :repo "john2x/jenkinsfile-mode")
+  :mode (("Jenkinsfile\\'" . jenkinsfile-mode)))
 
-  ;;universal scene descriptor
-  (use-package usda-mode
-    :defer t
-    :load-path "lisp/"
-    :mode (("\\.usda\\'" . usda-mode)
-           ("\\.usd\\'"  . usda-mode)))
+;;universal scene descriptor
+(use-package usda-mode
+  :defer t
+  :load-path "lisp/"
+  :mode (("\\.usda\\'" . usda-mode)
+         ("\\.usd\\'"  . usda-mode)))
 
-  ;; built-in
-  (use-package nxml-mode
-    :defer t
-    :mode (("\\.xml\\'" . nxml-mode)
-           ("\\.ofx\\'" . nxml-mode)
-           ;;quick book
-           ("\\.qfx\\'" . nxml-mode)))
+;; built-in
+(use-package nxml-mode
+  :defer t
+  :mode (("\\.xml\\'" . nxml-mode)
+         ("\\.ofx\\'" . nxml-mode)
+         ;;quick book
+         ("\\.qfx\\'" . nxml-mode)))
 #+end_src
 
 * LLMs
