@@ -897,6 +897,34 @@ Note that ~org-ql-find~ [[https://github.com/alphapapa/org-ql/issues/284][does n
 ("C-c o s" . org-ql-search)
 #+end_src
 
+* Markdown mode settings
+[[https://jblevins.org/projects/markdown-mode/][Markdown Mode for Emacs]] is popular with AI tools, Emacs has good support for it.
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t :defer t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+         ("C-c C-e" . markdown-do))
+  :hook
+  ;;markdown has its own display, which key is kind of annoying here
+  (markdown-mode . (lambda () (which-key-mode -1)))
+)
+
+#+end_src
+
+** key bindings
+- ~C-c C-l~ :: inserting a link
+- ~C-c C-s~ :: change the text style at the point.
+  + ~b~ :: bold the text
+  + ~q~ :: quote.
+  + ~c~ :: inline code
+  + H :: heading
+  + ~-~ ::  insert ~----------------------~
+  + ~f~ :: foot note
+-  ~C-c C-c~ ::  maintenance
+  + "e" : export
+....
 * Editing
 ** Line operations 
 Define a backward kill a line:
@@ -2132,9 +2160,6 @@ The org-babel is supported, see [[file:lisp/ob-lean4.el][ob-lean4.el]] and ~org-
 
 (use-package gdscript-mode :ensure t :defer t
   :mode (("\\.gd\\'" . gdscript-mode)))
-
-(use-package markdown-mode :ensure t :defer t
-  :mode (("\\.md\\'" . markdown-mode)))
 
 (use-package octave :ensure t :defer t
   :mode (("\\.m\\'" . octave-mode)))
