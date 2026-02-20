@@ -1886,7 +1886,6 @@ If using global pipx server, this can be done as well.
   pipx inject python-lsp-server [[your packages here]]
 #+end_src
 
-
 *** Build Scripts
 #+begin_src emacs-lisp
   ;;cmake
@@ -2140,6 +2139,47 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
 The org-babel is supported, see [[file:lisp/ob-lean4.el][ob-lean4.el]] and ~org-funcs-load-babel-compiler~ at [[file:lisp/org-funcs.el][org-funcs.el]]
 
+**** installing elan 
+[[https://lean-lang.org/install/manual/][installing lean]] on Linux and Mac is through package manager
+#+begin_src bash :tangle no
+brew install elan-init #on Mac
+paru -S elan-init #on Arch
+#+end_src
+
+On windows is not very straight-forward, since they just recommend using VsCode, but it is still doable
+#+begin_src bash :tangle no
+#download the installing script
+curl -O   --location https://elan.lean-lang.org/elan-init.ps1
+#this install lean under $HOME/.elan/bin
+powershell -ExecutionPolicy Bypass -f elan-init.ps1
+#remeber to add $HOME/.elan/bin to $PATH
+#+end_src
+
+**** using lake, the package manager
+~lake~ is the lean package manager, you can use it create project and compile it
+#+begin_src bash :tangle no
+lake new /path/to/project
+cd /path/to/project && lake build
+#+end_src
+
+Or after cloning the project, retrieve the packages
+#+begin_src bash :tangle no
+git clone https://github.com/<repository owner>/<repository name>.git /path/to/project
+cd /path/to/project
+
+lake exe cache get
+#+end_src
+**** Mathlib
+creating a project depend on mathlib
+#+begin_src bash :tangle no
+lake +leanprover-community/mathlib4:lean-toolchain new mathliblean-tutorial math  
+#+end_src
+
+Updating the math-lib, somehow need to update it manually for now
+#+begin_src bash :tangle no
+curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/lean-toolchain -o lean-toolchain
+lake update  
+#+end_src
 
 *** Other languages
 #+begin_src emacs-lisp
