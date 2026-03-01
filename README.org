@@ -1800,9 +1800,34 @@ Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it 
 
 **** TODO However for unknown reason. The [[https://github.com/emacsmirror/rmsbolt/blob/master/rmsbolt.el#L230][rmsbolt-line-mapping]] not working well on windows. We should probably disable this.
 **** TODO add shader languages like HLSL
+HLSL code can be compiled in this way
 #+begin_src shell
 dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of demangler
 #+end_src
+
+GLSL code can be compiled this way
+#+begin_src shell
+glslangValidator "-g" "--spirv-dis" "-o" /tmp/output.s example.glsl  
+#+end_src
+
+#+begin_src emacs-lisp
+(defun rmsbolt--glsl-compile-cmd (&key src-buffer)
+  "Process a compile command for glslangValidator.
+
+Use SRC-BUFFER as buffer containing local variables."
+
+  (rmsbolt--with-local-files
+   src-buffer
+   (let* ( ;; Turn off passing the source file if we find compile_commands
+          (cmd (buffer-local-value 'rmsbolt-command src-buffer))
+          (cmd (string-join
+                (list cmd
+                      "-g" "--spirv-dis"
+                      "-o" output-filename src-filename)
+                " ")))
+     cmd)))
+#+end_src
+
 
 ** Languages
 *** C family
@@ -2588,6 +2613,31 @@ ECA is LSP protocol for llms
     (setenv "OPENAI_API_KEY" my/llm-openai-key)))
 #+end_src
 
+*** Tools
+ECA can call external tools, most likely it is some kind of command line tool. For example, this tool use ~trafilatura~ to download the web page and convert that into markdown files.
+#+begin_src json :tangle no
+{
+  "customTools": {
+    "web-search": {
+      "description": "Fetches the content of a URL and returns it in Markdown format.",
+      "command": "trafilatura --output-format=markdown -u {{url}}",
+      "schema": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL to fetch content from."
+          }
+        },
+        "required": ["url"]
+      }
+    }
+  }
+}
+#+end_src
+
+Install ~trafilatura~ with ~pipx install ~trafilatura~.
+
+*** skills
 
 * Miscellaneous
 ** Common helpers
