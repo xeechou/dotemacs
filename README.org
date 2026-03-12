@@ -2248,7 +2248,9 @@ lake update
   :defer t
   :load-path "lisp/"
   :mode (("\\.usda\\'" . usda-mode)
-         ("\\.usd\\'"  . usda-mode)))
+         ("\\.usd\\'"  . usda-mode))
+  ;; disable fmo-mode because usda-mode inherit c-mode
+  :hook (usda-mode . (lambda () (fmo-mode -1))))
 
 ;; built-in
 (use-package nxml-mode
