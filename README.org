@@ -1940,11 +1940,19 @@ If using global pipx server, this can be done as well.
   :mode (("\\.slang\\'" . slang-mode)
          ("\\.sl\\'" . slang-mode)
          ("\\.slangh\\'" . slang-mode))
-  :hook (slang-mode . company-mode)
+  
+  :hook
+  (slang-mode . company-mode)
+  (slang-mode . (lambda () (my/merge-list-buffer-local
+                            'company-backends
+                            (list 'company-dabbrev 'company-capf))))
+
   :config
   (require 'slang-lsp)
-  (slang-lsp-initialize))
+  (slang-lsp-initialize)
+  )
 #+end_src
+
 
 **** GLSL
 #+begin_src emacs-lisp :noweb yes
