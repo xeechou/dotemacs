@@ -46,9 +46,80 @@
 	  (,usda-assetp-regexp . font-lock-constant-face)
 	  (,usda-comments-regexp . font-lock-comment-face))))
 
+(defvar usda-mode-syntax-table
+  (let ((table (make-syntax-table)))
+    ;; Make " punctuation ("." class) by default so it doesn't
+    ;; auto-start strings.  We handle all string delimiters via
+    ;; syntax-propertize instead.
+    (modify-syntax-entry ?\" "." table)
+    ;; # starts a line comment ("<" = comment-starter)
+    (modify-syntax-entry ?# "<" table)
+    ;; newline ends a line comment (">" = comment-ender)
+    (modify-syntax-entry ?\n ">" table)
+    ;; Paired delimiters for paren-matching, indentation, and sexp navigation.
+    ;; "(" class = open paren, ")" class = close paren;
+    ;; the second character is the matching counterpart.
+    (modify-syntax-entry ?\( "()" table)   ; ( matches )
+    (modify-syntax-entry ?\) ")(" table)   ; ) matches (
+    (modify-syntax-entry ?\{ "(}" table)   ; { matches }
+    (modify-syntax-entry ?\} "){" table)   ; } matches {
+    (modify-syntax-entry ?\[ "(]" table)   ; [ matches ]
+    (modify-syntax-entry ?\] ")[" table)   ; ] matches [
+    table)
+  "Syntax table for `usda-mode'.")
+
+(defvar usda-syntax-propertize-function
+  (syntax-propertize-rules
+   ;; Triple-quoted strings: """..."""
+   ("\"\"\"" (0 (ignore (usda-syntax-stringify))))
+   ;; Regular double-quoted strings: "..."
+   ("\"" (0 (ignore (usda-syntax-stringify-single)))))
+  "Syntax propertize rules for strings in USDA.")
+
+(defun usda-syntax-stringify ()
+  "Put `syntax-table' property on triple-quoted strings."
+  (let* ((ppss (save-excursion
+                 (backward-char 3)
+                 (syntax-ppss)))
+         (in-string (nth 3 ppss)))
+    (if in-string
+        ;; We're closing a triple-quoted string.
+        ;; The last quote of the closing """ gets string-fence (|).
+        (put-text-property (1- (point)) (point)
+                           'syntax-table (string-to-syntax "|"))
+      ;; We're opening a triple-quoted string.
+      ;; The first quote of the opening """ gets string-fence (|).
+      (put-text-property (- (point) 3) (- (point) 2)
+                         'syntax-table (string-to-syntax "|")))))
+
+(defun usda-syntax-stringify-single ()
+  "Put `syntax-table' property on regular double-quoted strings.
+Only applies when not already inside a triple-quoted string."
+  (let* ((ppss (save-excursion
+                 (backward-char 1)
+                 (syntax-ppss)))
+         (in-string (nth 3 ppss)))
+    (unless (eq in-string t)  ; not inside a string-fence (triple-quoted) string
+      ;; Mark this quote as a regular string delimiter
+      (put-text-property (1- (point)) (point)
+                         'syntax-table (string-to-syntax "\"")))))
+
 ;; code mostly took from https://www.omarpolo.com/post/writing-a-major-mode.html
 (defun usda-indent-line ()
-  "Indent current line."
+  "Indent current line.
+
+Algorithm:
+1. Move to the first non-whitespace character on the line.
+2. Use `syntax-ppss' to get the paren/brace/bracket nesting depth
+   at that position — this becomes the base indentation level.
+3. If the line is empty and the cursor wasn't at the indentation
+   point, don't indent (set level to 0).
+4. If the first non-whitespace character is a closing delimiter
+   (`)' `}' `]'), subtract 1 from the level so it aligns with
+   its matching opener rather than the content inside.
+5. Replace all leading whitespace with (level × tab-width) spaces.
+6. If the cursor was at the indentation point when invoked, move
+   it to the end of line after re-indenting."
   (let (indent
 	boi-p                           ;begin of indent
 	move-eol-p
@@ -85,8 +156,9 @@
   (add-to-list 'auto-mode-alist '("\\.usd\\'" . usda-mode)))
 
 ;;;###autoload
-(define-derived-mode usda-mode c-mode "USDa"
-  "Major mode for editing USD's ascii representation"
+(define-derived-mode usda-mode prog-mode "USDa"
+  "Major mode for editing USD's ascii representation."
+  :syntax-table usda-mode-syntax-table
   (setq font-lock-defaults '((usda-font-lock-keywords)))
   ;; comments
   (setq-local comment-start "#")
@@ -95,6 +167,6 @@
   (setq-local indent-line-function #'usda-indent-line)
   (setq-local indent-tabs-mode nil)
   (setq-local tab-width 4)
-  )
+  (setq-local syntax-propertize-function usda-syntax-propertize-function))
 
 (provide 'usda-mode)
