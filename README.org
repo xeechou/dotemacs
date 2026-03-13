@@ -1919,6 +1919,15 @@ Use SRC-BUFFER as buffer containing local variables."
 
 Finally we can define a front-end.
 
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+((eq major-mode 'slang-mode)
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "slangc"
+                          :supports-asm t
+                          :supports-disass nil
+                          :compile-cmd-function #'my/slang-rmsbolt-compile-cmd
+                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
+#+end_src
 **** GLSL
 Let's allow extra args in the loop
 #+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
