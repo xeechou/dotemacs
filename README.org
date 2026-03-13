@@ -1862,6 +1862,38 @@ NonSemantic.Shader.DebugInfo.100 to map assembly to source lines."
     (nreverse result)))
 #+end_src
 
+***** extra compiler arguments
+
+Both ~slangc~ and ~glslangValidator~ compile commands support additional arguments via buffer-local variables. This is useful for passing project-specific flags (e.g. include paths, defines) from ~.dir-locals.el~.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(defun my/rmsbolt-extra-args-safe-p (val)
+  "Return non-nil if VAL is nil, a string, or a list of strings."
+  (or (null val)
+      (stringp val)
+      (and (listp val) (cl-every #'stringp val))))
+
+(defun my/rmsbolt-extra-args-to-list (args)
+  "Normalize ARGS to a list of strings.
+ARGS can be nil, a string, or a list of strings."
+  (cond
+   ((null args) nil)
+   ((stringp args) (list args))
+   ((listp args) args)))
+
+(defvar-local rmsbolt-slang-extra-args nil
+  "Extra command-line arguments for slangc.
+Either a single string or a list of strings.
+Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
+(put 'rmsbolt-slang-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)
+#+end_src
+
+For example, in a project's ~.dir-locals.el~:
+#+begin_src emacs-lisp :tangle no
+((slang-mode . ((rmsbolt-slang-extra-args . ("-I./shaders/include" "-DUSE_BINDLESS=1"))))
+ (glsl-mode  . ((rmsbolt-glsl-extra-args  . ("-I./shaders/include")))))
+#+end_src
+
 ***** compiler
 Then we use ~slangc~ to compile to SPIR-V assembly with debug info (~-target spirv-asm -g2~). 
 
@@ -1872,29 +1904,31 @@ Use SRC-BUFFER as buffer containing local variables."
   (rmsbolt--with-local-files
    src-buffer
    (let* ((cmd (buffer-local-value 'rmsbolt-command src-buffer))
+          (extra (my/rmsbolt-extra-args-to-list
+                  (buffer-local-value 'rmsbolt-slang-extra-args src-buffer)))
           (cmd (string-join
-                (list cmd
-                      src-filename
-                      "-target" "spirv-asm"
-                      "-g2"
-                      "-o" output-filename)
+                (append (list cmd
+                              src-filename
+                              "-target" "spirv-asm"
+                              "-g2")
+                        extra
+                        (list "-o" output-filename))
                 " ")))
      cmd)))
 #+end_src
 
 Finally we can define a front-end.
 
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
-((eq major-mode 'slang-mode)
- (setq rmsbolt-language-descriptor
-       (make-rmsbolt-lang :compile-cmd "slangc"
-                          :supports-asm t
-                          :supports-disass nil
-                          :compile-cmd-function #'my/slang-rmsbolt-compile-cmd
-                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))  
+**** GLSL
+Let's allow extra args in the loop
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(defvar-local rmsbolt-glsl-extra-args nil
+  "Extra command-line arguments for glslangValidator.
+Either a single string or a list of strings.
+Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
+(put 'rmsbolt-glsl-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)  
 #+end_src
 
-**** GLSL
 #+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
 (defun my/rmsbolt-glsl-compile-cmd (&key src-buffer)
   "Process a compile command for glslangValidator.
@@ -1904,10 +1938,14 @@ Use SRC-BUFFER as buffer containing local variables."
    src-buffer
    (let* ( ;; Turn off passing the source file if we find compile_commands
           (cmd (buffer-local-value 'rmsbolt-command src-buffer))
+          (extra (my/rmsbolt-extra-args-to-list
+                  (buffer-local-value 'rmsbolt-glsl-extra-args src-buffer)))
           (cmd (string-join
-                (list cmd
-                      "-gV" "--spirv-dis" src-filename "-H"
-                      ">" output-filename)
+                (append (list cmd
+                              "-gV" "--spirv-dis")
+                        extra
+                        (list src-filename "-H"
+                              ">" output-filename))
                 " ")))
      cmd)))
 #+end_src
