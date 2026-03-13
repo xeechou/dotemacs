@@ -1974,6 +1974,39 @@ dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of dem
 ((c-mode c-ts-mode)     . eglot-ensure)
 #+end_src
 
+**** [[https://github.com/andreasfertig/cppinsights][C++ Insights]]
+#+begin_src emacs-lisp
+(use-package cppinsights
+  :when (executable-find "insights")
+  :pin melpa :defer t
+  :commands cppinsights-run
+  :custom
+  (cppinsights-program "insights")
+)
+#+end_src
+
+On mac it's installed by ~brew install cppinsights~ which uses llvm@20. It does not work on mac mostly I almost always got this compilation issue:
+
+#+begin_src log :tangle no
+In file included from /opt/homebrew/Cellar/llvm@20/20.1.8/include/c++/v1/cwchar:117:
+In file included from /opt/homebrew/Cellar/llvm@20/20.1.8/include/c++/v1/wchar.h:122:
+/opt/homebrew/Cellar/llvm@20/20.1.8/include/c++/v1/__mbstate_t.h:51:4: error: "We don't know how to get the definition of mbstate_t without <wchar.h> on your platform."
+   51 | #  error "We don't know how to get the definition of mbstate_t without <wchar.h> on your platform."  
+#+end_src
+
+The following trick did not work either.
+
+#+begin_src emacs-lisp :tangle no
+(setq cppinsights-extra-args
+      '("-isystem/usr/local/include"
+        "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1"
+        "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include"
+        "-isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+        "-isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include")
+      )
+#+end_src
+
+
 *** Python
 **** company mode :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
