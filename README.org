@@ -1764,6 +1764,7 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
    ;;compiler explorer in emacs
   (use-package rmsbolt   :ensure t :defer t
     :init
+    <<RMSBOLT_COMPILERS>>
     (defun my/cc-ts-rmsbolt-hook ()
       ;;setup languages
       (cond
@@ -1773,47 +1774,127 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
     (rmsbolt-mode . my/cc-ts-rmsbolt-hook))
 #+end_src
 
+**** c/c++ using clang++ directly (default was gcc)
 Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linux and windows.
+
 #+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
-  ;; cond
-  ((or (eq major-mode 'c-ts-mode)
-       (eq major-mode 'c-mode))
-   (setq rmsbolt-language-descriptor
-         (make-rmsbolt-lang :compile-cmd "clang"
-                            :supports-asm t
-                            :supports-disass t
-                            :demangler "llvm-cxxfilt"
-                            :compile-cmd-function #'rmsbolt--c-compile-cmd
-                            :disass-hidden-funcs
-                            rmsbolt--hidden-func-c)))
+;; cond
+((or (eq major-mode 'c-ts-mode)
+     (eq major-mode 'c-mode))
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "clang"
+                          :supports-asm t
+                          :supports-disass t
+                          :demangler "llvm-cxxfilt"
+                          :compile-cmd-function #'rmsbolt--c-compile-cmd
+                          :disass-hidden-funcs
+                          rmsbolt--hidden-func-c)))
 
-  ((or (eq major-mode 'c++-ts-mode)
-       (eq major-mode 'c++-mode))
-   (setq rmsbolt-language-descriptor
-         (make-rmsbolt-lang :compile-cmd "clang++"
-                            :supports-asm t
-                            :supports-disass t
-                            :demangler "llvm-cxxfilt"
-                            :compile-cmd-function #'rmsbolt--c-compile-cmd
-                            :disass-hidden-funcs rmsbolt--hidden-func-c)))  
+((or (eq major-mode 'c++-ts-mode)
+     (eq major-mode 'c++-mode))
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "clang++"
+                          :supports-asm t
+                          :supports-disass t
+                          :demangler "llvm-cxxfilt"
+                          :compile-cmd-function #'rmsbolt--c-compile-cmd
+                          :disass-hidden-funcs rmsbolt--hidden-func-c)))  
 #+end_src
 
-**** TODO However for unknown reason. The [[https://github.com/emacsmirror/rmsbolt/blob/master/rmsbolt.el#L230][rmsbolt-line-mapping]] not working well on windows. We should probably disable this.
-**** TODO add shader languages like HLSL
-HLSL code can be compiled in this way
-#+begin_src shell
-dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of demangler
+**** Slang shader support
+***** line mapping
+
+The crucial piece is to generate *line-mapping* information for the target assembly. Line mapping is done by parsing ~DebugLine~ instructions from ~NonSemantic.Shader.DebugInfo.100~ and resolving ~OpConstant~ ID references to source line numbers.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(cl-defun my/rmsbolt-process-spirv-asm-lines (_src-buffer asm-lines)
+  "Process SPIR-V ASM-LINES to add source line properties.
+Parses OpConstant definitions and DebugLine instructions from
+NonSemantic.Shader.DebugInfo.100 to map assembly to source lines."
+  (let ((const-table (make-hash-table :test #'equal))
+        (source-linum nil)
+        (result nil))
+    ;; Pass 1: build constant table from OpConstant lines
+    ;; e.g. %uint_14 = OpConstant %uint 14
+    (dolist (line asm-lines)
+      (when (string-match
+             (rx bol (group "%" (1+ (not (any space)))) ; %id
+                 (1+ space) "=" (1+ space)
+                 "OpConstant" (1+ space)
+                 "%" (1+ (not (any space))) ; type like %uint or %int
+                 (1+ space)
+                 (group (opt "-") (1+ digit))  ; value (possibly negative)
+                 eol)
+             line)
+        (puthash (match-string 1 line)
+                 (string-to-number (match-string 2 line))
+                 const-table)))
+    ;; Pass 2: walk lines, track DebugLine and tag instructions
+    (dolist (line asm-lines)
+      (cond
+       ;; DebugLine: extract Line Start (2nd operand after DebugLine)
+       ;; e.g. %245 = OpExtInst %void %2 DebugLine %4 %uint_14 %uint_14 %uint_5 %uint_6
+       ((string-match
+         (rx "DebugLine" (1+ space)
+             "%" (1+ (not (any space)))       ; Source id
+             (1+ space)
+             (group "%" (1+ (not (any space)))); Line Start id
+             )
+         line)
+        (let ((line-start-id (match-string 1 line)))
+          (setq source-linum (gethash line-start-id const-table)))
+        (push line result))
+       ;; DebugNoLine or OpFunctionEnd: reset line mapping
+       ((or (string-match-p (rx "DebugNoLine") line)
+            (string-match-p (rx "DebugNoScope") line)
+            (string-match-p (rx bol "OpFunctionEnd") line))
+        (setq source-linum nil)
+        (push line result))
+       ;; Regular instruction lines: tag with source line if known
+       (t
+        (when source-linum
+          (add-text-properties 0 (length line)
+                               `(rmsbolt-src-line ,source-linum) line))
+        (push line result))))
+    (nreverse result)))
 #+end_src
 
-GLSL code can be compiled this way
-#+begin_src shell
-glslangValidator "-g" "--spirv-dis" "-o" /tmp/output.s example.glsl  
+***** compiler
+Then we use ~slangc~ to compile to SPIR-V assembly with debug info (~-target spirv-asm -g2~). 
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(cl-defun my/slang-rmsbolt-compile-cmd (&key src-buffer)
+  "Process a compile command for slangc -> SPIR-V assembly.
+Use SRC-BUFFER as buffer containing local variables."
+  (rmsbolt--with-local-files
+   src-buffer
+   (let* ((cmd (buffer-local-value 'rmsbolt-command src-buffer))
+          (cmd (string-join
+                (list cmd
+                      src-filename
+                      "-target" "spirv-asm"
+                      "-g2"
+                      "-o" output-filename)
+                " ")))
+     cmd)))
 #+end_src
 
-#+begin_src emacs-lisp
-(defun rmsbolt--glsl-compile-cmd (&key src-buffer)
+Finally we can define a front-end.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+((eq major-mode 'slang-mode)
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "slangc"
+                          :supports-asm t
+                          :supports-disass nil
+                          :compile-cmd-function #'my/slang-rmsbolt-compile-cmd
+                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))  
+#+end_src
+
+**** GLSL
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(defun my/rmsbolt-glsl-compile-cmd (&key src-buffer)
   "Process a compile command for glslangValidator.
-
 Use SRC-BUFFER as buffer containing local variables."
 
   (rmsbolt--with-local-files
@@ -1822,10 +1903,27 @@ Use SRC-BUFFER as buffer containing local variables."
           (cmd (buffer-local-value 'rmsbolt-command src-buffer))
           (cmd (string-join
                 (list cmd
-                      "-g" "--spirv-dis"
-                      "-o" output-filename src-filename)
+                      "-gV" "--spirv-dis" src-filename "-H"
+                      ">" output-filename)
                 " ")))
      cmd)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+((eq major-mode 'glsl-mode)
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "glslangValidator"
+                          :supports-asm t
+                          :supports-disass nil
+                          :compile-cmd-function #'my/rmsbolt-glsl-compile-cmd
+                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
+
+#+end_src
+
+**** TODO HLSL
+
+#+begin_src shell :tangle no
+dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of demangler
 #+end_src
 
 
