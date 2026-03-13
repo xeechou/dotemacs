@@ -1815,10 +1815,13 @@ NonSemantic.Shader.DebugInfo.100 to map assembly to source lines."
         (source-linum nil)
         (result nil))
     ;; Pass 1: build constant table from OpConstant lines
-    ;; e.g. %uint_14 = OpConstant %uint 14
+    ;; e.g.   %uint_14 = OpConstant %uint 14
+    ;; Note: (* space) needed because glslangValidator indents OpConstant
+    ;; lines, while slangc emits them at column 0.
     (dolist (line asm-lines)
       (when (string-match
-             (rx bol (group "%" (1+ (not (any space)))) ; %id
+             (rx bol (* space) ;; see comment above.
+                 (group "%" (1+ (not (any space)))) ; %id
                  (1+ space) "=" (1+ space)
                  "OpConstant" (1+ space)
                  "%" (1+ (not (any space))) ; type like %uint or %int
