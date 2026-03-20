@@ -1774,210 +1774,7 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
     (rmsbolt-mode . my/cc-ts-rmsbolt-hook))
 #+end_src
 
-**** c/c++ using clang++ directly (default was gcc)
-Language setups:  C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linux and windows.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
-;; cond
-((or (eq major-mode 'c-ts-mode)
-     (eq major-mode 'c-mode))
- (setq rmsbolt-language-descriptor
-       (make-rmsbolt-lang :compile-cmd "clang"
-                          :supports-asm t
-                          :supports-disass t
-                          :demangler "llvm-cxxfilt"
-                          :compile-cmd-function #'rmsbolt--c-compile-cmd
-                          :disass-hidden-funcs
-                          rmsbolt--hidden-func-c)))
-
-((or (eq major-mode 'c++-ts-mode)
-     (eq major-mode 'c++-mode))
- (setq rmsbolt-language-descriptor
-       (make-rmsbolt-lang :compile-cmd "clang++"
-                          :supports-asm t
-                          :supports-disass t
-                          :demangler "llvm-cxxfilt"
-                          :compile-cmd-function #'rmsbolt--c-compile-cmd
-                          :disass-hidden-funcs rmsbolt--hidden-func-c)))  
-#+end_src
-
-**** Slang shader support
-***** line mapping
-
-The crucial piece is to generate *line-mapping* information for the target assembly. Line mapping is done by parsing ~DebugLine~ instructions from ~NonSemantic.Shader.DebugInfo.100~ and resolving ~OpConstant~ ID references to source line numbers.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
-(cl-defun my/rmsbolt-process-spirv-asm-lines (_src-buffer asm-lines)
-  "Process SPIR-V ASM-LINES to add source line properties.
-Parses OpConstant definitions and DebugLine instructions from
-NonSemantic.Shader.DebugInfo.100 to map assembly to source lines."
-  (let ((const-table (make-hash-table :test #'equal))
-        (source-linum nil)
-        (result nil))
-    ;; Pass 1: build constant table from OpConstant lines
-    ;; e.g.   %uint_14 = OpConstant %uint 14
-    ;; Note: (* space) needed because glslangValidator indents OpConstant
-    ;; lines, while slangc emits them at column 0.
-    (dolist (line asm-lines)
-      (when (string-match
-             (rx bol (* space) ;; see comment above.
-                 (group "%" (1+ (not (any space)))) ; %id
-                 (1+ space) "=" (1+ space)
-                 "OpConstant" (1+ space)
-                 "%" (1+ (not (any space))) ; type like %uint or %int
-                 (1+ space)
-                 (group (opt "-") (1+ digit))  ; value (possibly negative)
-                 eol)
-             line)
-        (puthash (match-string 1 line)
-                 (string-to-number (match-string 2 line))
-                 const-table)))
-    ;; Pass 2: walk lines, track DebugLine and tag instructions
-    (dolist (line asm-lines)
-      (cond
-       ;; DebugLine: extract Line Start (2nd operand after DebugLine)
-       ;; e.g. %245 = OpExtInst %void %2 DebugLine %4 %uint_14 %uint_14 %uint_5 %uint_6
-       ((string-match
-         (rx "DebugLine" (1+ space)
-             "%" (1+ (not (any space)))       ; Source id
-             (1+ space)
-             (group "%" (1+ (not (any space)))); Line Start id
-             )
-         line)
-        (let ((line-start-id (match-string 1 line)))
-          (setq source-linum (gethash line-start-id const-table)))
-        (push line result))
-       ;; DebugNoLine or OpFunctionEnd: reset line mapping
-       ((or (string-match-p (rx "DebugNoLine") line)
-            (string-match-p (rx "DebugNoScope") line)
-            (string-match-p (rx bol "OpFunctionEnd") line))
-        (setq source-linum nil)
-        (push line result))
-       ;; Regular instruction lines: tag with source line if known
-       (t
-        (when source-linum
-          (add-text-properties 0 (length line)
-                               `(rmsbolt-src-line ,source-linum) line))
-        (push line result))))
-    (nreverse result)))
-#+end_src
-
-***** extra compiler arguments
-
-Both ~slangc~ and ~glslangValidator~ compile commands support additional arguments via buffer-local variables. This is useful for passing project-specific flags (e.g. include paths, defines) from ~.dir-locals.el~.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
-(defun my/rmsbolt-extra-args-safe-p (val)
-  "Return non-nil if VAL is nil, a string, or a list of strings."
-  (or (null val)
-      (stringp val)
-      (and (listp val) (cl-every #'stringp val))))
-
-(defun my/rmsbolt-extra-args-to-list (args)
-  "Normalize ARGS to a list of strings.
-ARGS can be nil, a string, or a list of strings."
-  (cond
-   ((null args) nil)
-   ((stringp args) (list args))
-   ((listp args) args)))
-
-(defvar-local rmsbolt-slang-extra-args nil
-  "Extra command-line arguments for slangc.
-Either a single string or a list of strings.
-Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
-(put 'rmsbolt-slang-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)
-#+end_src
-
-For example, in a project's ~.dir-locals.el~:
-#+begin_src emacs-lisp :tangle no
-((slang-mode . ((rmsbolt-slang-extra-args . ("-I./shaders/include" "-DUSE_BINDLESS=1"))))
- (glsl-mode  . ((rmsbolt-glsl-extra-args  . ("-I./shaders/include")))))
-#+end_src
-
-***** compiler
-Then we use ~slangc~ to compile to SPIR-V assembly with debug info (~-target spirv-asm -g2~). 
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
-(cl-defun my/slang-rmsbolt-compile-cmd (&key src-buffer)
-  "Process a compile command for slangc -> SPIR-V assembly.
-Use SRC-BUFFER as buffer containing local variables."
-  (rmsbolt--with-local-files
-   src-buffer
-   (let* ((cmd (buffer-local-value 'rmsbolt-command src-buffer))
-          (extra (my/rmsbolt-extra-args-to-list
-                  (buffer-local-value 'rmsbolt-slang-extra-args src-buffer)))
-          (cmd (string-join
-                (append (list cmd
-                              src-filename
-                              "-target" "spirv-asm"
-                              "-g2")
-                        extra
-                        (list "-o" output-filename))
-                " ")))
-     cmd)))
-#+end_src
-
-Finally we can define a front-end.
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
-((eq major-mode 'slang-mode)
- (setq rmsbolt-language-descriptor
-       (make-rmsbolt-lang :compile-cmd "slangc"
-                          :supports-asm t
-                          :supports-disass nil
-                          :compile-cmd-function #'my/slang-rmsbolt-compile-cmd
-                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
-#+end_src
-**** GLSL
-Let's allow extra args in the loop
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
-(defvar-local rmsbolt-glsl-extra-args nil
-  "Extra command-line arguments for glslangValidator.
-Either a single string or a list of strings.
-Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
-(put 'rmsbolt-glsl-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)  
-#+end_src
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
-(defun my/rmsbolt-glsl-compile-cmd (&key src-buffer)
-  "Process a compile command for glslangValidator.
-Use SRC-BUFFER as buffer containing local variables."
-
-  (rmsbolt--with-local-files
-   src-buffer
-   (let* ( ;; Turn off passing the source file if we find compile_commands
-          (cmd (buffer-local-value 'rmsbolt-command src-buffer))
-          (extra (my/rmsbolt-extra-args-to-list
-                  (buffer-local-value 'rmsbolt-glsl-extra-args src-buffer)))
-          (cmd (string-join
-                (append (list cmd
-                              "-gV" "--spirv-dis")
-                        extra
-                        (list src-filename "-H"
-                              ">" output-filename))
-                " ")))
-     cmd)))
-#+end_src
-
-#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
-((eq major-mode 'glsl-mode)
- (setq rmsbolt-language-descriptor
-       (make-rmsbolt-lang :compile-cmd "glslangValidator"
-                          :supports-asm t
-                          :supports-disass nil
-                          :compile-cmd-function #'my/rmsbolt-glsl-compile-cmd
-                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
-
-#+end_src
-
-**** TODO HLSL
-
-#+begin_src shell :tangle no
-dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of demangler
-#+end_src
-
-
-** Languages
+* Programming Languages
 ** C family
 #+begin_src emacs-lisp
   ;; C family
@@ -2056,6 +1853,325 @@ The following trick did not work either.
       )
 #+end_src
 
+*** RMSbolt setup
+C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linux and windows
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+;; cond
+((or (eq major-mode 'c-ts-mode)
+     (eq major-mode 'c-mode))
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "clang"
+                          :supports-asm t
+                          :supports-disass t
+                          :demangler "llvm-cxxfilt"
+                          :compile-cmd-function #'rmsbolt--c-compile-cmd
+                          :disass-hidden-funcs
+                          rmsbolt--hidden-func-c)))
+
+((or (eq major-mode 'c++-ts-mode)
+     (eq major-mode 'c++-mode))
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "clang++"
+                          :supports-asm t
+                          :supports-disass t
+                          :demangler "llvm-cxxfilt"
+                          :compile-cmd-function #'rmsbolt--c-compile-cmd
+                          :disass-hidden-funcs rmsbolt--hidden-func-c)))  
+#+end_src
+
+** slang
+#+begin_src emacs-lisp
+(use-package slang-mode
+  :when (executable-find "slangd")
+  :vc (:fetcher github :repo "K1ngst0m/slang-mode")
+  :defer t
+  :mode (("\\.slang\\'" . slang-mode)
+         ("\\.sl\\'" . slang-mode)
+         ("\\.slangh\\'" . slang-mode))
+  
+  :hook
+  (slang-mode . company-mode)
+  (slang-mode . (lambda () (my/merge-list-buffer-local
+                            'company-backends
+                            (list 'company-dabbrev 'company-capf))))
+
+  :config
+  (require 'slang-lsp)
+  (slang-lsp-initialize)
+  )
+#+end_src
+
+*** Rmsbolt support
+**** line mapping
+The crucial piece is to generate *line-mapping* information for the target assembly. Line mapping is done by parsing ~DebugLine~ instructions from ~NonSemantic.Shader.DebugInfo.100~ and resolving ~OpConstant~ ID references to source line numbers.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(cl-defun my/rmsbolt-process-spirv-asm-lines (_src-buffer asm-lines)
+  "Process SPIR-V ASM-LINES to add source line properties.
+Parses OpConstant definitions and DebugLine instructions from
+NonSemantic.Shader.DebugInfo.100 to map assembly to source lines."
+  (let ((const-table (make-hash-table :test #'equal))
+        (source-linum nil)
+        (result nil))
+    ;; Pass 1: build constant table from OpConstant lines
+    ;; e.g.   %uint_14 = OpConstant %uint 14
+    ;; Note: (* space) needed because glslangValidator indents OpConstant
+    ;; lines, while slangc emits them at column 0.
+    (dolist (line asm-lines)
+      (when (string-match
+             (rx bol (* space) ;; see comment above.
+                 (group "%" (1+ (not (any space)))) ; %id
+                 (1+ space) "=" (1+ space)
+                 "OpConstant" (1+ space)
+                 "%" (1+ (not (any space))) ; type like %uint or %int
+                 (1+ space)
+                 (group (opt "-") (1+ digit))  ; value (possibly negative)
+                 eol)
+             line)
+        (puthash (match-string 1 line)
+                 (string-to-number (match-string 2 line))
+                 const-table)))
+    ;; Pass 2: walk lines, track DebugLine and tag instructions
+    (dolist (line asm-lines)
+      (cond
+       ;; DebugLine: extract Line Start (2nd operand after DebugLine)
+       ;; e.g. %245 = OpExtInst %void %2 DebugLine %4 %uint_14 %uint_14 %uint_5 %uint_6
+       ((string-match
+         (rx "DebugLine" (1+ space)
+             "%" (1+ (not (any space)))       ; Source id
+             (1+ space)
+             (group "%" (1+ (not (any space)))); Line Start id
+             )
+         line)
+        (let ((line-start-id (match-string 1 line)))
+          (setq source-linum (gethash line-start-id const-table)))
+        (push line result))
+       ;; DebugNoLine or OpFunctionEnd: reset line mapping
+       ((or (string-match-p (rx "DebugNoLine") line)
+            (string-match-p (rx "DebugNoScope") line)
+            (string-match-p (rx bol "OpFunctionEnd") line))
+        (setq source-linum nil)
+        (push line result))
+       ;; Regular instruction lines: tag with source line if known
+       (t
+        (when source-linum
+          (add-text-properties 0 (length line)
+                               `(rmsbolt-src-line ,source-linum) line))
+        (push line result))))
+    (nreverse result)))
+#+end_src
+
+**** extra compiler arguments
+
+Both ~slangc~ and ~glslangValidator~ compile commands support additional arguments via buffer-local variables. This is useful for passing project-specific flags (e.g. include paths, defines) from ~.dir-locals.el~.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(defun my/rmsbolt-extra-args-safe-p (val)
+  "Return non-nil if VAL is nil, a string, or a list of strings."
+  (or (null val)
+      (stringp val)
+      (and (listp val) (cl-every #'stringp val))))
+
+(defun my/rmsbolt-extra-args-to-list (args)
+  "Normalize ARGS to a list of strings.
+ARGS can be nil, a string, or a list of strings."
+  (cond
+   ((null args) nil)
+   ((stringp args) (list args))
+   ((listp args) args)))
+
+(defvar-local rmsbolt-slang-extra-args nil
+  "Extra command-line arguments for slangc.
+Either a single string or a list of strings.
+Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
+(put 'rmsbolt-slang-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)
+#+end_src
+
+For example, in a project's ~.dir-locals.el~:
+#+begin_src emacs-lisp :tangle no
+((slang-mode . ((rmsbolt-slang-extra-args . ("-I./shaders/include" "-DUSE_BINDLESS=1"))))
+ (glsl-mode  . ((rmsbolt-glsl-extra-args  . ("-I./shaders/include")))))
+#+end_src
+
+**** compiler
+Then we use ~slangc~ to compile to SPIR-V assembly with debug info (~-target spirv-asm -g2~). 
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(cl-defun my/slang-rmsbolt-compile-cmd (&key src-buffer)
+  "Process a compile command for slangc -> SPIR-V assembly.
+Use SRC-BUFFER as buffer containing local variables."
+  (rmsbolt--with-local-files
+   src-buffer
+   (let* ((cmd (buffer-local-value 'rmsbolt-command src-buffer))
+          (extra (my/rmsbolt-extra-args-to-list
+                  (buffer-local-value 'rmsbolt-slang-extra-args src-buffer)))
+          (cmd (string-join
+                (append (list cmd
+                              src-filename
+                              "-target" "spirv-asm"
+                              "-g2")
+                        extra
+                        (list "-o" output-filename))
+                " ")))
+     cmd)))
+#+end_src
+
+Finally we can define a front-end.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+((eq major-mode 'slang-mode)
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "slangc"
+                          :supports-asm t
+                          :supports-disass nil
+                          :compile-cmd-function #'my/slang-rmsbolt-compile-cmd
+                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
+#+end_src
+
+** GLSL
+#+begin_src emacs-lisp :noweb yes
+  ;; glsl
+  (use-package glsl-mode
+    :ensure t
+    :defer t
+    :init
+    (defun my/glsl-mode-hook ()
+      <<GLSL_LSP>>
+        )
+    :mode (("\\.glsl\\'" . glsl-mode)
+           ("\\.vert\\'" . glsl-mode)
+           ("\\.frag\\'" . glsl-mode)
+           ("\\.geom\\'" . glsl-mode)
+           ("\\.comp\\'" . glsl-mode)
+           ("\\.rgen\\'" . glsl-mode)
+           ("\\.rchit\\'" . glsl-mode)
+           ("\\.rmiss\\'" . glsl-mode))
+    :hook
+    ((glsl-mode . company-mode)
+     (glsl-mode . my/glsl-mode-hook)))
+#+end_src
+
+GLSL has a language server ~company-glsl~
+#+begin_src emacs-lisp
+  (use-package company-glsl
+    :defer t
+    :ensure t
+    :after company)
+#+end_src
+
+It depends on ~glslangValidator~ to be available.
+#+begin_src emacs-lisp :tangle no :noweb-ref GLSL_LSP
+  (when (executable-find "glslangValidator")
+    (make-variable-buffer-local 'company-backends)
+    (add-to-list 'company-backends 'company-glsl))
+#+end_src
+
+*** RMSBOLT support
+Let's allow extra args in the loop
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(defvar-local rmsbolt-glsl-extra-args nil
+  "Extra command-line arguments for glslangValidator.
+Either a single string or a list of strings.
+Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
+(put 'rmsbolt-glsl-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)  
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_COMPILERS
+(defun my/rmsbolt-glsl-compile-cmd (&key src-buffer)
+  "Process a compile command for glslangValidator.
+Use SRC-BUFFER as buffer containing local variables."
+
+  (rmsbolt--with-local-files
+   src-buffer
+   (let* ( ;; Turn off passing the source file if we find compile_commands
+          (cmd (buffer-local-value 'rmsbolt-command src-buffer))
+          (extra (my/rmsbolt-extra-args-to-list
+                  (buffer-local-value 'rmsbolt-glsl-extra-args src-buffer)))
+          (cmd (string-join
+                (append (list cmd
+                              "-gV" "--spirv-dis")
+                        extra
+                        (list src-filename "-H"
+                              ">" output-filename))
+                " ")))
+     cmd)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref RMSBOLT_LANGS
+((eq major-mode 'glsl-mode)
+ (setq rmsbolt-language-descriptor
+       (make-rmsbolt-lang :compile-cmd "glslangValidator"
+                          :supports-asm t
+                          :supports-disass nil
+                          :compile-cmd-function #'my/rmsbolt-glsl-compile-cmd
+                          :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
+
+#+end_src
+
+
+** HLSL
+#+begin_src emacs-lisp :noweb yes
+  ;; hlsl
+  (use-package hlsl-mode
+    :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
+    :defer t
+    :mode (("\\.fxh\\'"    . hlsl-mode)
+           ("\\.hlsl\\'"   . hlsl-mode)
+           ("\\.vs\\'"     . hlsl-mode)
+           ("\\.ps\\'"     . hlsl-mode)
+           ("\\.hs\\'"     . hlsl-mode) ;;hull shader
+           ("\\.ds\\'"     . hlsl-mode) ;;domain shader
+           ("\\.cs\\'"     . hlsl-mode) ;;compute shader
+           ("\\.ms\\'"     . hlsl-mode) ;;mesh shader
+           ("\\.as\\'"     . hlsl-mode) ;;amplification shader
+           ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
+           )
+    :init
+    (defun my/hlsl-mode-hook ()
+      <<HLSL_LSP>>
+      )
+    :hook ((hlsl-mode . company-mode)
+           ;;TODO there is some bug on windows that :config block always run. I
+           ;;have to put it in hook
+           (hlsl-mode . my/hlsl-mode-hook)))
+#+end_src
+
+setup the slangd as language server if it's available
+#+begin_src emacs-lisp :tangle no :noweb-ref HLSL_LSP
+  (if (and (executable-find "slangd")
+           (eq major-mode 'hlsl-mode)) ;; only enables for hlsl-mode
+      ;;available
+      (progn
+        (eglot-ensure)
+        (add-to-list 'eglot-server-programs
+                     `(hlsl-mode . ("slangd")))
+        (add-to-list 'company-backends 'company-capf))
+    ;; not available
+    (my/merge-list-buffer-local 'company-backends
+                           (list 'company-keywords 'company-dabbrev)))
+#+end_src
+
+** AZSL
+Currently AZSL does not have a language server so no [[https://company-mode.github.io/manual/Backends.html#index-company_002dcapf][company-capf]] available. I only use [[https://company-mode.github.io/manual/Backends.html#index-company_002ddabbrev][company-dabbrev]] and [[https://company-mode.github.io/manual/Backends.html#index-company_002dkeywords][company-keywords]].
+
+#+begin_src emacs-lisp
+  (use-package azsl-mode
+    :vc (:fetcher github :repo "xeechou/azsl-mode.el")
+    :defer t
+    :mode (("\\.azsl\\'"  . azsl-mode)
+           ("\\.azsli\\'" . azsl-mode))
+    :hook ((azsl-mode . company-mode)))
+#+end_src
+
+** unity shaders
+
+#+begin_src emacs-lisp
+  (use-package shader-mode
+    :disabled
+    :mode (("\\.shader\\'" . hlsl-mode)))  
+#+end_src
+
 ** Python
 *** company mode :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
@@ -2108,129 +2224,6 @@ If using global pipx server, this can be done as well.
     :mode (("/meson\\.build\\'" . meson-mode))
     :hook ((meson-mode . company-mode))
     )
-#+end_src
-
-** Shader languages
-*** slang
-#+begin_src emacs-lisp
-(use-package slang-mode
-  :when (executable-find "slangd")
-  :vc (:fetcher github :repo "K1ngst0m/slang-mode")
-  :defer t
-  :mode (("\\.slang\\'" . slang-mode)
-         ("\\.sl\\'" . slang-mode)
-         ("\\.slangh\\'" . slang-mode))
-  
-  :hook
-  (slang-mode . company-mode)
-  (slang-mode . (lambda () (my/merge-list-buffer-local
-                            'company-backends
-                            (list 'company-dabbrev 'company-capf))))
-
-  :config
-  (require 'slang-lsp)
-  (slang-lsp-initialize)
-  )
-#+end_src
-
-*** GLSL
-#+begin_src emacs-lisp :noweb yes
-  ;; glsl
-  (use-package glsl-mode
-    :ensure t
-    :defer t
-    :init
-    (defun my/glsl-mode-hook ()
-      <<GLSL_LSP>>
-        )
-    :mode (("\\.glsl\\'" . glsl-mode)
-           ("\\.vert\\'" . glsl-mode)
-           ("\\.frag\\'" . glsl-mode)
-           ("\\.geom\\'" . glsl-mode)
-           ("\\.comp\\'" . glsl-mode)
-           ("\\.rgen\\'" . glsl-mode)
-           ("\\.rchit\\'" . glsl-mode)
-           ("\\.rmiss\\'" . glsl-mode))
-    :hook
-    ((glsl-mode . company-mode)
-     (glsl-mode . my/glsl-mode-hook)))
-#+end_src
-
-GLSL has a language server ~company-glsl~
-#+begin_src emacs-lisp
-  (use-package company-glsl
-    :defer t
-    :ensure t
-    :after company)
-#+end_src
-
-It depends on ~glslangValidator~ to be available.
-#+begin_src emacs-lisp :tangle no :noweb-ref GLSL_LSP
-  (when (executable-find "glslangValidator")
-    (make-variable-buffer-local 'company-backends)
-    (add-to-list 'company-backends 'company-glsl))
-#+end_src
-
-*** HLSL
-#+begin_src emacs-lisp :noweb yes
-  ;; hlsl
-  (use-package hlsl-mode
-    :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
-    :defer t
-    :mode (("\\.fxh\\'"    . hlsl-mode)
-           ("\\.hlsl\\'"   . hlsl-mode)
-           ("\\.vs\\'"     . hlsl-mode)
-           ("\\.ps\\'"     . hlsl-mode)
-           ("\\.hs\\'"     . hlsl-mode) ;;hull shader
-           ("\\.ds\\'"     . hlsl-mode) ;;domain shader
-           ("\\.cs\\'"     . hlsl-mode) ;;compute shader
-           ("\\.ms\\'"     . hlsl-mode) ;;mesh shader
-           ("\\.as\\'"     . hlsl-mode) ;;amplification shader
-           ("\\.lib\\'"    . hlsl-mode) ;;ray-tracing shader library
-           )
-    :init
-    (defun my/hlsl-mode-hook ()
-      <<HLSL_LSP>>
-      )
-    :hook ((hlsl-mode . company-mode)
-           ;;TODO there is some bug on windows that :config block always run. I
-           ;;have to put it in hook
-           (hlsl-mode . my/hlsl-mode-hook)))
-#+end_src
-
-setup the slangd as language server if it's available
-#+begin_src emacs-lisp :tangle no :noweb-ref HLSL_LSP
-  (if (and (executable-find "slangd")
-           (eq major-mode 'hlsl-mode)) ;; only enables for hlsl-mode
-      ;;available
-      (progn
-        (eglot-ensure)
-        (add-to-list 'eglot-server-programs
-                     `(hlsl-mode . ("slangd")))
-        (add-to-list 'company-backends 'company-capf))
-    ;; not available
-    (my/merge-list-buffer-local 'company-backends
-                           (list 'company-keywords 'company-dabbrev)))
-#+end_src
-
-*** AZSL
-Currently AZSL does not have a language server so no [[https://company-mode.github.io/manual/Backends.html#index-company_002dcapf][company-capf]] available. I only use [[https://company-mode.github.io/manual/Backends.html#index-company_002ddabbrev][company-dabbrev]] and [[https://company-mode.github.io/manual/Backends.html#index-company_002dkeywords][company-keywords]].
-
-#+begin_src emacs-lisp
-  (use-package azsl-mode
-    :vc (:fetcher github :repo "xeechou/azsl-mode.el")
-    :defer t
-    :mode (("\\.azsl\\'"  . azsl-mode)
-           ("\\.azsli\\'" . azsl-mode))
-    :hook ((azsl-mode . company-mode)))
-#+end_src
-
-*** unity shaders
-
-#+begin_src emacs-lisp
-  (use-package shader-mode
-    :disabled
-    :mode (("\\.shader\\'" . hlsl-mode)))  
 #+end_src
 
 ** Rust
