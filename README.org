@@ -1978,7 +1978,7 @@ dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of dem
 
 
 ** Languages
-*** C family
+** C family
 #+begin_src emacs-lisp
   ;; C family
   (use-package cc-mode
@@ -2014,7 +2014,7 @@ dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of dem
     ((c-mode-common . my/cmode-hook)
      ((c++-mode c++-ts-mode c-mode c-ts-mode) . my/cmode-company-hook)))
 #+end_src
-**** Setup company and eglot
+*** Setup company and eglot
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
 ((c++-mode c++-ts-mode c-mode c-ts-mode) . company-mode)
 #+end_src
@@ -2024,7 +2024,7 @@ dxc -Zi -Qembed_debug -Fc /tmp/output.s -Tps_6_6 example.hlsl #this lacks of dem
 ((c-mode c-ts-mode)     . eglot-ensure)
 #+end_src
 
-**** [[https://github.com/andreasfertig/cppinsights][C++ Insights]]
+*** [[https://github.com/andreasfertig/cppinsights][C++ Insights]]
 #+begin_src emacs-lisp
 (use-package cppinsights
   :when (executable-find "insights")
@@ -2056,9 +2056,8 @@ The following trick did not work either.
       )
 #+end_src
 
-
-*** Python
-**** company mode :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
+** Python
+*** company mode :: add ~python-ts-mode~, we use  ~company-capf~ by language servers.
 #+begin_src emacs-lisp :tangle no :noweb-ref COMPANY_HOOKS
 ((python-mode python-ts-mode) . company-mode)
 ;;don't forget adding company backends!!
@@ -2071,7 +2070,7 @@ The following trick did not work either.
 ((python-mode python-ts-mode) . eglot-ensure)
 #+end_src
 
-**** Setup [[https://journal.spencerwnelson.com/entries/emacs_virtualenv_lsp.html][Python virtualenvs]]
+*** Setup [[https://journal.spencerwnelson.com/entries/emacs_virtualenv_lsp.html][Python virtualenvs]]
 You also need the language servers available for Emacs, Emacs has to know when to find the packages, the best way is to setup per-project virtual environments, or you can setup the global virtual environments
 
 #+begin_src emacs-lisp
@@ -2092,7 +2091,7 @@ If using global pipx server, this can be done as well.
   pipx inject python-lsp-server [[your packages here]]
 #+end_src
 
-*** Build Scripts
+** Build Scripts
 #+begin_src emacs-lisp
   ;;cmake
   (use-package cmake-mode
@@ -2111,8 +2110,8 @@ If using global pipx server, this can be done as well.
     )
 #+end_src
 
-*** Shader languages
-**** slang
+** Shader languages
+*** slang
 #+begin_src emacs-lisp
 (use-package slang-mode
   :when (executable-find "slangd")
@@ -2134,8 +2133,7 @@ If using global pipx server, this can be done as well.
   )
 #+end_src
 
-
-**** GLSL
+*** GLSL
 #+begin_src emacs-lisp :noweb yes
   ;; glsl
   (use-package glsl-mode
@@ -2173,7 +2171,7 @@ It depends on ~glslangValidator~ to be available.
     (add-to-list 'company-backends 'company-glsl))
 #+end_src
 
-**** HLSL
+*** HLSL
 #+begin_src emacs-lisp :noweb yes
   ;; hlsl
   (use-package hlsl-mode
@@ -2215,7 +2213,7 @@ setup the slangd as language server if it's available
                            (list 'company-keywords 'company-dabbrev)))
 #+end_src
 
-**** AZSL
+*** AZSL
 Currently AZSL does not have a language server so no [[https://company-mode.github.io/manual/Backends.html#index-company_002dcapf][company-capf]] available. I only use [[https://company-mode.github.io/manual/Backends.html#index-company_002ddabbrev][company-dabbrev]] and [[https://company-mode.github.io/manual/Backends.html#index-company_002dkeywords][company-keywords]].
 
 #+begin_src emacs-lisp
@@ -2227,7 +2225,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
     :hook ((azsl-mode . company-mode)))
 #+end_src
 
-**** unity shaders
+*** unity shaders
 
 #+begin_src emacs-lisp
   (use-package shader-mode
@@ -2235,7 +2233,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
     :mode (("\\.shader\\'" . hlsl-mode)))  
 #+end_src
 
-*** Rust
+** Rust
 #+begin_src emacs-lisp
   (use-package rust-mode :ensure t :defer t
     :mode (("\\.rs\\'" . rust-mode))
@@ -2246,7 +2244,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
       (add-hook 'rust-ts-mode-hook 'eglot-ensure)))
 #+end_src
 
-*** Go Lang
+** Go Lang
 #+begin_src emacs-lisp
   ;; golang
   (use-package go-mode :ensure t :defer t
@@ -2254,7 +2252,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
            ("\\.mode\\'" . go-mode))
     :hook ((go-mode . (lambda () (add-hook 'before-save-hook 'gofmt-before-save nil t)))))
 #+end_src
-*** Web programmings
+** Web programmings
 #+begin_src emacs-lisp
   ;;javascript
   (use-package rjsx-mode
@@ -2292,7 +2290,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
            ("\\..setregpatch\\'" . json-mode)
            ("wireplumber\\.conf\\'" . json-mode)))
 #+end_src
-*** Flutter
+** Flutter
 #+begin_src emacs-lisp
   ;;dart
   (use-package dart-mode
@@ -2309,7 +2307,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
                                         :src-dir "lib/"))
     )
 #+end_src
-*** Beancount
+** Beancount
 The [[https://github.com/beancount/beancount][beancount]] is a text based double entry ledger system.
 #+begin_src emacs-lisp
   (use-package beancount
@@ -2339,7 +2337,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
   pipx inject --include-apps beancount fava
 #+end_src
 
-*** LEAN
+** LEAN
 #+begin_src emacs-lisp
 (use-package lean4-mode :ensure t :defer t
   :commands lean4-mode
@@ -2353,7 +2351,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 
 The org-babel is supported, see [[file:lisp/ob-lean4.el][ob-lean4.el]] and ~org-funcs-load-babel-compiler~ at [[file:lisp/org-funcs.el][org-funcs.el]]
 
-**** installing elan 
+*** installing elan 
 [[https://lean-lang.org/install/manual/][installing lean]] on Linux and Mac is through package manager
 #+begin_src bash :tangle no
 brew install elan-init #on Mac
@@ -2369,7 +2367,7 @@ powershell -ExecutionPolicy Bypass -f elan-init.ps1
 #remeber to add $HOME/.elan/bin to $PATH
 #+end_src
 
-**** using lake, the package manager
+*** using lake, the package manager
 ~lake~ is the lean package manager, you can use it create project and compile it
 #+begin_src bash :tangle no
 lake new /path/to/project
@@ -2383,7 +2381,7 @@ cd /path/to/project
 
 lake exe cache get
 #+end_src
-**** Mathlib
+*** Mathlib
 creating a project depend on mathlib
 #+begin_src bash :tangle no
 lake +leanprover-community/mathlib4:lean-toolchain new mathliblean-tutorial math  
@@ -2395,7 +2393,7 @@ curl -L https://raw.githubusercontent.com/leanprover-community/mathlib4/master/l
 lake update  
 #+end_src
 
-*** Other languages
+** Other languages
 #+begin_src emacs-lisp
 ;;lua
 (use-package lua-mode :ensure t :defer t
