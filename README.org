@@ -1326,11 +1326,14 @@ prerequisite : format-all
   (use-package difflib :ensure t :pin melpa :defer t)
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :noweb yes
 (use-package fmo-mode :ensure t :pin melpa
   :custom (fmo-ensure-formatters t)
   :hook (((c-mode c++-mode c-ts-mode c++-ts-mode) . fmo-mode)
-         ((hlsl-mode glsl-mode azsl-mode ) . fmo-mode)))
+         ((hlsl-mode glsl-mode azsl-mode ) . fmo-mode))
+  :config
+  <<FMO_LANGS>>
+  )
 #+end_src
 
 *** Clean up the white spaces
@@ -2028,6 +2031,31 @@ Finally we can define a front-end.
                           :compile-cmd-function #'my/slang-rmsbolt-compile-cmd
                           :process-asm-custom-fn #'my/rmsbolt-process-spirv-asm-lines)))
 #+end_src
+
+
+*** TODO Formatter setup
+This does not work for now because 1: ~(language-id-buffer)~ does not take slang, 2: format-all does not take "SLANG" as language either. I need to make a PR. 3: clang-format's hlsl mode is WIP.
+
+#+begin_src emacs-lisp :tangle no
+(setf (alist-get "SLANG" format-all-default-formatters nil nil #'equal) '(slang-format))
+
+(define-format-all-formatter slang-format
+			     (:executable "clang-format")
+			     (:install
+			      (macos "brew install clang-format")
+			      (windows "scoop install llvm"))
+			     (:languages "SLANG")
+			     (:features region)
+			     (:format
+			      (format-all--buffer-easy
+			       executable
+			       ;; override slang to format as hlsl code
+			       "-assume-filename" ".hlsl"
+			       (when region
+				 (list "--offset" (number-to-string (1- (car region)))
+				       "--length" (number-to-string (- (cdr region) (car region))))))))
+#+end_src
+
 
 ** GLSL
 #+begin_src emacs-lisp :noweb yes
