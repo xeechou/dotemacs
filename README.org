@@ -2101,7 +2101,7 @@ Let's allow extra args in the loop
 (defvar-local rmsbolt-glsl-extra-args nil
   "Extra command-line arguments for glslangValidator.
 Either a single string or a list of strings.
-Set via .dir-locals.el, e.g. \\='(\"-I./include\" \"-DFOO=1\").")
+Set via .dir-locals.el, e.g. \\=(slang-mode . (\"-I./include\" \"-DFOO=1\").")
 (put 'rmsbolt-glsl-extra-args 'safe-local-variable #'my/rmsbolt-extra-args-safe-p)  
 #+end_src
 
