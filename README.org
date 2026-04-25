@@ -1568,6 +1568,7 @@ treesit-auto does not work on windows at moment.
 #+begin_src emacs-lisp
 (use-package treesit-auto
     :unless (or (eq system-type 'windows-nt)
+		(eq system-type 'gnu/linux)  ;;the treesitter is broken at the moment
                 (not (treesit-available-p)))
     :ensure t
     :custom
