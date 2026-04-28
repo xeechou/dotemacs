@@ -2782,15 +2782,19 @@ I prefer the google genimi, set it to default if available
           :key my/llm-anthropic-key))
 #+end_src
 
-**** Ollama backend, run locally
+**** local AI
 Ollama backend runs locally on your pc
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
-  (when (and (my/test-port-open "127.0.0.1" 11434)
-             (boundp 'my/llm-ollama-model))
-    (gptel-make-ollama "Ollama"
-      :host "localhost:11434"
-      :stream t
-      :models `(,my/llm-ollama-model)))
+(when (and (boundp 'my/local-ai-url)
+	   (boundp 'my/local-ai-models))
+  (gptel-make-openai "LocalAI"
+    :host (substring my/local-ai-url (length "https://"))
+    :protocol "https"
+    :endpoint "/v1/chat/completions"
+    :key "dummy"
+    :stream t
+    :models my/local-ai-models)
+  )
 #+end_src
 **** Copilot chat
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
