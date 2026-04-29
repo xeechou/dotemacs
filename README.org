@@ -1829,14 +1829,15 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
 #+begin_src emacs-lisp
 (use-package cppinsights
   :when (executable-find "insights")
-  :pin melpa :defer t
+  :vc (:fetcher github :repo "xeechou/cppinsights.el")
+  :defer t
   :commands cppinsights-run
   :custom
   (cppinsights-program "insights")
   :config
   (when (eq system-type 'darwin)
     ;; For this to get correct headers from system, we need additional options
-    (setq cppinsights-clang-opts '("-sysroot" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"))
+    (setq cppinsights-clang-opts '("-isysroot" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"))
     )
 )
 #+end_src
