@@ -1880,12 +1880,25 @@ C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linu
   :mode (("\\.slang\\'" . slang-mode)
          ("\\.sl\\'" . slang-mode)
          ("\\.slangh\\'" . slang-mode))
+  :init
+  (defun my/slang-no-electric-indent-for-brackets (char)
+    "Prevent electric-indent from reindenting on [ and ] in `slang-mode'."
+    (when (memq char '(?\[ ?\]))
+      'no-indent))
   
   :hook
   (slang-mode . company-mode)
   (slang-mode . (lambda () (my/merge-list-buffer-local
                             'company-backends
                             (list 'company-dabbrev 'company-capf))))
+  ;; disable indentation for [] syntax
+  (slang-mode . (lambda ()
+		  (add-hook 'electric-indent-functions
+			    #'my/slang-no-electric-indent-for-brackets
+			    nil
+			    t)))
+  ;; disable format-all
+  (slang-mode . (lambda () (fmo-mode -1)))
 
   :config
   (require 'slang-lsp)
