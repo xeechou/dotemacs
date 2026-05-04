@@ -227,6 +227,15 @@ menu bar configuration. I disable tool bar and scroll bar for a minimalist look.
 (setq read-file-name-completion-ignore-case nil)
 #+end_src
 
+Disable changing font size by scrolling, using ~C-x C--~ and ~C-x C-+~ instead!!! Very easily meshed up with track-pad.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "<pinch>") 'ignore)
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
+  
+#+end_src
+
 ** Setup the default encoding environment
 #+begin_src emacs-lisp
 (setenv "LC_CTYPE" "en_US.UTF-8")
