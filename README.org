@@ -2841,7 +2841,10 @@ ECA is LSP protocol for llms
   (when (boundp 'my/llm-anthropic-key)
     (setenv "ANTHROPIC_API_KEY" my/llm-anthropic-key))
   (when (boundp 'my/llm-openai-key)
-    (setenv "OPENAI_API_KEY" my/llm-openai-key)))
+    (setenv "OPENAI_API_KEY" my/llm-openai-key))
+  (when (boundp 'my/llm-deepseek-key)
+    (setenv "DEEPSEEK_API_KEY" my/llm-deepseek-key))
+  )
 #+end_src
 
 *** Tools
