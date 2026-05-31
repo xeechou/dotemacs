@@ -1685,7 +1685,7 @@ simple text mode:
     :config
     ;;by default eglot forces company to only use company-capf, I lose a lot of
     ;;backends in this way
-    (setq eglot-stay-out-of '(company))
+    (setq eglot-stay-out-of '(company flymake))
     ;;eldoc's multi-line mini buffer is really annoying, turn it off
     (setq eldoc-echo-area-use-multiline-p nil)
     ;; clangd often mess around with headers, turn this off.
@@ -1705,6 +1705,18 @@ simple text mode:
                 ("C-c H"  . eldoc))
     )
 #+end_src
+
+*** [[https://github.com/flycheck/flycheck-eglot][Enable Flycheck for eglot as opposed flymake]]
+
+#+begin_src emacs-lisp
+(use-package flycheck-eglot :ensure t :pin melpa
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
+#+end_src
+
+We should also disable flymake by ~(setq eglot-stay-out-of '(company flymake))~, see [[https://utcc.utoronto.ca/~cks/space/blog/programming/EmacsLspModeToEglot][this blog]].
+
 
 ** Debugging with [[https://microsoft.github.io/debug-adapter-protocol//specification.html][debug adapter protocol]]
 *** [[https://github.com/svaante/dape][dape]] configs
