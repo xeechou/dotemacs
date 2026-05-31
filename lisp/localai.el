@@ -29,6 +29,25 @@ querying available models."
   :type 'string
   :group 'localai)
 
+(defun localai--models-endpoint (&optional base-url)
+  "Return the LocalAI models endpoint for BASE-URL.
+BASE-URL defaults to `localai-default-url`."
+  (let ((base (or base-url localai-default-url)))
+    (if (string-suffix-p "/" base)
+        (concat (substring base 0 -1) "/v1/models")
+      (concat base "/v1/models"))))
+
+;;;###autoload
+(defun localai-reachable-p (&optional base-url timeout)
+  "Return non-nil when LocalAI BASE-URL is reachable.
+BASE-URL defaults to `localai-default-url`. TIMEOUT is in seconds and
+defaults to 3. Reachability means the `/v1/models` endpoint responds
+with a parseable model list."
+  (let ((ids (condition-case nil
+                 (localai-get-models-sync base-url (or timeout 3))
+               (error nil))))
+    (and (listp ids) ids)))
+
 (defun localai--parse-buffer-for-data ()
   "Assume point is at beginning of buffer containing an HTTP response.
 Skip headers and parse the JSON body returning the parsed object.
@@ -74,10 +93,7 @@ query the /v1/models endpoint on the server. Returns a list of id strings
 or nil on error. If called interactively, prints the list in the echo area.
 TIMEOUT is the number of seconds to wait for a response (default 10)."
   (interactive)
-  (let* ((base (or base-url localai-default-url))
-         (endpoint (if (string-suffix-p "/" base)
-                       (concat (substring base 0 -1) "/v1/models")
-                     (concat base "/v1/models")))
+  (let* ((endpoint (localai--models-endpoint base-url))
          (timeout (or timeout 10))
          (url-request-extra-headers '(("Accept" . "application/json"))))
     (let ((buf (url-retrieve-synchronously endpoint t t timeout)))
@@ -106,10 +122,7 @@ nil on error).
 Example:
   (localai-get-models-async (lambda (ids) (message \"%S\" ids)))"
   (interactive (list (lambda (ids) (message "localai: %S" ids))))
-  (let* ((base (or base-url localai-default-url))
-         (endpoint (if (string-suffix-p "/" base)
-                       (concat (substring base 0 -1) "/v1/models")
-                     (concat base "/v1/models"))))
+  (let* ((endpoint (localai--models-endpoint base-url)))
     (let ((url-request-extra-headers '(("Accept" . "application/json"))))
       (url-retrieve
        endpoint

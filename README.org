@@ -2796,7 +2796,8 @@ I prefer the google genimi, set it to default if available
 Ollama backend runs locally on your pc
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (and (boundp 'my/local-ai-url)
-	   (boundp 'my/local-ai-models))
+           (boundp 'my/local-ai-models)
+           (localai-reachable-p my/local-ai-url))
   (gptel-make-openai "LocalAI"
     :host (substring my/local-ai-url (length "https://"))
     :protocol "https"
