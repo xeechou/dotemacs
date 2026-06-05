@@ -26,6 +26,7 @@ RUN apt-get update \
 # See debug-sshd-publickey.md for the full debugging story.
 RUN useradd --create-home --shell /bin/bash "${USERNAME}" \
     && mkdir -p /home/emacs/.emacs.d /home/emacs/org /home/emacs/org/pages /var/run/sshd \
+    && printf "%s\n" "alias emac='emacsclient -t'" >> /home/emacs/.bashrc \
     && chown -R "${USERNAME}:${USERNAME}" /home/emacs \
     && usermod -p '*' "${USERNAME}"
 
