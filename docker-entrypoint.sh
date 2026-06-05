@@ -36,21 +36,18 @@ if [ -n "${SSH_PRIVATE_KEY:-}" ]; then
     chown "${USERNAME}:${USERNAME}" "${PRIVATE_KEY_FILE}"
     chmod 600 "${PRIVATE_KEY_FILE}"
 
-    SSH_PRIVATE_KEY_SHA1="$(sha1sum "${PRIVATE_KEY_FILE}" | awk '{print $1}')"
-    echo "SSH_PRIVATE_KEY sha1=${SSH_PRIVATE_KEY_SHA1}"
 
     printf '%s\n' \
-        'Host *' \
-        '  IdentityFile ~/.ssh/id_git' \
-        '  IdentitiesOnly yes' \
-        > "${SSH_CONFIG_FILE}"
+	'Host *' \
+	'  IdentityFile ~/.ssh/id_git' \
+	'  IdentitiesOnly yes' \
+	> "${SSH_CONFIG_FILE}"
     chown "${USERNAME}:${USERNAME}" "${SSH_CONFIG_FILE}"
     chmod 600 "${SSH_CONFIG_FILE}"
 fi
 
 # Start emacs daemon so ssh clients can connect with emacsclient -t
 HOME="${USER_HOME}" sudo -u "${USERNAME}" emacs --daemon
-echo "alias=emac='emacsclient -t'" >> "${USER_HOME}/.bashrc"
 
 ssh-keygen -A
 exec /usr/sbin/sshd -D -e
