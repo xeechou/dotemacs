@@ -102,7 +102,10 @@ All my functions are defined with prefix ~my/~.
 (defun my/full-path ()
   "Copy the full path of the current buffer."
   (interactive)
-  (kill-new (buffer-file-name (window-buffer (minibuffer-selected-window)))))
+  (with-current-buffer (window-buffer (minibuffer-selected-window))
+    (kill-new (expand-file-name
+	       (or (buffer-file-name)
+                   default-directory)))))
 
 (defun my/test-port-open (host port)
   "Test if a TCP PORT at HOST is open."
