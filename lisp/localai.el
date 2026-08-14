@@ -37,14 +37,25 @@ BASE-URL defaults to `localai-default-url`."
         (concat (substring base 0 -1) "/v1/models")
       (concat base "/v1/models"))))
 
+(defun localai--build-headers (&optional api-key)
+  "Return an alist of HTTP headers for LocalAI requests.
+Always includes \"Accept: application/json\". When API-KEY is
+non-nil, adds an \"Authorization: Bearer <key>\" header."
+  (let ((headers '(("Accept" . "application/json"))))
+    (when api-key
+      (push (cons "Authorization" (format "Bearer %s" api-key))
+            headers))
+    headers))
+
 ;;;###autoload
-(defun localai-reachable-p (&optional base-url timeout)
+(defun localai-reachable-p (&optional base-url timeout api-key)
   "Return non-nil when LocalAI BASE-URL is reachable.
 BASE-URL defaults to `localai-default-url`. TIMEOUT is in seconds and
-defaults to 3. Reachability means the `/v1/models` endpoint responds
+defaults to 3. API-KEY, when non-nil, is sent as a Bearer token.
+Reachability means the `/v1/models` endpoint responds
 with a parseable model list."
   (let ((ids (condition-case nil
-                 (localai-get-models-sync base-url (or timeout 3))
+                 (localai-get-models-sync base-url (or timeout 3) api-key)
                (error nil))))
     (and (listp ids) ids)))
 
@@ -86,16 +97,17 @@ array of objects with an \"id\" key. Returns nil if nothing found."
                           items))))))
 
 ;;;###autoload
-(defun localai-get-models-sync (&optional base-url timeout)
+(defun localai-get-models-sync (&optional base-url timeout api-key)
   "Synchronously fetch model ids from BASE-URL (defaults to `localai-default-url`).
 BASE-URL should be the server base (no endpoint path). This function will
 query the /v1/models endpoint on the server. Returns a list of id strings
 or nil on error. If called interactively, prints the list in the echo area.
-TIMEOUT is the number of seconds to wait for a response (default 10)."
+TIMEOUT is the number of seconds to wait for a response (default 10).
+API-KEY, when non-nil, is sent as an \"Authorization: Bearer <key>\" header."
   (interactive)
   (let* ((endpoint (localai--models-endpoint base-url))
          (timeout (or timeout 10))
-         (url-request-extra-headers '(("Accept" . "application/json"))))
+         (url-request-extra-headers (localai--build-headers api-key)))
     (let ((buf (url-retrieve-synchronously endpoint t t timeout)))
       (if (not buf)
           (progn
@@ -114,16 +126,17 @@ TIMEOUT is the number of seconds to wait for a response (default 10)."
             (kill-buffer buf)))))))
 
 ;;;###autoload
-(defun localai-get-models-async (callback &optional base-url)
+(defun localai-get-models-async (callback &optional base-url api-key)
   "Asynchronously fetch model ids from BASE-URL (defaults to `localai-default-url`).
 BASE-URL should be the server base (no endpoint path). CALLBACK is a
 function of one argument which will be called with the list of ids (or
-nil on error).
+nil on error). API-KEY, when non-nil, is sent as an
+\"Authorization: Bearer <key>\" header.
 Example:
   (localai-get-models-async (lambda (ids) (message \"%S\" ids)))"
   (interactive (list (lambda (ids) (message "localai: %S" ids))))
   (let* ((endpoint (localai--models-endpoint base-url)))
-    (let ((url-request-extra-headers '(("Accept" . "application/json"))))
+    (let ((url-request-extra-headers (localai--build-headers api-key)))
       (url-retrieve
        endpoint
        (lambda (status)
