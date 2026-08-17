@@ -60,6 +60,7 @@ request/
 eca/eca.zip
 eca/eca
 eca/eca-version
+.eca/config.json
 
 # Dape files
 debug-adapters/

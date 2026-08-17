@@ -2811,20 +2811,39 @@ I prefer the google genimi, set it to default if available
 #+end_src
 
 **** local AI
-Ollama backend runs locally on your pc
-#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
-(when (and (boundp 'my/local-ai-url)
-           (boundp 'my/local-ai-models)
-           (localai-reachable-p my/local-ai-url))
-  (gptel-make-openai "LocalAI"
-    :host (substring my/local-ai-url (length "https://"))
-    :protocol "https"
-    :endpoint "/v1/chat/completions"
-    :key "dummy"
-    :stream t
-    :models my/local-ai-models)
-  )
+Define your own Open-AI API compatible AI providers like these
+#+begin_src emacs-lisp :tangle no
+(setq my/localai-providers
+      '((:name "provider 1"
+               :host  "https://provider1.url"
+               :endpoint "/v1/chat/completions"
+               :stream t
+               :key nil) ;;this one does not need any key
+        (:name "alt"
+               :host "https://provider2.url"
+               :endpoint "/v1/chat/completions"
+               :stream t
+               :key "sk-aabb-ccdd-eeff-gghh")))
 #+end_src
+
+Here we setup all of them for gptel
+
+#+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
+(when (boundp 'my/localai-providers)
+  (dolist (provider my/localai-providers)
+    ;;test if reachable in case if you need VPN
+    (when (localai-reachable-p (plist-get provider :host) nil (plist-get provider :key))
+      (gptel-make-openai
+          (plist-get provider :name)
+        :host     (substring (plist-get provider :host) (length "https://"))
+        :protocol "https"
+        :endpoint (plist-get provider :endpoint)
+        :key      (if (plist-get provider :key) (plist-get provider :key) "dummy")
+        :stream   (plist-get provider :stream)
+        :models   (localai-get-models-sync
+                   (plist-get provider :host) nil (plist-get provider :key))))))
+#+end_src
+
 **** Copilot chat
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_BACKENDS
 (when (boundp 'my/llm-copilot-key)
