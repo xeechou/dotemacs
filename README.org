@@ -1681,38 +1681,33 @@ simple text mode:
 
 #+begin_src emacs-lisp :noweb yes
 
-  ;; eglot configuration, switching to eglot after emacs 29
-  (use-package eglot
-    :ensure t :defer t
-    :hook (
-           <<EGLOT_HOOKS>>
-           )
-    :custom
-    (eglot-extend-to-xref t)
-    ;;inlay-hints are annoying
-    (eglot-ignored-server-capabilities '(:inlayHintProvider))
-    :config
-    ;;by default eglot forces company to only use company-capf, I lose a lot of
-    ;;backends in this way
-    (setq eglot-stay-out-of '(company flymake))
-    ;;eldoc's multi-line mini buffer is really annoying, turn it off
-    (setq eldoc-echo-area-use-multiline-p nil)
-    ;; clangd often mess around with headers, turn this off.
-    (add-to-list 'eglot-server-programs
-                 '((c++-mode c-mode c-ts-mode c++-ts-mode)
-                   . ("clangd"
-                      "-j=4"
-                      "--header-insertion=never"
-                      "--header-insertion-decorators=0")))
-    ;;C++ requires clangd, python requires python-language server
-    :bind (:map eglot-mode-map
-                ;; we just use the default binding here, so comment it out
-                ;; ("M-." . xref-find-definitions)
-                ;; ("M-?" . xref-find-references)
-                ;; ("M-," . xref-go-back)
-                ("C-c R"  . eglot-rename)
-                ("C-c H"  . eldoc))
-    )
+;; eglot configuration, switching to eglot after emacs 29
+(use-package eglot
+  :ensure t :defer t
+  :hook (
+         <<EGLOT_HOOKS>>
+         )
+  :custom
+  (eglot-extend-to-xref t)
+  ;;inlay-hints are annoying
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  :config
+  ;;by default eglot forces company to only use company-capf, I lose a lot of
+  ;;backends in this way
+  (setq eglot-stay-out-of '(company flymake))
+  ;;eldoc's multi-line mini buffer is really annoying, turn it off
+  (setq eldoc-echo-area-use-multiline-p nil)
+  ;; add-to-eglot-server-programs
+  <<EGLOT_SERVERS>>
+  ;;C++ requires clangd, python requires python-language server
+  :bind (:map eglot-mode-map
+              ;; we just use the default binding here, so comment it out
+              ;; ("M-." . xref-find-definitions)
+              ;; ("M-?" . xref-find-references)
+              ;; ("M-," . xref-go-back)
+              ("C-c R"  . eglot-rename)
+              ("C-c H"  . eldoc))
+  )
 #+end_src
 
 *** [[https://github.com/flycheck/flycheck-eglot][Enable Flycheck for eglot as opposed flymake]]
@@ -1850,10 +1845,22 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
 ((c++-mode c++-ts-mode c-mode c-ts-mode) . company-mode)
 #+end_src
 
+We exclude ~c-mode~ and ~c-ts-mode~ from ~eglot-ensure~ because ~slang-mode~ derives from ~c-mode~. When eglot starts clangd for a C/C++ buffer in a project, it registers the server in ~eglot--servers-by-project~ with managed modes including ~c-mode~. When a ~.slang~ file is opened in the same project, ~eglot--maybe-activate-editing-mode~ (on ~after-change-major-mode-hook~) calls ~eglot-current-server~, which finds clangd via ~eglot--servers-by-project~. The ~eglot--languageId~ predicate then checks ~provided-mode-derived-p~ — since ~slang-mode~ derives from ~c-mode~, it returns non-nil, so eglot thinks clangd can manage the slang buffer and activates ~eglot--managed-mode~ with clangd instead of slangd. Use ~c++-mode~ for C files.
+
 #+begin_src emacs-lisp :tangle no :noweb-ref EGLOT_HOOKS
 ((c++-mode c++-ts-mode) . eglot-ensure)
-((c-mode c-ts-mode)     . eglot-ensure)
 #+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref EGLOT_SERVERS
+(when (executable-find "clangd")
+  (add-to-list 'eglot-server-programs
+	       '((c++-mode c++-ts-mode)
+	         . ("clangd"
+		    "-j=4"
+		    "--header-insertion=never"
+		    "--header-insertion-decorators=0"))))
+#+end_src
+
 
 *** [[https://github.com/andreasfertig/cppinsights][C++ Insights]]
 #+begin_src emacs-lisp
@@ -1931,11 +1938,18 @@ C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linu
   ;; disable format-all
   (slang-mode . (lambda () (fmo-mode -1)))
 
-  :config
-  (require 'slang-lsp)
-  (slang-lsp-initialize)
+  (slang-mode . eglot-ensure)
   )
 #+end_src
+
+Do not use the buggy slang-lsp.el, we just setup the server here. The actual configuration need to go to ~eglot-workspace-configuration~ in ~.dir-locals.el~.
+
+#+begin_src emacs-lisp :tangle no :noweb-ref EGLOT_SERVERS
+(when (executable-find "slangd")
+  (add-to-list 'eglot-server-programs
+	       `((slang-mode) . (,(executable-find "slangd")))))
+#+end_src
+
 
 *** Rmsbolt support
 **** line mapping
