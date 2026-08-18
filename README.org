@@ -1246,15 +1246,18 @@ My setup uses ~run-with-timer~ every hour to check the if it's time to change th
 ** Ligature and font settings
 [[https://github.com/mickeynp/ligature.el][ligature]] is a typographical method to combine two or more glyphs or letters  to form a single glyph.
 
+Normally this requires "HARFBUZZ" feature set but on Mac it seemed to work without it. You can verify by toggle global switch ~global-ligature-mode~.
+
 #+begin_src emacs-lisp
-  (use-package ligature
-    :defer t
-    :vc (:fetcher github :repo "mickeynp/ligature.el")
-    :if (string-match "HARFBUZZ" system-configuration-features)
-    :hook ((prog-mode text-mode) . ligature-mode)
-    :config
-    ;; Enable "www" ligature in every possible major mode
-    (ligature-set-ligatures 't '("www")))  
+(use-package ligature
+  :defer t
+  :vc (:url "https://github.com/mickeynp/ligature.el")
+  :if (or (eq window-system 'ns)
+          (string-match "HARFBUZZ" system-configuration-features))
+  :hook ((prog-mode text-mode) . ligature-mode)
+  :config
+  ;; Enable "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www")))
 #+end_src
 
 I created a small package to manage my fixed width font(with ligature), proportional font, CJK font and emoji font.
