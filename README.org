@@ -282,7 +282,7 @@ copied from emacswiki
 ** [[https://github.com/baudtack/pomodoro.el][pomodoro.el]]
 #+begin_src emacs-lisp
   (use-package pomodoro :defer t
-    :vc (:fetcher github :repo "baudtack/pomodoro.el")
+    :vc (:url "https://github.com/baudtack/pomodoro.el")
     :commands pomodoro-start
     :custom
     (pomodoro-work-start-sound (expand-file-name "assets/stop1.mp3" (my/dotfile-dir)))
@@ -605,7 +605,7 @@ allows you to use fixed pitch (for code) and variable pitch (everything else) *I
 *** org-modern-indent
 #+begin_src emacs-lisp 
 (use-package org-modern-indent
-  :vc (:fetcher github :repo "jdtsmith/org-modern-indent")
+  :vc (:url "https://github.com/jdtsmith/org-modern-indent")
   :hook (org-modern-mode . org-modern-indent-mode)
   )
 #+end_src
@@ -843,7 +843,7 @@ The [[https://titan-c.gitlab.io/org-cv/][Org CV]] package helps manages the curr
 
 #+begin_src emacs-lisp
   (use-package ox-moderncv ;;TODO this is an exception to defer?
-    :vc (:fetcher github :repo "Titan-C/org-cv")
+    :vc (:url "https://github.com/Titan-C/org-cv")
     :init (require 'ox-moderncv))
 #+end_src
 
@@ -1291,7 +1291,7 @@ I created a small package to manage my fixed width font(with ligature), proporti
   :bind ("C-x g" . magit-status))
 
 (use-package ssh-agency
-  :vc (:fetcher github :repo "magit/ssh-agency")
+  :vc (:url "https://github.com/magit/ssh-agency")
   :hook (magit-credential . ssh-agency-ensure))
 #+end_src
 *** Projectile
@@ -1318,7 +1318,7 @@ There is not thing special here, we just add a key-map and use ~alien~ indexing 
 
 #+begin_src emacs-lisp
   (use-package color-rg
-    :vc (:fetcher github :repo "manateelazycat/color-rg")
+    :vc (:url "https://github.com/manateelazycat/color-rg")
     :config (when (eq system-type 'windows-nt)
               (setq color-rg-command-prefix "powershell"))
     :custom (color-rg-search-no-ignore-file nil))
@@ -1389,7 +1389,7 @@ prerequisite : format-all
 *** fic-mode: keyword highlighting
 #+begin_src emacs-lisp
 (use-package fic-mode ;;show FIXME/TODO in comments
-  :vc (:fetcher github :repo "lewang/fic-mode")
+  :vc (:url "https://github.com/lewang/fic-mode")
   :diminish fic-mode
   :hook (prog-mode . fic-mode)
   :custom (fic-highlighted-words '("FIXME" "TODO" "BUG" "NOTE")))
@@ -1729,7 +1729,7 @@ We should also disable flymake by ~(setq eglot-stay-out-of '(company flymake))~,
 
 #+begin_src emacs-lisp
 (use-package dape :ensure t
-  :vc (:fetcher github :repo "svaante/dape")
+  :vc (:url "https://github.com/svaante/dape")
   :preface
   ;; By default dape shares the same keybinding prefix as `gud'
   ;; If you do not want to use any prefix, set it to nil.
@@ -1856,7 +1856,7 @@ RMSBolt mode mimics [[https://godbolt.org/][Compiler Explorer]] in Emacs. Making
 #+begin_src emacs-lisp
 (use-package cppinsights
   :when (executable-find "insights")
-  :vc (:fetcher github :repo "xeechou/cppinsights.el")
+  :vc (:url "https://github.com/xeechou/cppinsights.el")
   :defer t
   :commands cppinsights-run
   :custom
@@ -1903,7 +1903,7 @@ C and C++, we use ~clang++~ and ~llvm-cxfilt~. In this way it supports both Linu
 #+begin_src emacs-lisp
 (use-package slang-mode
   :when (executable-find "slangd")
-  :vc (:fetcher github :repo "K1ngst0m/slang-mode")
+  :vc (:url "https://github.com/K1ngst0m/slang-mode")
   :defer t
   :mode (("\\.slang\\'" . slang-mode)
          ("\\.sl\\'" . slang-mode)
@@ -2171,7 +2171,7 @@ Use SRC-BUFFER as buffer containing local variables."
 #+begin_src emacs-lisp :noweb yes
   ;; hlsl
   (use-package hlsl-mode
-    :vc (:fetcher github :repo "xeechou/hlsl-mode.el")
+    :vc (:url "https://github.com/xeechou/hlsl-mode.el")
     :defer t
     :mode (("\\.fxh\\'"    . hlsl-mode)
            ("\\.hlsl\\'"   . hlsl-mode)
@@ -2214,7 +2214,7 @@ Currently AZSL does not have a language server so no [[https://company-mode.gith
 
 #+begin_src emacs-lisp
   (use-package azsl-mode
-    :vc (:fetcher github :repo "xeechou/azsl-mode.el")
+    :vc (:url "https://github.com/xeechou/azsl-mode.el")
     :defer t
     :mode (("\\.azsl\\'"  . azsl-mode)
            ("\\.azsli\\'" . azsl-mode))
@@ -2362,7 +2362,7 @@ The [[https://github.com/beancount/beancount][beancount]] is a text based double
 #+begin_src emacs-lisp
   (use-package beancount
     :when (executable-find "bean-check")
-    :vc (:fetcher github :repo "beancount/beancount-mode")
+    :vc (:url "https://github.com/beancount/beancount-mode")
     :defer t
     :mode (("\\.beancount\\'" . beancount-mode))
     :config
@@ -2391,7 +2391,7 @@ I use [[https://github.com/pypa/pipx][pipx]] to install beancount locally, you c
 #+begin_src emacs-lisp
 (use-package lean4-mode :ensure t :defer t
   :commands lean4-mode
-  :vc (:fetcher "https://github.com/leanprover-community/lean4-mode.git"
+  :vc (:url "https://github.com/leanprover-community/lean4-mode.git"
        :rev :last-release
        ;; Or, if you prefer the bleeding edge version of Lean4-Mode:
        ;; :rev :newest
@@ -2477,7 +2477,7 @@ lake update
 (use-package groovy-mode :ensure t :defer t)
 (use-package jenkinsfile-mode
   :after groovy-mode
-  :vc (:fetcher github :repo "john2x/jenkinsfile-mode")
+  :vc (:url "https://github.com/john2x/jenkinsfile-mode")
   :mode (("Jenkinsfile\\'" . jenkinsfile-mode)))
 
 ;;universal scene descriptor
@@ -2691,7 +2691,7 @@ gptel [[https://github.com/karthink/gptel/wiki/Tools-collection][wiki]] has a co
 
 #+begin_src emacs-lisp
 (use-package llm-tool-collection :ensure t
-  :vc (:fetcher github :repo "skissue/llm-tool-collection" :rev :newest))
+  :vc (:url "https://github.com/skissue/llm-tool-collection" :rev :newest))
 #+end_src
 
 Then integrate with gptel
@@ -2924,20 +2924,20 @@ Install ~trafilatura~ with ~pipx install ~trafilatura~.
 #+begin_src emacs-lisp
 ;; install required inheritenv dependency:
 (use-package inheritenv
-  :vc (:fetcher github :repo "purcell/inheritenv" :rev :newest))
+  :vc (:url "https://github.com/purcell/inheritenv" :rev :newest))
 
 ;;Monet is an Emacs package that implements the (undocumented) Claude Code IDE
 ;;protocol, enabling Claude to interact with your Emacs environment through a
 ;;WebSocket connection.
 (use-package monet
-  :vc (:fetcher github :repo "stevemolitor/monet" :rev :newest))
+  :vc (:url "https://github.com/stevemolitor/monet" :rev :newest))
 
 ;; for eat terminal backend:
 (use-package eat :ensure t)
 
 (use-package claude-code :ensure t
   :when (executable-find "claude")
-  :vc (:fetcher github :repo "stevemolitor/claude-code.el" :rev :newest)  
+  :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest)  
 
   :config
   (setq claude-code-terminal-backend 'eat)
@@ -2965,7 +2965,7 @@ Install ~trafilatura~ with ~pipx install ~trafilatura~.
 [[https://github.com/garberw/openwith][openwith]] to open external program for file types.
 #+begin_src emacs-lisp
 (use-package openwith
-  :vc (:fetcher github :repo "garberw/openwith" :rev "master")
+  :vc (:url "https://github.com/garberw/openwith" :rev "master")
   :init (openwith-mode 1)
   :config (setq openwith-associations '(("\\.pdf\\'" "sioyek" (file)))))  
 #+end_src

@@ -56,13 +56,13 @@
   (use-package diminish :ensure t))
 
 ;; vc-use-package not yet available in 29, we need to enable it.
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
+(when (< emacs-major-version 30)
+  (message "minimum requirement is emacs-30")
+  (kill-emacs))
 
 ;; available in 29 by-default
 (eval-when-compile
-  (require 'use-package)
+  (require 'use-package) ;;built-in vc-package support
   (require 'bind-key)
   (require 'diminish)
   (require 'cl-lib))
