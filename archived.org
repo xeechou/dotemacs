@@ -122,7 +122,7 @@ disabled in favor of org-ql
   (use-package unity
     :disabled
     :defer t
-    :vc (:fetcher github :repo "elizagamedev/unity.Eli")
+    :vc (:url "https://github.com/elizagamedev/unity.Eli")
     :hook (after-init . unity-mode))  
 #+end_src
 
