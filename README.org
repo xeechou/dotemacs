@@ -1697,6 +1697,9 @@ simple text mode:
   (setq eglot-stay-out-of '(company flymake))
   ;;eldoc's multi-line mini buffer is really annoying, turn it off
   (setq eldoc-echo-area-use-multiline-p nil)
+  ;;eldoc sometimes pops up a separate *eldoc* doc buffer when the echo area
+  ;;isn't big enough; force everything into the minibuffer instead
+  (setq eldoc-display-functions '(eldoc-display-in-echo-area))
   ;; add-to-eglot-server-programs
   <<EGLOT_SERVERS>>
   ;;C++ requires clangd, python requires python-language server
