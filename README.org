@@ -2184,6 +2184,14 @@ Use SRC-BUFFER as buffer containing local variables."
 #+end_src
 
 
+** GLSL-fx
+#+begin_src emacs-lisp
+(use-package glslfx-mode
+  :defer t :load-path "lisp/"
+  :mode ("\\.glslfx\\'" . glslfx-mode))
+#+end_src
+
+
 ** HLSL
 #+begin_src emacs-lisp :noweb yes
   ;; hlsl
