@@ -70,3 +70,6 @@ dape-breakpoints
 # Tangled files
 README.el*
 
+
+# manually installed eca server binary (see eca use-package block)
+eca/

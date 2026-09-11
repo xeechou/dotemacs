@@ -177,6 +177,31 @@ Emacs inherits your proxy ~ENV~ such as ~http_proxy~ and ~https_proxy~. I have t
         (getenv "http_proxy")))
 #+end_src
 
+** Curl TLS sanity check
+Many packages shell out to ~curl~ (eca, gptel, ...) and all of them report a
+broken certificate store badly -- ~eca~ feeds curl's stderr to its JSON parser
+and complains about ~(json-parse-error 1 1 1)~, which tells you nothing.
+
+Hit it once after startup and let curl speak for itself.
+#+begin_src emacs-lisp
+  (defun my/curl-tls-check ()
+    "Warn if curl cannot verify TLS certificates."
+    (interactive)
+    (when-let* ((curl (executable-find "curl")))
+      (with-temp-buffer
+        ;; body goes to the null device, so the buffer collects only stderr
+        (let ((code (call-process curl nil t nil "-sS" "-I" "--max-time" "5"
+                                  "-o" null-device "https://github.com")))
+          ;; 35/60/77/83 are certificate failures; 6/7/28 just mean no network
+          (when (memq code (list 35 60 77 83))
+            (warn "curl cannot verify TLS certificates (exit %s):\n%s"
+                  code (string-trim (buffer-string))))))))
+
+  ;; on idle so it never delays startup
+  (add-hook 'emacs-startup-hook
+            (lambda () (run-with-idle-timer 5 nil #'my/curl-tls-check)))
+#+end_src
+
 ** Generate UUIDs
 #+begin_src emacs-lisp
   (use-package uuidgen :ensure t :defer t :pin melpa
