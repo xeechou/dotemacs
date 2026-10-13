@@ -1,5 +1,4 @@
-;;; appr.el --- manage your look/feel for Emacs -*- lexical-binding: t
-;;; -*-
+;;; appr.el --- manage your look/feel for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Xichen Zhou
 ;; Author: Xichen Zhou <sichem.zh@gmail.com>
@@ -134,7 +133,10 @@ inside FONT-LIST."
 ;; emoji font
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom appr-emoji-font-list '("Noto Color Emoji" "Symbola" "Apple Color Emoji")
+(defcustom appr-emoji-font-list '("Noto Color Emoji" ;;google fonts, preinstalled on most linux
+				   "Segoe UI Emoji" ;;builtin on windows
+				   "Symbola" ;;not builtin, third party
+				   "Apple Color Emoji") ;;builtin on macos
   "Supported CJK font"
   :group 'appr
   :type `(repeat (string :tag "Emoji Font")))
@@ -148,6 +150,38 @@ inside FONT-LIST."
 (defun appr-setup-emoji-font ()
   "Setup the Emoji font, RETURN t if succeed nil otherwise"
   (appr-setup-fontset-font appr-emoji-symbol-range appr-emoji-font-list))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; symbol font
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defcustom appr-symbol-font-list '("Noto Sans Symbols 2" ;;not builtin, google fonts
+				   "Segoe UI Symbol" ;;builtin on windows
+				   "Apple Symbols" ;;builtin on macos
+				   "Symbola") ;;not builtin, third party
+  "Supported symbol font, for the unicode symbols that are not
+covered by the main font (eg: the stopwatch and circle symbols
+used by eca-chat)."
+  :group 'appr
+  :type `(repeat (string :tag "Symbol Font")))
+
+(defcustom appr-symbol-font-ranges '((#x2300 . #x23ff) ;;misc technical
+				     (#x2600 . #x27bf) ;;misc symbols and dingbats
+				     (#x2b00 . #x2bff)) ;;misc symbols and arrows
+  "Symbol font ranges"
+  :group 'appr
+  :type '(repeat (cons integer integer)))
+
+;;TESTED
+(defun appr-setup-symbol-font ()
+  "Setup the symbol font, RETURN t if succeed nil otherwise"
+  (appr--setup-font-loop
+   #'(lambda (font)
+       (when (member font (font-family-list))
+	 (dolist (range appr-symbol-font-ranges)
+	   (set-fontset-font t range font))
+	 t))
+   appr-symbol-font-list))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; variable pitch font
@@ -182,6 +216,7 @@ inside FONT-LIST."
   (appr-setup-ligature-font)
   (appr-setup-cjk-font)
   (appr-setup-emoji-font)
+  (appr-setup-symbol-font)
   (appr-setup-variable-pitch-font))
 
 
