@@ -2844,6 +2844,16 @@ Then integrate with gptel
 #+end_src
 
 
+**** gptel-agent
+#+begin_src emacs-lisp
+(use-package gptel-agent
+  :vc ( :url "https://github.com/karthink/gptel-agent"
+        :rev :newest)
+  :config (gptel-agent-update))
+
+#+end_src
+
+
 
 *** Backends
 **** OpenAI key
