@@ -2819,14 +2819,19 @@ Then integrate with gptel
 #+begin_src emacs-lisp :tangle no :noweb-ref GPTEL_TOOLS
 (gptel-make-tool
  :name "get_youtube_transcript"
- :function (lambda (url)
+ :function (lambda (url &optional langs)
              (with-temp-buffer
-               (ytb-sub-dl-insert-transcript url)
+               (ytb-sub-dl-insert-transcript
+                url (and langs (not (string-empty-p langs)) langs))
                (buffer-substring-no-properties (point-min) (point-max))))
  :description "Getting the Youtube video transcript"
  :args (list '(:name "url"
                :type string
-               :description "The YouTube URL to download"))
+               :description "The YouTube URL to download")
+             '(:name "langs"
+               :type string
+               :optional t
+               :description "Subtitle language(s) for yt-dlp's --sub-lang option, e.g. \"en\", \"zh\", or a comma-separated priority list such as \"en-orig,en\" (the default)."))
  :category "web")
 #+end_src
 
