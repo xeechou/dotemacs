@@ -74,22 +74,9 @@ Emacs has two native-compilation modes and only one of them works out of the box
   #+end_src
 - *JIT* (just in time): compiling packages on the fly needs =libgccjit= at run time, which the official installers do not ship. Without it =native-comp-available-p= returns nil and the third-party packages (magit, vertico, company, ...) stay byte-compiled.
 
-Two ways to get the JIT half as well:
+ For some reason the windows build does not come with ~libgccjit-0.dll~, the method to resolve for me is through my [[https://github.com/xeechou/dotemacs-msbin][3rdparties]] binaries coming from *MSYS2-UCRT64* which installs ~libgccjit-0.dll~ and related ~x86_64-w64-mingw32-gcc-15.2.0.exe~ in the PATH.
 
-1. Install the MSYS2 build, it is configured with =--with-native-compilation=aot= and depends on =libgccjit=:
-   #+begin_src bash :tangle no
-   pacman -S mingw-w64-ucrt-x86_64-emacs
-   #+end_src
-2. Or graft =libgccjit= onto the official build, the existing =msys64= already carries gcc 15.2 and binutils so this is a 12MiB download:
-   #+begin_src bash :tangle no
-   pacman -S mingw-w64-ucrt-x86_64-libgccjit
-   #+end_src
-   #+begin_src powershell :tangle no
-   Copy-Item "C:\Softwares\msys64\ucrt64\bin\libgccjit-0.dll" "C:\Softwares\Emacs\emacs-31.1\bin\"
-   #+end_src
-   Native compilation also spawns the assembler, so append (do not prepend, the DotEmacs tools must keep priority) =C:\Softwares\msys64\ucrt64\bin= to the PATH Emacs sees, for example through the =*_BINPATH= mechanism of =load-env-paths=. Then =(native-comp-available-p)= returns =t= and packages JIT-compile into =eln-cache/= on first use. This combination is unsupported: if the DLL does not load the variable stays nil, remove the DLL and nothing is lost.
-
-When installing Emacs 31 pick the original =emacs-31.1= builds. The =emacs-31.1_1= rebuild was published after antivirus false-positive reports on the MINGW64 set and was built *without* gccjit/native compilation, so even the built-in lisp is plain byte-code there. The installers are signed by Corwin Brust, verify the download with:
+**** verify the Emacs install
 
 #+begin_src bash :tangle no
 gpg --keyserver keyserver.ubuntu.com --recv-keys ECE77CF417C76C1ACFCE7C2B5B6135511580F007
