@@ -42,6 +42,47 @@ On Linux, those run-time requires can be easily satisfied with package managers
 like =apt-get= or =dnf install=. On windows, it's another story, for this purpose,
 I maintain a [[https://github.com/xeechou/dotemacs-msbin][dotemacs-msbin]] for those dependencies on Windows.
 
+*** Windows performance tuning
+Emacs and especially Magit are noticeably slower on Windows than on Linux/MacOS, this is mostly the platform itself rather than the configuration:
+
+- Spawning a process on Windows costs about 100ms (measured with =git rev-parse=, against about 5ms on Linux). A =magit-status= refresh runs 5-15 =git= processes, so it pays 0.5-1.5s of pure spawn overhead on every refresh.
+- Windows Defender real-time protection scans every process spawn and every file I/O, stacking on top of that overhead.
+- Native compilation works only half way out of the box: the built-in lisp is AOT compiled, third-party packages are not, see [[*Native compilation on Windows][Native compilation on Windows]] below.
+
+Two one-time system tunings recover most of the gap:
+
+1. Let git use its built-in file-system monitor and untracked cache, this speeds up =git status= (which Magit runs on every refresh) on large repositories:
+   #+begin_src bash :tangle no
+   git config --global core.fsmonitor true
+   git config --global core.untrackedCache true
+   #+end_src
+
+2. Exclude Emacs, Git and this configuration from Windows Defender real-time scanning. This needs an administrator PowerShell and is a security trade-off, the excluded paths and processes are no longer scanned:
+   #+begin_src powershell :tangle no
+   Add-MpPreference -ExclusionPath "C:\Softwares\Emacs","C:\Softwares\Git","C:\Users\zhoux\.emacs.d"
+   Add-MpPreference -ExclusionProcess "emacs.exe","git.exe"
+   #+end_src
+
+For the Emacs-Lisp side of the Windows tuning (font cache compaction) see the [[*Windows performance settings][Windows performance settings]] section. To profile Magit refreshes, =(setq magit-refresh-verbose t)= prints per-git-command timings in =*Messages*=.
+
+**** Native compilation on Windows
+Emacs has two native-compilation modes and only one of them works out of the box on Windows:
+
+- *AOT* (ahead of time): the official GNU installers ship =*.eln= files under =lib/emacs/<version>/native-lisp/=. These load without =libgccjit=, so the built-in lisp (org, eglot, dired, ...) does run as native code. Check it with:
+  #+begin_src emacs-lisp :tangle no
+  (native-comp-function-p (symbol-function 'string-trim)) ;; => t
+  #+end_src
+- *JIT* (just in time): compiling packages on the fly needs =libgccjit= at run time, which the official installers do not ship. Without it =native-comp-available-p= returns nil and the third-party packages (magit, vertico, company, ...) stay byte-compiled.
+
+ For some reason the windows build does not come with ~libgccjit-0.dll~, the method to resolve for me is through my [[https://github.com/xeechou/dotemacs-msbin][3rdparties]] binaries coming from *MSYS2-UCRT64* which installs ~libgccjit-0.dll~ and related ~x86_64-w64-mingw32-gcc-15.2.0.exe~ in the PATH.
+
+**** verify the Emacs install
+
+#+begin_src bash :tangle no
+gpg --keyserver keyserver.ubuntu.com --recv-keys ECE77CF417C76C1ACFCE7C2B5B6135511580F007
+gpg --verify emacs-31.1-installer-UCRT64.exe.sig emacs-31.1-installer-UCRT64.exe
+#+end_src
+
 *** Binaries for MacOS
 On MacOS binaries can be installed using [[https://brew.sh/][Homebrew]]. You can use the following commands to setup
 #+begin_src bash :tangle no
@@ -262,6 +303,14 @@ Disable changing font size by scrolling, using ~C-x C--~ and ~C-x C-+~ instead!!
 (global-set-key (kbd "<C-wheel-up>") 'ignore)
 (global-set-key (kbd "<C-wheel-down>") 'ignore)
   
+#+end_src
+
+** Windows performance settings
+On Windows the GC compacts font caches, which causes visible redisplay and scrolling stutter, in particular with CJK/emoji/ligature fonts. See [[*Windows performance tuning][the Windows performance tuning notes]] for the system-level (git/Defender) side of the story.
+
+#+begin_src emacs-lisp
+(when (eq system-type 'windows-nt)
+  (setq inhibit-compacting-font-caches t))
 #+end_src
 
 ** Setup the default encoding environment

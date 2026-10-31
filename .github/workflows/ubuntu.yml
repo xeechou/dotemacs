@@ -18,7 +18,7 @@ jobs:
         uses: jcs090218/setup-emacs@master
         with:
           # The version of Emacs to install, e.g. "24.3", or "snapshot" for a recent development version.
-          version: 29.1
+          version: "31.1"
  
       - name: Install Dependencies
         run: sudo apt install -y cmake libxi-dev ninja-build  g++ cmake
