@@ -1655,28 +1655,29 @@ Hide show does not work with ~#ifdef~, the hideif package
 ** Tree-sitter
 [[https://tree-sitter.github.io/tree-sitter/][Tree-sitter]] is a new major mode managements package.
 
-*** Define indentation rules
+*** Define indentation rules (for C++-ts-mode)
 here is my custom rule just to disable namespace indentation ~(setq
 treesit--indent-verbose t)~ to see if your rule works ~(treesit-check-indent
 c++-mode)~ to check your rules against ~c++-mode~.
 
-#+begin_src emacs-lisp
-  (when (treesit-available-p)
-    (require 'treesit)
+Using ~(treesit-simple-indent-add-rules LANG RULES)~ to augment the indentation rules
 
-    (defun my/indent-rules ()
-      `(
-        ((n-p-gp "declaration" "declaration_list" "namespace_definition")
-         parent-bol 0)
-        ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
-        ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
-        ((n-p-gp "function_definition" "declaration_list" "namespace_definition")
-         parent-bol 0)
-        ((n-p-gp "template_declaration" "declaration_list" "namespace_definition")
-         parent-bol 0)
-        ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp)))
-      ))
-  #+end_src
+#+begin_src emacs-lisp
+(when (treesit-available-p)
+  (require 'treesit)
+
+(defun my/add-cpp-indent-overrides ()
+  (treesit-simple-indent-add-rules
+   'cpp
+   '(((n-p-gp "declaration" "declaration_list" "namespace_definition") parent-bol 0)
+     ((n-p-gp "comment" "declaration_list" "namespace_definition") parent-bol 0)
+     ((n-p-gp "class_specifier" "declaration_list" "namespace_definition") parent-bol 0)
+     ((n-p-gp "function_definition" "declaration_list" "namespace_definition") parent-bol 0)
+     ((n-p-gp "template_declaration" "declaration_list" "namespace_definition") parent-bol 0))
+   :before))
+
+(add-hook 'c++-ts-mode-hook #'my/add-cpp-indent-overrides)
+#+end_src
 
 The difficult thing is to setup the indentations. See [[https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html][gnu archive]] and this
 [[https://casouri.github.io/note/2023/tree-sitter-starter-guide/index.html#Indentation][blog-post]] is very useful.
@@ -1690,7 +1691,7 @@ treesit-auto does not work on windows at moment.
                 (not (treesit-available-p)))
     :ensure t
     :custom
-    (c-ts-mode-indent-style #'my/indent-rules)
+    (c-ts-mode-indent-style 'bsd)
     :hook ((after-init . treesit-auto-mode))
     :config
     (setq-default treesit-font-lock-level 3)
