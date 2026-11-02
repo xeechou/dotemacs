@@ -1676,7 +1676,7 @@ Using ~(treesit-simple-indent-add-rules LANG RULES)~ to augment the indentation 
      ((n-p-gp "template_declaration" "declaration_list" "namespace_definition") parent-bol 0))
    :before))
 
-(add-hook 'c++-ts-mode-hook #'my/add-cpp-indent-overrides)
+(add-hook 'c++-ts-mode-hook #'my/add-cpp-indent-overrides))
 #+end_src
 
 The difficult thing is to setup the indentations. See [[https://lists.gnu.org/archive/html/help-gnu-emacs/2023-08/msg00445.html][gnu archive]] and this
