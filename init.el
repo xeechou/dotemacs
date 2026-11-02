@@ -18,9 +18,8 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 ;; set for using native-compiled emacs
-(when (fboundp 'native-compiled-async)
-  (setq comp-deferred-compilation t
-	comp-deferred-compilation-black-list '("/mu4e.*\\.el$")))
+(when (fboundp 'native-compile-async)
+  (setq native-comp-jit-compilation-deny-list '("/mu4e.*\\.el$")))
 
 
 
